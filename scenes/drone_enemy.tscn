@@ -1,0 +1,147 @@
+[gd_scene load_steps=18 format=3 uid="uid://drone0000001"]
+
+[ext_resource type="Script" path="res://scripts/drone_enemy.gd" id="1_drone"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_root"]
+radius = 0.85
+
+[sub_resource type="StandardMaterial3D" id="Mat_DroneBody"]
+albedo_color = Color(0.25, 0.27, 0.29, 1)
+roughness = 0.55
+metallic = 0.2
+
+[sub_resource type="BoxMesh" id="Mesh_Fuselage"]
+material = SubResource("Mat_DroneBody")
+size = Vector3(0.28, 0.22, 1.35)
+
+[sub_resource type="StandardMaterial3D" id="Mat_DroneNose"]
+albedo_color = Color(0.18, 0.19, 0.2, 1)
+roughness = 0.4
+metallic = 0.4
+
+[sub_resource type="CylinderMesh" id="Mesh_NoseCone"]
+material = SubResource("Mat_DroneNose")
+top_radius = 0.04
+bottom_radius = 0.13
+height = 0.42
+radial_segments = 8
+
+[sub_resource type="StandardMaterial3D" id="Mat_DeltaWing"]
+albedo_color = Color(0.28, 0.3, 0.32, 1)
+roughness = 0.6
+metallic = 0.15
+
+[sub_resource type="BoxMesh" id="Mesh_DeltaWingMain"]
+material = SubResource("Mat_DeltaWing")
+size = Vector3(2.1, 0.045, 0.85)
+
+[sub_resource type="BoxMesh" id="Mesh_DeltaWingForward"]
+material = SubResource("Mat_DeltaWing")
+size = Vector3(1.2, 0.04, 0.6)
+
+[sub_resource type="BoxMesh" id="Mesh_WingFin"]
+material = SubResource("Mat_DeltaWing")
+size = Vector3(0.04, 0.32, 0.48)
+
+[sub_resource type="StandardMaterial3D" id="Mat_Engine"]
+albedo_color = Color(0.12, 0.12, 0.14, 1)
+metallic = 0.7
+roughness = 0.4
+
+[sub_resource type="CylinderMesh" id="Mesh_Engine"]
+material = SubResource("Mat_Engine")
+top_radius = 0.09
+bottom_radius = 0.09
+height = 0.22
+radial_segments = 8
+
+[sub_resource type="BoxMesh" id="Mesh_PropBlade"]
+material = SubResource("Mat_Engine")
+size = Vector3(0.55, 0.035, 0.015)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bg"]
+bg_color = Color(0.15, 0.15, 0.15, 0.8)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fg"]
+bg_color = Color(0.9, 0.2, 0.2, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_hp"]
+viewport_path = NodePath("SubViewport")
+
+[node name="DroneEnemy" type="CharacterBody3D" groups=["enemy"]]
+collision_layer = 2
+collision_mask = 7
+script = ExtResource("1_drone")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("SphereShape3D_root")
+
+[node name="Visuals" type="Node3D" parent="."]
+
+[node name="Fuselage" type="MeshInstance3D" parent="Visuals"]
+mesh = SubResource("Mesh_Fuselage")
+
+[node name="NoseCone" type="MeshInstance3D" parent="Visuals"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0.85)
+mesh = SubResource("Mesh_NoseCone")
+
+[node name="DeltaWing" type="MeshInstance3D" parent="Visuals"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.01, -0.15)
+mesh = SubResource("Mesh_DeltaWingMain")
+
+[node name="ForwardWing" type="MeshInstance3D" parent="Visuals"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.01, 0.28)
+mesh = SubResource("Mesh_DeltaWingForward")
+
+[node name="FinL" type="MeshInstance3D" parent="Visuals"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.03, 0.14, -0.18)
+mesh = SubResource("Mesh_WingFin")
+
+[node name="FinR" type="MeshInstance3D" parent="Visuals"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.03, 0.14, -0.18)
+mesh = SubResource("Mesh_WingFin")
+
+[node name="EngineNacelle" type="MeshInstance3D" parent="Visuals"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0.03, -0.68)
+mesh = SubResource("Mesh_Engine")
+
+[node name="Propeller" type="MeshInstance3D" parent="Visuals"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, -0.82)
+mesh = SubResource("Mesh_PropBlade")
+
+[node name="SubViewport" type="SubViewport" parent="."]
+transparent_bg = true
+size = Vector2i(100, 14)
+
+[node name="HealthBar" type="ProgressBar" parent="SubViewport"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_fg")
+max_value = 30.0
+value = 30.0
+show_percentage = false
+
+[node name="HealthBarSprite" type="Sprite3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.65, 0)
+billboard = 1
+texture = SubResource("ViewportTexture_hp")
+
+[node name="AudioEngine" type="AudioStreamPlayer3D" parent="."]
+unit_size = 8.0
+max_distance = 45.0
+
+[node name="AudioDive" type="AudioStreamPlayer3D" parent="."]
+unit_size = 14.0
+max_distance = 65.0

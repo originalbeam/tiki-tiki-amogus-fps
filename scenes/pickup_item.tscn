@@ -1,0 +1,103 @@
+[gd_scene load_steps=14 format=3 uid="uid://pickup0000001"]
+
+[ext_resource type="Script" path="res://scripts/pickup_item.gd" id="1_pickup"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_pickup"]
+radius = 0.85
+
+[sub_resource type="StandardMaterial3D" id="Mat_VestNavy"]
+albedo_color = Color(0.12, 0.18, 0.28, 1)
+roughness = 0.65
+
+[sub_resource type="StandardMaterial3D" id="Mat_VestPlate"]
+albedo_color = Color(0.22, 0.55, 0.85, 1)
+metallic = 0.6
+roughness = 0.3
+
+[sub_resource type="BoxMesh" id="Mesh_VestBody"]
+material = SubResource("Mat_VestNavy")
+size = Vector3(0.42, 0.46, 0.2)
+
+[sub_resource type="BoxMesh" id="Mesh_VestPlate"]
+material = SubResource("Mat_VestPlate")
+size = Vector3(0.26, 0.24, 0.04)
+
+[sub_resource type="BoxMesh" id="Mesh_VestPouch"]
+material = SubResource("Mat_VestNavy")
+size = Vector3(0.1, 0.12, 0.08)
+
+[sub_resource type="StandardMaterial3D" id="Mat_BandageWhite"]
+albedo_color = Color(0.92, 0.94, 0.95, 1)
+roughness = 0.8
+
+[sub_resource type="StandardMaterial3D" id="Mat_RedCross"]
+shading_mode = 0
+albedo_color = Color(0.95, 0.15, 0.15, 1)
+
+[sub_resource type="CylinderMesh" id="Mesh_BandageRoll"]
+material = SubResource("Mat_BandageWhite")
+top_radius = 0.14
+bottom_radius = 0.14
+height = 0.18
+radial_segments = 12
+
+[sub_resource type="BoxMesh" id="Mesh_CrossH"]
+material = SubResource("Mat_RedCross")
+size = Vector3(0.14, 0.02, 0.04)
+
+[sub_resource type="BoxMesh" id="Mesh_CrossV"]
+material = SubResource("Mat_RedCross")
+size = Vector3(0.04, 0.02, 0.14)
+
+[node name="PickupItem" type="Area3D"]
+collision_layer = 8
+collision_mask = 1
+script = ExtResource("1_pickup")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0)
+shape = SubResource("SphereShape3D_pickup")
+
+[node name="Visuals" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0)
+
+[node name="ArmorMesh" type="Node3D" parent="Visuals"]
+
+[node name="Body" type="MeshInstance3D" parent="Visuals/ArmorMesh"]
+mesh = SubResource("Mesh_VestBody")
+
+[node name="Plate" type="MeshInstance3D" parent="Visuals/ArmorMesh"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04, 0.1)
+mesh = SubResource("Mesh_VestPlate")
+
+[node name="PouchL" type="MeshInstance3D" parent="Visuals/ArmorMesh"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.12, -0.14, 0.11)
+mesh = SubResource("Mesh_VestPouch")
+
+[node name="PouchR" type="MeshInstance3D" parent="Visuals/ArmorMesh"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.12, -0.14, 0.11)
+mesh = SubResource("Mesh_VestPouch")
+
+[node name="OmniLight3D" type="OmniLight3D" parent="Visuals/ArmorMesh"]
+light_color = Color(0.3, 0.65, 1, 1)
+light_energy = 1.2
+omni_range = 2.5
+
+[node name="BandageMesh" type="Node3D" parent="Visuals"]
+visible = false
+
+[node name="Roll" type="MeshInstance3D" parent="Visuals/BandageMesh"]
+mesh = SubResource("Mesh_BandageRoll")
+
+[node name="Cross1" type="MeshInstance3D" parent="Visuals/BandageMesh"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.095, 0)
+mesh = SubResource("Mesh_CrossH")
+
+[node name="Cross2" type="MeshInstance3D" parent="Visuals/BandageMesh"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.095, 0)
+mesh = SubResource("Mesh_CrossV")
+
+[node name="OmniLight3D" type="OmniLight3D" parent="Visuals/BandageMesh"]
+light_color = Color(0.4, 1, 0.5, 1)
+light_energy = 1.0
+omni_range = 2.0

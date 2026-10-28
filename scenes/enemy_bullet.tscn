@@ -1,0 +1,33 @@
+[gd_scene load_steps=5 format=3 uid="uid://e1bullet00001"]
+
+[ext_resource type="Script" path="res://scripts/enemy_bullet.gd" id="1_bullet"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_laser"]
+shading_mode = 0
+albedo_color = Color(1, 0.2, 0.2, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_laser"]
+material = SubResource("StandardMaterial3D_laser")
+radius = 0.15
+height = 0.3
+radial_segments = 8
+rings = 4
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_laser"]
+radius = 0.2
+
+[node name="EnemyBullet" type="Area3D"]
+collision_layer = 4
+collision_mask = 3
+script = ExtResource("1_bullet")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("SphereMesh_laser")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("SphereShape3D_laser")
+
+[node name="OmniLight3D" type="OmniLight3D" parent="."]
+light_color = Color(1, 0.25, 0.25, 1)
+light_energy = 1.5
+omni_range = 2.5

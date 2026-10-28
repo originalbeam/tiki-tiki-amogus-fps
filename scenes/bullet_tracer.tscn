@@ -1,0 +1,18 @@
+[gd_scene load_steps=4 format=3 uid="uid://b1tracer00001"]
+
+[ext_resource type="Script" path="res://scripts/bullet_tracer.gd" id="1_tracer"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tracer"]
+shading_mode = 0
+albedo_color = Color(1, 0.88, 0.35, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_tracer"]
+material = SubResource("StandardMaterial3D_tracer")
+size = Vector3(0.015, 0.015, 1)
+
+[node name="BulletTracer" type="Node3D"]
+script = ExtResource("1_tracer")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.5)
+mesh = SubResource("BoxMesh_tracer")
