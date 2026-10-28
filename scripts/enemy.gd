@@ -175,21 +175,21 @@ func setup_weapon_visuals() -> void:
 func build_ak_visuals(parent: Node3D) -> void:
 	var mat_metal = StandardMaterial3D.new()
 	mat_metal.albedo_color = Color(0.18, 0.19, 0.22)
-	mat_metal.metallic = 0.85
-	mat_metal.roughness = 0.3
+	mat_metal.metallic = 0.88
+	mat_metal.roughness = 0.32
 	
 	var mat_wood = StandardMaterial3D.new()
-	mat_wood.albedo_color = Color(0.48, 0.22, 0.1)
-	mat_wood.roughness = 0.6
+	mat_wood.albedo_color = Color(0.48, 0.22, 0.10)
+	mat_wood.roughness = 0.55
 	
-	var mat_mag = StandardMaterial3D.new()
-	mat_mag.albedo_color = Color(0.68, 0.3, 0.12)
-	mat_mag.roughness = 0.5
+	var mat_grip = StandardMaterial3D.new()
+	mat_grip.albedo_color = Color(0.38, 0.18, 0.10)
+	mat_grip.roughness = 0.45
 	
 	# Receiver
 	var rec = MeshInstance3D.new()
 	var rec_m = BoxMesh.new()
-	rec_m.size = Vector3(0.08, 0.1, 0.38)
+	rec_m.size = Vector3(0.065, 0.08, 0.34)
 	rec.mesh = rec_m
 	rec.material_override = mat_metal
 	parent.add_child(rec)
@@ -197,79 +197,100 @@ func build_ak_visuals(parent: Node3D) -> void:
 	# Barrel
 	var bar = MeshInstance3D.new()
 	var bar_m = CylinderMesh.new()
-	bar_m.top_radius = 0.02
-	bar_m.bottom_radius = 0.02
-	bar_m.height = 0.38
+	bar_m.top_radius = 0.014
+	bar_m.bottom_radius = 0.014
+	bar_m.height = 0.36
 	bar.mesh = bar_m
 	bar.material_override = mat_metal
 	bar.rotation.x = deg_to_rad(90.0)
-	bar.position = Vector3(0, 0.02, 0.35)
+	bar.position = Vector3(0, 0.015, 0.34)
 	parent.add_child(bar)
 	
-	# Wood Handguard
+	# Wood Lower & Upper Handguards
 	var hg = MeshInstance3D.new()
 	var hg_m = BoxMesh.new()
-	hg_m.size = Vector3(0.085, 0.09, 0.2)
+	hg_m.size = Vector3(0.072, 0.076, 0.18)
 	hg.mesh = hg_m
 	hg.material_override = mat_wood
-	hg.position = Vector3(0, 0, 0.22)
+	hg.position = Vector3(0, 0.005, 0.22)
 	parent.add_child(hg)
 	
-	# Buttstock
+	# Wood Buttstock
 	var st = MeshInstance3D.new()
 	var st_m = BoxMesh.new()
-	st_m.size = Vector3(0.07, 0.12, 0.26)
+	st_m.size = Vector3(0.06, 0.11, 0.24)
 	st.mesh = st_m
 	st.material_override = mat_wood
-	st.position = Vector3(0, -0.02, -0.28)
+	st.position = Vector3(0, -0.02, -0.26)
+	st.rotation.x = deg_to_rad(-8.0)
 	parent.add_child(st)
 	
-	# Curved Magazine
+	# Pistol Grip (slants backward towards stock)
+	var grip = MeshInstance3D.new()
+	var gr_m = BoxMesh.new()
+	gr_m.size = Vector3(0.045, 0.12, 0.06)
+	grip.mesh = gr_m
+	grip.material_override = mat_grip
+	grip.position = Vector3(0, -0.08, -0.06)
+	grip.rotation.x = deg_to_rad(20.0)
+	parent.add_child(grip)
+	
+	# Curved 30-round Steel Magazine (curves forward towards muzzle)
 	var mag = MeshInstance3D.new()
 	var mag_m = BoxMesh.new()
-	mag_m.size = Vector3(0.05, 0.22, 0.1)
+	mag_m.size = Vector3(0.042, 0.20, 0.09)
 	mag.mesh = mag_m
-	mag.material_override = mat_mag
-	mag.position = Vector3(0, -0.14, 0.08)
-	mag.rotation.x = deg_to_rad(16.0)
+	mag.material_override = mat_metal
+	mag.position = Vector3(0, -0.12, 0.08)
+	mag.rotation.x = deg_to_rad(-20.0)
 	parent.add_child(mag)
 	
 	# Muzzle
 	muzzle_marker = Marker3D.new()
-	muzzle_marker.position = Vector3(0, 0.02, 0.56)
+	muzzle_marker.position = Vector3(0, 0.015, 0.54)
 	parent.add_child(muzzle_marker)
 
 func build_pistol_visuals(parent: Node3D) -> void:
 	var mat_slide = StandardMaterial3D.new()
-	mat_slide.albedo_color = Color(0.2, 0.22, 0.26)
-	mat_slide.metallic = 0.8
-	mat_slide.roughness = 0.25
+	mat_slide.albedo_color = Color(0.18, 0.20, 0.22)
+	mat_slide.metallic = 0.88
+	mat_slide.roughness = 0.28
 	
 	var mat_frame = StandardMaterial3D.new()
-	mat_frame.albedo_color = Color(0.1, 0.11, 0.12)
-	mat_frame.roughness = 0.6
+	mat_frame.albedo_color = Color(0.12, 0.13, 0.14)
+	mat_frame.roughness = 0.75
 	
-	# Slide
+	# Slide (Glock square steel profile)
 	var slide = MeshInstance3D.new()
 	var s_m = BoxMesh.new()
-	s_m.size = Vector3(0.065, 0.06, 0.28)
+	s_m.size = Vector3(0.052, 0.048, 0.24)
 	slide.mesh = s_m
 	slide.material_override = mat_slide
+	slide.position = Vector3(0, 0.024, 0.0)
 	parent.add_child(slide)
 	
-	# Grip
+	# Frame (Polymer receiver, zero Z-fighting)
+	var frame = MeshInstance3D.new()
+	var fr_m = BoxMesh.new()
+	fr_m.size = Vector3(0.048, 0.030, 0.22)
+	frame.mesh = fr_m
+	frame.material_override = mat_frame
+	frame.position = Vector3(0, -0.014, 0.005)
+	parent.add_child(frame)
+	
+	# Grip (slants backward towards wrist at 20 deg)
 	var grip = MeshInstance3D.new()
 	var g_m = BoxMesh.new()
-	g_m.size = Vector3(0.058, 0.16, 0.085)
+	g_m.size = Vector3(0.044, 0.14, 0.07)
 	grip.mesh = g_m
 	grip.material_override = mat_frame
-	grip.position = Vector3(0, -0.09, -0.06)
-	grip.rotation.x = deg_to_rad(-14.0)
+	grip.position = Vector3(0, -0.085, -0.04)
+	grip.rotation.x = deg_to_rad(20.0)
 	parent.add_child(grip)
 	
 	# Muzzle
 	muzzle_marker = Marker3D.new()
-	muzzle_marker.position = Vector3(0, 0.01, 0.16)
+	muzzle_marker.position = Vector3(0, 0.024, 0.15)
 	parent.add_child(muzzle_marker)
 
 func build_axe_visuals(parent: Node3D) -> void:

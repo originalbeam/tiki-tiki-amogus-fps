@@ -74,8 +74,10 @@ var ak_handle_offset_z: float = 0.0
 var pistol_slide_offset_z: float = 0.0
 var dry_fire_cooldown: float = 0.0
 
-var ak_mag_initial_pos: Vector3 = Vector3(0, -0.12, -0.06)
-var pistol_mag_initial_pos: Vector3 = Vector3(0, -0.08, 0.05)
+var ak_mag_initial_pos: Vector3 = Vector3(0, -0.12, -0.07)
+var ak_mag_initial_rot: Vector3 = Vector3.ZERO
+var pistol_mag_initial_pos: Vector3 = Vector3(0, -0.08, 0.045)
+var pistol_mag_initial_rot: Vector3 = Vector3.ZERO
 
 # Knife system
 var is_quick_knifing: bool = false
@@ -94,8 +96,10 @@ func _ready() -> void:
 		shotgun_shell.visible = false
 	if ak_magazine:
 		ak_mag_initial_pos = ak_magazine.position
+		ak_mag_initial_rot = ak_magazine.rotation
 	if pistol_magazine:
 		pistol_mag_initial_pos = pistol_magazine.position
+		pistol_mag_initial_rot = pistol_magazine.rotation
 	
 	# Setup Knife 3D model
 	knife_model = get_node_or_null("Knife")
@@ -686,14 +690,15 @@ func reload_magazine_weapon() -> void:
 		play_sfx(SoundEffects.create_magazine_out_sound())
 		var mag_drop: Tween = create_tween()
 		mag_drop.tween_property(ak_magazine, "position:y", ak_mag_initial_pos.y - 0.25, 0.25)
-		mag_drop.parallel().tween_property(ak_magazine, "rotation:x", deg_to_rad(45.0), 0.25)
+		mag_drop.parallel().tween_property(ak_magazine, "rotation:x", ak_mag_initial_rot.x + deg_to_rad(15.0), 0.25)
 		await mag_drop.finished
 		
 		# New magazine rises from bottom and clicks into magwell
 		ak_magazine.position = Vector3(ak_mag_initial_pos.x, ak_mag_initial_pos.y - 0.3, ak_mag_initial_pos.z)
-		ak_magazine.rotation.x = deg_to_rad(22.0)
+		ak_magazine.rotation.x = ak_mag_initial_rot.x + deg_to_rad(15.0)
 		var mag_insert: Tween = create_tween()
 		mag_insert.tween_property(ak_magazine, "position:y", ak_mag_initial_pos.y, 0.28).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		mag_insert.parallel().tween_property(ak_magazine, "rotation:x", ak_mag_initial_rot.x, 0.28).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 		await mag_insert.finished
 		# Play magazine insert metallic click
 		play_sfx(SoundEffects.create_magazine_in_sound())
@@ -703,13 +708,15 @@ func reload_magazine_weapon() -> void:
 		play_sfx(SoundEffects.create_magazine_out_sound())
 		var mag_drop: Tween = create_tween()
 		mag_drop.tween_property(pistol_magazine, "position:y", pistol_mag_initial_pos.y - 0.22, 0.22)
+		mag_drop.parallel().tween_property(pistol_magazine, "position:z", pistol_mag_initial_pos.z - 0.08, 0.22)
 		await mag_drop.finished
 		
-		# New magazine slides into grip
-		pistol_magazine.position.y = pistol_mag_initial_pos.y - 0.25
-		pistol_magazine.rotation.x = deg_to_rad(-15.0)
+		# New magazine slides into grip (matches authentic backward slant)
+		pistol_magazine.position = Vector3(pistol_mag_initial_pos.x, pistol_mag_initial_pos.y - 0.22, pistol_mag_initial_pos.z - 0.08)
+		pistol_magazine.rotation = pistol_mag_initial_rot
 		var mag_insert: Tween = create_tween()
 		mag_insert.tween_property(pistol_magazine, "position:y", pistol_mag_initial_pos.y, 0.25)
+		mag_insert.parallel().tween_property(pistol_magazine, "position:z", pistol_mag_initial_pos.z, 0.25)
 		await mag_insert.finished
 		# Play magazine insert metallic click
 		play_sfx(SoundEffects.create_magazine_in_sound())
