@@ -1,6 +1,7 @@
 <<<<<<< HEAD
 # tiki-tiki-amogus-fps
 TIKI TIKI TIKI TIKIIIIIIIII
+ВСЕМ ПРИВЕТ ЭТО АНДРЮША И Я ТУТ НАВАЙКОДИЛ ЧУТЬЧУТЬ
 =======
 # Among Us 3D FPS (Godot 4)
 
