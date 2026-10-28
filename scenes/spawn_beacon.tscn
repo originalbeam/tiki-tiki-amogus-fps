@@ -1,0 +1,56 @@
+[gd_scene load_steps=6 format=3 uid="uid://beacon0000001"]
+
+[ext_resource type="Script" path="res://scripts/spawn_beacon.gd" id="1_beacon"]
+
+[sub_resource type="StandardMaterial3D" id="Mat_BeaconBeam"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(1, 0.25, 0.25, 0.35)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_beam"]
+material = SubResource("Mat_BeaconBeam")
+top_radius = 0.35
+bottom_radius = 0.5
+height = 8.0
+radial_segments = 12
+
+[sub_resource type="StandardMaterial3D" id="Mat_BeaconRing"]
+shading_mode = 0
+albedo_color = Color(1, 0.3, 0.3, 0.9)
+
+[sub_resource type="TorusMesh" id="TorusMesh_ring"]
+material = SubResource("Mat_BeaconRing")
+inner_radius = 0.9
+outer_radius = 1.05
+rings = 16
+ring_segments = 8
+
+[node name="SpawnBeacon" type="Node3D"]
+script = ExtResource("1_beacon")
+
+[node name="LightBeam" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 0)
+mesh = SubResource("CylinderMesh_beam")
+
+[node name="GroundRing" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+mesh = SubResource("TorusMesh_ring")
+
+[node name="BeaconLight" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+light_color = Color(1, 0.3, 0.3, 1)
+light_energy = 2.5
+omni_range = 6.0
+
+[node name="InfoLabel" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.6, 0)
+billboard = 1
+no_depth_test = true
+render_priority = 2
+outline_render_priority = 1
+pixel_size = 0.008
+modulate = Color(1, 1, 1, 1)
+text = "СПАВН"
+font_size = 56
+outline_size = 16
+outline_modulate = Color(0, 0, 0, 1)

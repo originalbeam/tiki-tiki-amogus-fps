@@ -1,0 +1,299 @@
+[gd_scene load_steps=8 format=3 uid="uid://mainmenu00001"]
+
+[ext_resource type="Script" path="res://scripts/main_menu.gd" id="1_menu"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_BtnNormal"]
+bg_color = Color(0.12, 0.14, 0.2, 0.9)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.2, 0.5, 0.8, 0.8)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 16.0
+content_margin_top = 10.0
+content_margin_right = 16.0
+content_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_BtnHover"]
+bg_color = Color(0.18, 0.24, 0.35, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.3, 0.8, 1, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 16.0
+content_margin_top = 10.0
+content_margin_right = 16.0
+content_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_BtnPressed"]
+bg_color = Color(0.08, 0.1, 0.15, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.1, 0.7, 0.9, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 16.0
+content_margin_top = 10.0
+content_margin_right = 16.0
+content_margin_bottom = 10.0
+
+[sub_resource type="Gradient" id="Gradient_bg"]
+colors = PackedColorArray(0.03, 0.04, 0.07, 1, 0.1, 0.08, 0.16, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_bg"]
+gradient = SubResource("Gradient_bg")
+fill_from = Vector2(0.5, 0)
+fill_to = Vector2(0.5, 1)
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_menu")
+
+[node name="Background" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("GradientTexture2D_bg")
+
+[node name="Vignette" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.02, 0.02, 0.04, 0.4)
+
+[node name="Header" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -300.0
+offset_top = 50.0
+offset_right = 300.0
+offset_bottom = 160.0
+grow_horizontal = 2
+
+[node name="Title" type="Label" parent="Header"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.25, 0.25, 1)
+theme_override_colors/font_shadow_color = Color(0.8, 0.1, 0.1, 0.5)
+theme_override_constants/shadow_offset_x = 3
+theme_override_constants/shadow_offset_y = 3
+theme_override_font_sizes/font_size = 46
+text = "AMONG US: 3D FPS"
+horizontal_alignment = 1
+
+[node name="Subtitle" type="Label" parent="Header"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 18
+text = "INVASION OF THE IMPOSTORS"
+horizontal_alignment = 1
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 140.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MainButtons" type="VBoxContainer" parent="CenterContainer"]
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="PlayBtn" type="Button" parent="CenterContainer/MainButtons"]
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxFlat_BtnNormal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_BtnHover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_BtnPressed")
+text = "▶ ИГРАТЬ"
+
+[node name="SettingsBtn" type="Button" parent="CenterContainer/MainButtons"]
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_BtnNormal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_BtnHover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_BtnPressed")
+text = "⚙ НАСТРОЙКИ ГРАФИКИ"
+
+[node name="QuitBtn" type="Button" parent="CenterContainer/MainButtons"]
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.4, 0.4, 1)
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_BtnNormal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_BtnHover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_BtnPressed")
+text = "✕ ВЫХОД"
+
+[node name="DifficultyPanel" type="VBoxContainer" parent="CenterContainer"]
+visible = false
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Title" type="Label" parent="CenterContainer/DifficultyPanel"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_font_sizes/font_size = 22
+text = "ВЫБЕРИТЕ СЛОЖНОСТЬ"
+horizontal_alignment = 1
+
+[node name="EasyBtn" type="Button" parent="CenterContainer/DifficultyPanel"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.9, 0.5, 1)
+theme_override_font_sizes/font_size = 17
+theme_override_styles/normal = SubResource("StyleBoxFlat_BtnNormal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_BtnHover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_BtnPressed")
+text = "ЛЕГКАЯ (Медленные враги)"
+
+[node name="NormalBtn" type="Button" parent="CenterContainer/DifficultyPanel"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.85, 0.3, 1)
+theme_override_font_sizes/font_size = 17
+theme_override_styles/normal = SubResource("StyleBoxFlat_BtnNormal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_BtnHover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_BtnPressed")
+text = "НОРМАЛЬНАЯ (Стандарт)"
+
+[node name="HardBtn" type="Button" parent="CenterContainer/DifficultyPanel"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.35, 0.35, 1)
+theme_override_font_sizes/font_size = 17
+theme_override_styles/normal = SubResource("StyleBoxFlat_BtnNormal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_BtnHover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_BtnPressed")
+text = "СЛОЖНАЯ (Быстрые & Опасные)"
+
+[node name="Spacer" type="Control" parent="CenterContainer/DifficultyPanel"]
+custom_minimum_size = Vector2(0, 6)
+layout_mode = 2
+
+[node name="BackBtn" type="Button" parent="CenterContainer/DifficultyPanel"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_BtnNormal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_BtnHover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_BtnPressed")
+text = "← НАЗАД"
+
+[node name="SettingsPanel" type="VBoxContainer" parent="CenterContainer"]
+visible = false
+custom_minimum_size = Vector2(400, 0)
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Title" type="Label" parent="CenterContainer/SettingsPanel"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_font_sizes/font_size = 22
+text = "НАСТРОЙКИ ГРАФИКИ"
+horizontal_alignment = 1
+
+[node name="Grid" type="GridContainer" parent="CenterContainer/SettingsPanel"]
+layout_mode = 2
+theme_override_constants/h_separation = 20
+theme_override_constants/v_separation = 12
+columns = 2
+
+[node name="LabelFS" type="Label" parent="CenterContainer/SettingsPanel/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Полный экран (F11):"
+
+[node name="FullscreenCheck" type="CheckBox" parent="CenterContainer/SettingsPanel/Grid"]
+layout_mode = 2
+
+[node name="LabelVS" type="Label" parent="CenterContainer/SettingsPanel/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "V-Sync (Вертикальная синхр.):"
+
+[node name="VsyncCheck" type="CheckBox" parent="CenterContainer/SettingsPanel/Grid"]
+layout_mode = 2
+
+[node name="LabelMSAA" type="Label" parent="CenterContainer/SettingsPanel/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Сглаживание (MSAA 3D):"
+
+[node name="MsaaOptions" type="OptionButton" parent="CenterContainer/SettingsPanel/Grid"]
+layout_mode = 2
+
+[node name="LabelGlow" type="Label" parent="CenterContainer/SettingsPanel/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Свечение (Glow / Bloom):"
+
+[node name="GlowCheck" type="CheckBox" parent="CenterContainer/SettingsPanel/Grid"]
+layout_mode = 2
+
+[node name="LabelShadows" type="Label" parent="CenterContainer/SettingsPanel/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Тени (Shadows):"
+
+[node name="ShadowsCheck" type="CheckBox" parent="CenterContainer/SettingsPanel/Grid"]
+layout_mode = 2
+
+[node name="Spacer" type="Control" parent="CenterContainer/SettingsPanel"]
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+
+[node name="BackFromSettingsBtn" type="Button" parent="CenterContainer/SettingsPanel"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_BtnNormal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_BtnHover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_BtnPressed")
+text = "← НАЗАД"
+
+[connection signal="pressed" from="CenterContainer/MainButtons/PlayBtn" to="." method="_on_play_btn_pressed"]
+[connection signal="pressed" from="CenterContainer/MainButtons/SettingsBtn" to="." method="_on_settings_btn_pressed"]
+[connection signal="pressed" from="CenterContainer/MainButtons/QuitBtn" to="." method="_on_quit_btn_pressed"]
+[connection signal="pressed" from="CenterContainer/DifficultyPanel/EasyBtn" to="." method="_on_easy_btn_pressed"]
+[connection signal="pressed" from="CenterContainer/DifficultyPanel/NormalBtn" to="." method="_on_normal_btn_pressed"]
+[connection signal="pressed" from="CenterContainer/DifficultyPanel/HardBtn" to="." method="_on_hard_btn_pressed"]
+[connection signal="pressed" from="CenterContainer/DifficultyPanel/BackBtn" to="." method="_on_back_to_menu_pressed"]
+[connection signal="toggled" from="CenterContainer/SettingsPanel/Grid/FullscreenCheck" to="." method="_on_fullscreen_toggled"]
+[connection signal="toggled" from="CenterContainer/SettingsPanel/Grid/VsyncCheck" to="." method="_on_vsync_toggled"]
+[connection signal="item_selected" from="CenterContainer/SettingsPanel/Grid/MsaaOptions" to="." method="_on_msaa_selected"]
+[connection signal="toggled" from="CenterContainer/SettingsPanel/Grid/GlowCheck" to="." method="_on_glow_toggled"]
+[connection signal="toggled" from="CenterContainer/SettingsPanel/Grid/ShadowsCheck" to="." method="_on_shadows_toggled"]
+[connection signal="pressed" from="CenterContainer/SettingsPanel/BackFromSettingsBtn" to="." method="_on_back_to_menu_pressed"]

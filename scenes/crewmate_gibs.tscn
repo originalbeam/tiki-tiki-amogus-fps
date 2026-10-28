@@ -1,0 +1,186 @@
+[gd_scene load_steps=18 format=3 uid="uid://cgibs00000001"]
+
+[ext_resource type="Script" path="res://scripts/crewmate_gibs.gd" id="1_gibs"]
+
+[sub_resource type="StandardMaterial3D" id="Mat_DefaultRed"]
+albedo_color = Color(0.9, 0.1, 0.1, 1)
+roughness = 0.4
+
+[sub_resource type="SphereShape3D" id="Shape_Head"]
+radius = 0.45
+
+[sub_resource type="SphereMesh" id="Mesh_Head"]
+material = SubResource("Mat_DefaultRed")
+radius = 0.44
+height = 0.75
+radial_segments = 12
+rings = 6
+
+[sub_resource type="CylinderShape3D" id="Shape_Torso"]
+height = 0.65
+radius = 0.45
+
+[sub_resource type="CylinderMesh" id="Mesh_Torso"]
+material = SubResource("Mat_DefaultRed")
+top_radius = 0.44
+bottom_radius = 0.44
+height = 0.6
+radial_segments = 12
+
+[sub_resource type="StandardMaterial3D" id="Mat_Bone"]
+albedo_color = Color(0.95, 0.95, 0.9, 1)
+roughness = 0.2
+
+[sub_resource type="CylinderMesh" id="Mesh_Bone"]
+material = SubResource("Mat_Bone")
+top_radius = 0.06
+bottom_radius = 0.06
+height = 0.38
+radial_segments = 6
+
+[sub_resource type="SphereMesh" id="Mesh_BoneTop"]
+material = SubResource("Mat_Bone")
+radius = 0.1
+height = 0.18
+radial_segments = 6
+rings = 4
+
+[sub_resource type="BoxShape3D" id="Shape_Visor"]
+size = Vector3(0.52, 0.3, 0.25)
+
+[sub_resource type="StandardMaterial3D" id="Mat_Visor"]
+albedo_color = Color(0.4, 0.8, 0.95, 1)
+metallic = 0.3
+roughness = 0.1
+
+[sub_resource type="BoxMesh" id="Mesh_Visor"]
+material = SubResource("Mat_Visor")
+size = Vector3(0.5, 0.28, 0.22)
+
+[sub_resource type="BoxShape3D" id="Shape_Backpack"]
+size = Vector3(0.55, 0.75, 0.32)
+
+[sub_resource type="BoxMesh" id="Mesh_Backpack"]
+material = SubResource("Mat_DefaultRed")
+size = Vector3(0.5, 0.72, 0.28)
+
+[sub_resource type="CapsuleShape3D" id="Shape_Leg"]
+radius = 0.17
+height = 0.6
+
+[sub_resource type="CapsuleMesh" id="Mesh_Leg"]
+material = SubResource("Mat_DefaultRed")
+radius = 0.16
+height = 0.55
+radial_segments = 8
+rings = 3
+
+[sub_resource type="StandardMaterial3D" id="Mat_Blood"]
+shading_mode = 0
+albedo_color = Color(0.85, 0.05, 0.05, 1)
+
+[sub_resource type="SphereMesh" id="Mesh_BloodDrop"]
+material = SubResource("Mat_Blood")
+radius = 0.06
+height = 0.12
+radial_segments = 4
+rings = 2
+
+[node name="CrewmateGibs" type="Node3D"]
+script = ExtResource("1_gibs")
+
+[node name="HeadGib" type="RigidBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
+collision_layer = 8
+collision_mask = 1
+mass = 1.0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="HeadGib"]
+shape = SubResource("Shape_Head")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="HeadGib"]
+mesh = SubResource("Mesh_Head")
+
+[node name="TorsoBoneGib" type="RigidBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+collision_layer = 8
+collision_mask = 1
+mass = 1.5
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="TorsoBoneGib"]
+shape = SubResource("Shape_Torso")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="TorsoBoneGib"]
+mesh = SubResource("Mesh_Torso")
+
+[node name="Bone" type="MeshInstance3D" parent="TorsoBoneGib"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.38, 0)
+mesh = SubResource("Mesh_Bone")
+
+[node name="BoneTop" type="MeshInstance3D" parent="TorsoBoneGib/Bone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.18, 0)
+mesh = SubResource("Mesh_BoneTop")
+
+[node name="VisorGib" type="RigidBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, 0.32)
+collision_layer = 8
+collision_mask = 1
+mass = 0.5
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="VisorGib"]
+shape = SubResource("Shape_Visor")
+
+[node name="Visor" type="MeshInstance3D" parent="VisorGib"]
+mesh = SubResource("Mesh_Visor")
+
+[node name="BackpackGib" type="RigidBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, -0.4)
+collision_layer = 8
+collision_mask = 1
+mass = 0.8
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="BackpackGib"]
+shape = SubResource("Shape_Backpack")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="BackpackGib"]
+mesh = SubResource("Mesh_Backpack")
+
+[node name="LeftLegGib" type="RigidBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.25, 0.25, 0)
+collision_layer = 8
+collision_mask = 1
+mass = 0.6
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="LeftLegGib"]
+shape = SubResource("Shape_Leg")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="LeftLegGib"]
+mesh = SubResource("Mesh_Leg")
+
+[node name="RightLegGib" type="RigidBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.25, 0.25, 0)
+collision_layer = 8
+collision_mask = 1
+mass = 0.6
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="RightLegGib"]
+shape = SubResource("Shape_Leg")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="RightLegGib"]
+mesh = SubResource("Mesh_Leg")
+
+[node name="BloodParticles" type="CPUParticles3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+emitting = false
+amount = 35
+lifetime = 0.9
+one_shot = true
+explosiveness = 0.95
+mesh = SubResource("Mesh_BloodDrop")
+direction = Vector3(0, 1, 0)
+spread = 80.0
+gravity = Vector3(0, -14.0, 0)
+initial_velocity_min = 5.0
+initial_velocity_max = 10.0
+scale_amount_min = 0.6
+scale_amount_max = 1.6
