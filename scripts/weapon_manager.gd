@@ -82,6 +82,7 @@ var pistol_mag_initial_rot: Vector3 = Vector3.ZERO
 # Knife system
 var is_quick_knifing: bool = false
 var knife_model: Node3D = null
+var air_slash_mesh: MeshInstance3D = null
 var knife_idle_pos: Vector3 = Vector3(0.08, -0.16, -0.32)
 var knife_idle_rot: Vector3 = Vector3(-8.0, 15.0, -12.0)
 
@@ -101,14 +102,18 @@ func _ready() -> void:
 		pistol_mag_initial_pos = pistol_magazine.position
 		pistol_mag_initial_rot = pistol_magazine.rotation
 	
-	# Setup Knife 3D model
+	# Setup Knife 3D model and air slash effect
 	knife_model = get_node_or_null("Knife")
 	if not knife_model:
 		knife_model = build_knife_model()
 		add_child(knife_model)
 	knife_model.visible = false
 	
+	air_slash_mesh = build_air_slash_mesh()
+	add_child(air_slash_mesh)
+	
 	# Initialize weapons
+	weapons.clear()
 	weapons.append(Weapon.create_ak47())
 	weapons.append(Weapon.create_shotgun())
 	weapons.append(Weapon.create_pistol())
@@ -264,6 +269,13 @@ func try_shoot(just_pressed: bool) -> void:
 		return
 	if Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
 		return
+	var p_node: Node = owner
+	if p_node:
+		if ("is_in_shop" in p_node) and p_node.is_in_shop:
+			return
+		var hud = p_node.get_node_or_null("HUD")
+		if hud and hud.has_node("ShopPanel") and hud.get_node("ShopPanel").visible:
+			return
 		
 	# Logic 1: If shotgun is reloading, fire button cancels reload immediately WITHOUT shooting!
 	if is_reloading:
@@ -684,11 +696,14 @@ func reload_magazine_weapon() -> void:
 	tween.parallel().tween_property(self, "recoil_rot:z", deg_to_rad(22.0), dip_time)
 	tween.parallel().tween_property(self, "recoil_rot:x", deg_to_rad(-10.0), dip_time)
 	
+	var mag_drop: Tween = null
+	var mag_insert: Tween = null
+	
 	# Animate magazine detach (drops out of weapon)
 	if current_weapon.slot == 1 and ak_magazine:
 		# Play magazine detach metallic click
 		play_sfx(SoundEffects.create_magazine_out_sound())
-		var mag_drop: Tween = create_tween()
+		mag_drop = create_tween()
 		mag_drop.tween_property(ak_magazine, "position:y", ak_mag_initial_pos.y - 0.25, 0.25)
 		mag_drop.parallel().tween_property(ak_magazine, "rotation:x", ak_mag_initial_rot.x + deg_to_rad(15.0), 0.25)
 		await mag_drop.finished
@@ -696,7 +711,7 @@ func reload_magazine_weapon() -> void:
 		# New magazine rises from bottom and clicks into magwell
 		ak_magazine.position = Vector3(ak_mag_initial_pos.x, ak_mag_initial_pos.y - 0.3, ak_mag_initial_pos.z)
 		ak_magazine.rotation.x = ak_mag_initial_rot.x + deg_to_rad(15.0)
-		var mag_insert: Tween = create_tween()
+		mag_insert = create_tween()
 		mag_insert.tween_property(ak_magazine, "position:y", ak_mag_initial_pos.y, 0.28).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 		mag_insert.parallel().tween_property(ak_magazine, "rotation:x", ak_mag_initial_rot.x, 0.28).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 		await mag_insert.finished
@@ -706,15 +721,15 @@ func reload_magazine_weapon() -> void:
 	elif current_weapon.slot == 3 and pistol_magazine:
 		# Play magazine detach metallic click
 		play_sfx(SoundEffects.create_magazine_out_sound())
-		var mag_drop: Tween = create_tween()
+		mag_drop = create_tween()
 		mag_drop.tween_property(pistol_magazine, "position:y", pistol_mag_initial_pos.y - 0.22, 0.22)
-		mag_drop.parallel().tween_property(pistol_magazine, "position:z", pistol_mag_initial_pos.z - 0.08, 0.22)
+		mag_drop.parallel().tween_property(pistol_magazine, "position:z", pistol_mag_initial_pos.z + 0.08, 0.22)
 		await mag_drop.finished
 		
 		# New magazine slides into grip (matches authentic backward slant)
-		pistol_magazine.position = Vector3(pistol_mag_initial_pos.x, pistol_mag_initial_pos.y - 0.22, pistol_mag_initial_pos.z - 0.08)
+		pistol_magazine.position = Vector3(pistol_mag_initial_pos.x, pistol_mag_initial_pos.y - 0.22, pistol_mag_initial_pos.z + 0.08)
 		pistol_magazine.rotation = pistol_mag_initial_rot
-		var mag_insert: Tween = create_tween()
+		mag_insert = create_tween()
 		mag_insert.tween_property(pistol_magazine, "position:y", pistol_mag_initial_pos.y, 0.25)
 		mag_insert.parallel().tween_property(pistol_magazine, "position:z", pistol_mag_initial_pos.z, 0.25)
 		await mag_insert.finished
@@ -787,9 +802,33 @@ func reset_knife_idle_transform() -> void:
 		knife_model.position = knife_idle_pos
 		knife_model.rotation_degrees = knife_idle_rot
 
+func _update_knife_slash(progress: float) -> void:
+	if not knife_model:
+		return
+	var t: float = clampf(progress, 0.0, 1.0)
+	# Parametric curve: L-shape lying on side
+	# 1st half: sweeps forward in convex arc away from player (-Z)
+	# 2nd half: curls downward into lower-left corner and moves back toward player (+Z)
+	var x: float = lerpf(0.0, -1.25, t)
+	var y: float = -0.02 + sin(t * PI) * 0.045 - (t * t) * 0.16
+	var z: float = 0.02 - 0.18 * sin(t * PI) + 0.06 * (t * t)
+	knife_model.position = Vector3(x, y, z)
+	
+	var rx: float = -5.0 + 17.0 * (t * t)
+	var ry: float = 18.0 - 12.0 * t
+	var rz: float = -12.0 + 34.0 * t
+	knife_model.rotation_degrees = Vector3(rx, ry, rz)
+
 func quick_knife_attack() -> void:
 	if is_quick_knifing or is_switching:
 		return
+	var player_node: Node = owner
+	if player_node:
+		if ("is_in_shop" in player_node) and player_node.is_in_shop:
+			return
+		var hud = player_node.get_node_or_null("HUD")
+		if hud and hud.has_node("ShopPanel") and hud.get_node("ShopPanel").visible:
+			return
 	if is_reloading:
 		if current_weapon and current_weapon.is_shotgun:
 			shotgun_cancel_reload = true
@@ -806,7 +845,6 @@ func quick_knife_attack() -> void:
 	shotgun_model.visible = false
 	pistol_model.visible = false
 	
-	var player_node: Node = owner
 	var hud_node: Node = null
 	if player_node and player_node.has_node("HUD"):
 		hud_node = player_node.get_node("HUD")
@@ -821,32 +859,41 @@ func quick_knife_attack() -> void:
 	
 	if knife_model:
 		knife_model.visible = true
-		# Start position on right side of screen (purely horizontal sweeping stroke across screen)
-		knife_model.position = Vector3(0.28, 0.02, 0.08)
-		# Knife orientation: looking away from player under a small angle to the right
-		# (tip pointing forward along -Z, angled slightly rightwards around Y by -18°, with natural slight upward pitch and roll)
-		knife_model.rotation_degrees = Vector3(-6.0, -18.0, -10.0)
+		_update_knife_slash(0.0)
 		
 		# Swift cutting whoosh sound
 		play_sfx(SoundEffects.create_knife_slash_sound())
 		
-		# Animate sweeping cutting slice purely horizontally across the screen (Y and Z stay constant)
-		# Move from right (+0.28) across to left (-0.62), covering ~60% of horizontal screen view
-		# Rotation remains steady throughout the slash (no clockwise twisting or bending)
-		var slash_tween: Tween = create_tween()
-		slash_tween.tween_property(knife_model, "position", Vector3(-0.62, 0.02, 0.08), 0.18).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		if air_slash_mesh:
+			air_slash_mesh.visible = true
+			air_slash_mesh.scale = Vector3(0.08, 1.0, 0.08)
+			if air_slash_mesh.material_override:
+				(air_slash_mesh.material_override as StandardMaterial3D).albedo_color.a = 0.0
 		
-		# Mid-strike hit detection at peak of the slice
-		await get_tree().create_timer(0.08).timeout
+		# Animate sweeping cutting slice 1.5x faster (0.45s) along convex outward arc curving into bottom-left hook
+		var slash_duration: float = 0.45
+		var slash_tween: Tween = create_tween()
+		slash_tween.tween_method(_update_knife_slash, 0.0, 1.0, slash_duration).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		
+		if air_slash_mesh and air_slash_mesh.material_override:
+			slash_tween.parallel().tween_property(air_slash_mesh, "scale", Vector3(1.0, 1.0, 1.0), 0.27).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+			var fade_tween: Tween = create_tween()
+			fade_tween.tween_property(air_slash_mesh.material_override, "albedo_color:a", 0.70, 0.11)
+			fade_tween.tween_property(air_slash_mesh.material_override, "albedo_color:a", 0.0, 0.34).set_ease(Tween.EASE_IN)
+		
+		# Mid-strike hit detection at peak of the slice (0.21s)
+		await get_tree().create_timer(0.21).timeout
 		perform_knife_hit_detection()
 		
 		await slash_tween.finished
 	else:
 		perform_knife_hit_detection()
-		await get_tree().create_timer(0.18).timeout
+		await get_tree().create_timer(0.45).timeout
 		
 	if knife_model:
 		knife_model.visible = false
+	if air_slash_mesh:
+		air_slash_mesh.visible = false
 	ak47_model.visible = prev_ak_vis
 	shotgun_model.visible = prev_sg_vis
 	pistol_model.visible = prev_pst_vis
@@ -1030,4 +1077,59 @@ func build_knife_model() -> Node3D:
 	root.add_child(pommel_inst)
 	
 	return root
+
+func build_air_slash_mesh() -> MeshInstance3D:
+	var mi := MeshInstance3D.new()
+	mi.name = "AirSlashEffect"
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	
+	var segments := 24
+	for i in range(segments):
+		var t0: float = float(i) / float(segments)
+		var t1: float = float(i + 1) / float(segments)
+		
+		# Arc curve: sweeping from weapon position (X=0.0) with convex outward arc to bottom-left hook (X=-1.25)
+		var x0: float = lerpf(0.0, -1.25, t0)
+		var y0: float = -0.02 + sin(t0 * PI) * 0.045 - (t0 * t0) * 0.16
+		var z0: float = 0.02 - 0.18 * sin(t0 * PI) + 0.06 * (t0 * t0)
+		
+		var x1: float = lerpf(0.0, -1.25, t1)
+		var y1: float = -0.02 + sin(t1 * PI) * 0.045 - (t1 * t1) * 0.16
+		var z1: float = 0.02 - 0.18 * sin(t1 * PI) + 0.06 * (t1 * t1)
+		
+		var a0: float = sin(t0 * PI) * 0.75
+		var a1: float = sin(t1 * PI) * 0.75
+		
+		var p0_inner := Vector3(x0, y0 - 0.025, z0 + 0.025)
+		var p0_outer := Vector3(x0, y0 + 0.025, z0 - 0.025)
+		var p1_inner := Vector3(x1, y1 - 0.025, z1 + 0.025)
+		var p1_outer := Vector3(x1, y1 + 0.025, z1 - 0.025)
+		
+		st.set_color(Color(0.85, 0.95, 1.0, a0))
+		st.add_vertex(p0_inner)
+		st.set_color(Color(0.92, 0.98, 1.0, a0 * 0.85))
+		st.add_vertex(p0_outer)
+		st.set_color(Color(0.92, 0.98, 1.0, a1 * 0.85))
+		st.add_vertex(p1_outer)
+		
+		st.set_color(Color(0.85, 0.95, 1.0, a0))
+		st.add_vertex(p0_inner)
+		st.set_color(Color(0.92, 0.98, 1.0, a1 * 0.85))
+		st.add_vertex(p1_outer)
+		st.set_color(Color(0.85, 0.95, 1.0, a1))
+		st.add_vertex(p1_inner)
+		
+	var m := st.commit()
+	mi.mesh = m
+	
+	var mat := StandardMaterial3D.new()
+	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mat.cull_mode = BaseMaterial3D.CULL_DISABLED
+	mat.vertex_color_use_as_albedo = true
+	mat.albedo_color = Color(1.0, 1.0, 1.0, 0.0)
+	mi.material_override = mat
+	mi.visible = false
+	return mi
 
