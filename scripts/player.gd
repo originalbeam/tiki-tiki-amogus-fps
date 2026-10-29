@@ -39,6 +39,10 @@ var money: int = 0
 var score: int = 0
 var is_dead: bool = false
 
+# Minivan Shop Interaction & Restraint State
+var is_near_shop: bool = false
+var is_in_shop: bool = false
+
 # 3D Camera Controls
 var base_fov: float = 85.0
 var sprint_fov: float = 95.0
@@ -95,6 +99,17 @@ func _ready() -> void:
 func _ensure_mouse_captured() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
+func set_near_shop(near: bool) -> void:
+	is_near_shop = near
+	if hud and hud.has_method("show_shop_zone_prompt"):
+		hud.show_shop_zone_prompt(near)
+
+func set_in_shop(in_shop_state: bool) -> void:
+	is_in_shop = in_shop_state
+	if is_in_shop:
+		velocity.x = 0.0
+		velocity.z = 0.0
+
 func _input(event: InputEvent) -> void:
 	if is_dead:
 		if event.is_action_pressed("restart"):
@@ -143,11 +158,10 @@ func _input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 		return
 
-	# Wave Warmup Controls: [B] Shop, [F] Fast-forward
+	# Wave Warmup & Shop Controls: [B] Minivan Shop (Only when in shop zone!), [F] Start Wave
 	if event is InputEventKey and event.pressed and not event.echo:
 		if event.keycode == KEY_B:
-			var spawner = get_parent().get_node_or_null("EnemySpawner")
-			if spawner and spawner.is_warming_up:
+			if is_near_shop:
 				if hud and hud.has_method("toggle_shop"):
 					hud.toggle_shop()
 					get_viewport().set_input_as_handled()
@@ -155,7 +169,7 @@ func _input(event: InputEvent) -> void:
 		elif event.keycode == KEY_F:
 			var spawner = get_parent().get_node_or_null("EnemySpawner")
 			if spawner and spawner.is_warming_up:
-				spawner.rush_warmup()
+				spawner.start_wave_from_intermission()
 				get_viewport().set_input_as_handled()
 				return
 
@@ -177,6 +191,14 @@ func _input(event: InputEvent) -> void:
 
 func _physics_process(delta: float) -> void:
 	if is_dead:
+		return
+		
+	if is_in_shop:
+		velocity.x = 0.0
+		velocity.z = 0.0
+		if not is_on_floor():
+			velocity.y -= gravity * delta
+		move_and_slide()
 		return
 		
 	# Vodka "Чекунец 67" Buff processing
@@ -278,7 +300,9 @@ func add_camera_recoil(pitch: float, yaw: float) -> void:
 	rotate_y(yaw * 0.15)
 
 func handle_weapon_inputs() -> void:
-	if not weapon_manager or is_dead or get_tree().paused:
+	if not weapon_manager or is_dead or get_tree().paused or is_in_shop:
+		return
+	if hud and hud.has_node("ShopPanel") and hud.get_node("ShopPanel").visible:
 		return
 	if Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
 		return

@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://minivanshop001"]
+
+[ext_resource type="Script" path="res://scripts/minivan_shop.gd" id="1_shop"]
+
+[node name="MinivanShop" type="Node3D" groups=["minivan_shop"]]
+script = ExtResource("1_shop")

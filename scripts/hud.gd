@@ -122,7 +122,7 @@ var shop_catalog = {
 		"stat1_max": 10.0,
 		"stat2_label": "Урон залпа: 144 ед. (8 картечин по 18 ед.)",
 		"stat2_val": 144.0,
-		"stat2_max": 150.0,
+		"stat2_max": 200.0,
 		"btn_text": "КУПИТЬ 1 ПАТРОН ($3)"
 	},
 	"pistol": {
@@ -164,7 +164,7 @@ var shop_catalog = {
 		"desc": "Штурмовой комплекс максимального класса защиты (150 брони). Весь входящий урон уменьшается вдвое, после чего делится поровну между здоровьем и броней. Действует пока броня не упадет ниже 76.",
 		"stat1_label": "Запас брони: 150 ед.",
 		"stat1_val": 150.0,
-		"stat1_max": 150.0,
+		"stat1_max": 250.0,
 		"stat2_label": "Поглощение урона: -50% + Сплит",
 		"stat2_val": 100.0,
 		"stat2_max": 100.0,
@@ -186,40 +186,40 @@ var handbook_db = {
 	"ak47": {
 		"title": "АК-47 (АВТОМАТ КАЛАШНИКОВА)",
 		"bars": [
-			{"name": "Урон за пулю: 32 ед.", "val": 32.0, "max": 100.0},
-			{"name": "Темп огня: ~600 выстр/мин", "val": 600.0, "max": 800.0},
-			{"name": "Емкость магазина: 30 патронов", "val": 30.0, "max": 60.0},
-			{"name": "Эффективная дальность: Высокая", "val": 85.0, "max": 100.0}
+			{"name": "Урон за выстрел: 32 ед.", "val": 32.0, "max": 200.0},
+			{"name": "Темп стрельбы: 600 выстр/мин", "val": 600.0, "max": 900.0},
+			{"name": "Дальность поражения: 75 м", "val": 75.0, "max": 100.0},
+			{"name": "Точность и контроль: 65%", "val": 65.0, "max": 100.0}
 		],
 		"stats": "• Калибр: 7.62x39 мм образца 1943 года\n• Режим огня: Полный автомат (~600 выстр/мин)\n• Магазин: Секторный коробчатый на 30 патронов\n• Урон: 32 ед. на любой дистанции\n• Особенности: Легендарная надежность газоотводной автоматики с длинным ходом поршня. Громкий басовитый выстрел и звонкий металлический лязг затвора внушают первобытный ужас в космических захватчиков."
 	},
 	"shotgun": {
 		"title": "ПОМПОВЫЙ ДРОБОВИК",
 		"bars": [
-			{"name": "Урон залпа: 144 ед. (8x18)", "val": 144.0, "max": 150.0},
-			{"name": "Темп огня: ~65 выстр/мин", "val": 65.0, "max": 800.0},
-			{"name": "Емкость магазина: 5 патронов", "val": 5.0, "max": 60.0},
-			{"name": "Разброс картечи: Широкий", "val": 80.0, "max": 100.0}
+			{"name": "Урон залпа: 144 ед. (8x18)", "val": 144.0, "max": 200.0},
+			{"name": "Темп стрельбы: 65 выстр/мин", "val": 65.0, "max": 900.0},
+			{"name": "Дальность поражения: 20 м", "val": 20.0, "max": 100.0},
+			{"name": "Точность (кучность): 30%", "val": 30.0, "max": 100.0}
 		],
 		"stats": "• Калибр: 12 Gauge (картечь 8.5 мм)\n• Режим огня: Ручная перезарядка подвижным цевьем\n• Магазин: Подствольный трубчатый на 5 патронов\n• Урон: 8 картечин по 18 ед. (до 144 ед. суммарно в упор)\n• Особенности: Оглушительный грохот картечного залпа и смачный клацающий звук досылания патронов в патронник. Идеальный аргумент для зачистки узких коридоров станции."
 	},
 	"pistol": {
 		"title": "ТАКТИЧЕСКИЙ ПИСТОЛЕТ",
 		"bars": [
-			{"name": "Урон за пулю: 26 ед.", "val": 26.0, "max": 100.0},
-			{"name": "Темп огня: ~400 выстр/мин", "val": 400.0, "max": 800.0},
-			{"name": "Емкость магазина: 17 патронов", "val": 17.0, "max": 60.0},
-			{"name": "Точность стрельбы: Высокая", "val": 90.0, "max": 100.0}
+			{"name": "Урон за выстрел: 26 ед.", "val": 26.0, "max": 200.0},
+			{"name": "Темп стрельбы: 400 выстр/мин", "val": 400.0, "max": 900.0},
+			{"name": "Дальность поражения: 45 м", "val": 45.0, "max": 100.0},
+			{"name": "Точность и контроль: 85%", "val": 85.0, "max": 100.0}
 		],
 		"stats": "• Калибр: 9x19 мм Parabellum\n• Режим огня: Полуавтоматический\n• Магазин: Двухрядный на 17 патронов\n• Урон: 26 ед.\n• Особенности: Высокоточный полимерный аналог Glock 17. Звонкий сверхзвуковой щелчок выстрела, моментальный сброс магазина и четкий металлический спуск затворной задержки."
 	},
 	"knife": {
 		"title": "АРМЕЙСКИЙ ШТЫКОВОЙ НОЖ",
 		"bars": [
-			{"name": "Урон удара: 70 ед.", "val": 70.0, "max": 100.0},
-			{"name": "Скорость удара: 0.35 сек", "val": 85.0, "max": 100.0},
-			{"name": "Дистанция атаки: 2.8 м", "val": 28.0, "max": 100.0},
-			{"name": "Охват экрана: 60%", "val": 60.0, "max": 100.0}
+			{"name": "Урон удара: 70 ед.", "val": 70.0, "max": 200.0},
+			{"name": "Темп атаки: 175 ударов/мин", "val": 175.0, "max": 900.0},
+			{"name": "Дальность поражения: 2.8 м", "val": 3.0, "max": 100.0},
+			{"name": "Точность удара: 95%", "val": 95.0, "max": 100.0}
 		],
 		"stats": "• Тип: Тактическое холодное оружие ближнего боя\n• Быстрый удар: Клавиша [V] в любой момент\n• Урон: 70 ед. чистой стали\n• Дистанция поражения: 2.8 метра\n\n📜 СЕКРЕТНОЕ ДОСЬЕ / ЗАБАВНАЯ ИСТОРИЯ:\n«Штатный штык-нож с гравировкой \"Не влезай — зарежет!\". Найден на складе запчастей, где им десять лет подряд открывали консервные банки со сгущенкой и зачищали оптоволоконные кабели. Заточен до состояния лазерной бритвы. При нажатии клавиши [V] персонаж мгновенно опускает огнестрел и совершает сокрушительный диагональный росчерк на 60% экрана, рассекая скафандры предателей быстрее, чем они успеют нажать кнопку тревоги!»"
 	},
@@ -627,25 +627,27 @@ func _on_shop_buy_pressed() -> void:
 func open_shop() -> void:
 	if is_game_over:
 		return
+	var player = get_parent()
+	if player and player.has_method("set_in_shop"):
+		player.set_in_shop(true)
 	if shop_panel:
 		shop_panel.visible = true
 	select_shop_item(current_shop_item_id)
 	update_shop_ui()
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-	
-	var spawner = get_tree().root.find_child("EnemySpawner", true, false)
-	if spawner and spawner.has_method("pause_warmup"):
-		spawner.pause_warmup(true)
+	if shop_zone_prompt_label:
+		shop_zone_prompt_label.visible = false
 
 func close_shop() -> void:
+	var player = get_parent()
+	if player and player.has_method("set_in_shop"):
+		player.set_in_shop(false)
 	if shop_panel:
 		shop_panel.visible = false
 	if not pause_panel.visible and not handbook_panel.visible and not is_game_over:
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-		
-	var spawner = get_tree().root.find_child("EnemySpawner", true, false)
-	if spawner and spawner.has_method("pause_warmup"):
-		spawner.pause_warmup(false)
+	if shop_zone_prompt_label and player and ("is_near_shop" in player) and player.is_near_shop:
+		shop_zone_prompt_label.visible = true
 
 func toggle_shop() -> void:
 	if shop_panel and shop_panel.visible:
@@ -702,21 +704,48 @@ func play_buy_sfx() -> void:
 func _on_close_shop_pressed() -> void:
 	close_shop()
 
+var shop_zone_prompt_label: Label = null
+
+func show_shop_zone_prompt(show_prompt: bool) -> void:
+	if not shop_zone_prompt_label:
+		shop_zone_prompt_label = Label.new()
+		shop_zone_prompt_label.name = "ShopZonePrompt"
+		shop_zone_prompt_label.text = "🛒 ЗОНА ТОРГОВЛИ | Нажмите [B] для покупок"
+		shop_zone_prompt_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		shop_zone_prompt_label.anchors_preset = Control.PRESET_CENTER_BOTTOM
+		shop_zone_prompt_label.offset_left = -250
+		shop_zone_prompt_label.offset_right = 250
+		shop_zone_prompt_label.offset_top = -120
+		shop_zone_prompt_label.offset_bottom = -90
+		shop_zone_prompt_label.add_theme_font_size_override("font_size", 18)
+		shop_zone_prompt_label.add_theme_color_override("font_color", Color(0.3, 0.95, 1.0))
+		shop_zone_prompt_label.add_theme_color_override("font_outline_color", Color(0.0, 0.0, 0.0, 0.9))
+		shop_zone_prompt_label.add_theme_constant_override("outline_size", 4)
+		add_child(shop_zone_prompt_label)
+		
+	shop_zone_prompt_label.visible = show_prompt and (not shop_panel or not shop_panel.visible)
+
 # --- WAVE BANNER COUNTDOWN & INTEL ---
 
-func show_wave_warmup(wave_num: int, remaining_sec: int, intel_text: String) -> void:
+func show_wave_warmup(wave_num: int, _remaining_sec: int, intel_text: String) -> void:
 	wave_banner.visible = true
-	wave_banner_title.text = "ПРИГОТОВЬТЕСЬ! ВОЛНА %d ЧЕРЕЗ: %d СЕК" % [wave_num, remaining_sec]
+	wave_banner_title.text = "ПЕРЕРЫВ МЕЖДУ РАУНДАМИ (ВОЛНА %d)" % wave_num
 	wave_banner_intel.text = "РАЗВЕДКА: %s" % intel_text
+	if wave_banner_hint:
+		wave_banner_hint.text = "Нажмите [F], чтобы начать раунд | Магазин у минивэна [B]"
 
-func update_wave_warmup_countdown(wave_num: int, remaining_sec: int) -> void:
+func update_wave_warmup_countdown(wave_num: int, _remaining_sec: int) -> void:
 	if wave_banner.visible:
-		wave_banner_title.text = "ПРИГОТОВЬТЕСЬ! ВОЛНА %d ЧЕРЕЗ: %d СЕК" % [wave_num, remaining_sec]
+		wave_banner_title.text = "ПЕРЕРЫВ МЕЖДУ РАУНДАМИ (ВОЛНА %d)" % wave_num
 
 func show_wave_started() -> void:
 	if shop_panel and shop_panel.visible:
 		close_shop()
+	if shop_zone_prompt_label:
+		shop_zone_prompt_label.visible = false
 	wave_banner_title.text = "ВОЛНА НАЧАЛАСЬ! К БОЮ!"
+	if wave_banner_hint:
+		wave_banner_hint.text = ""
 	await get_tree().create_timer(1.6).timeout
 	if is_instance_valid(wave_banner):
 		wave_banner.visible = false
