@@ -49,19 +49,48 @@ func _process(delta: float) -> void:
 	if not is_wave_active:
 		return
 		
+	var actual_alive: int = get_alive_enemy_count()
+	enemies_alive = actual_alive
+	update_enemy_count_hud()
+		
 	if enemies_to_spawn > 0:
 		spawn_timer -= delta
 		if spawn_timer <= 0.0:
 			spawn_timer = randf_range(0.8, 1.8)
 			spawn_next_enemy()
 			enemies_to_spawn -= 1
-	elif enemies_alive <= 0:
+			update_enemy_count_hud()
+	elif actual_alive <= 0:
 		# Wave clear! Next wave after short delay
 		is_wave_active = false
+		update_enemy_count_hud()
 		if minivan_shop and minivan_shop.has_method("on_wave_cleared"):
 			minivan_shop.on_wave_cleared()
+		var shops = get_tree().get_nodes_in_group("shop_building")
+		for s in shops:
+			if s.has_method("on_wave_cleared"):
+				s.on_wave_cleared()
 		await get_tree().create_timer(3.0).timeout
 		prepare_wave(current_wave + 1)
+
+func get_alive_enemy_count() -> int:
+	var count: int = 0
+	var all_enemies = get_tree().get_nodes_in_group("enemy")
+	for e in all_enemies:
+		if is_instance_valid(e) and not e.is_queued_for_deletion():
+			if "is_dead" in e and e.is_dead:
+				continue
+			if "health" in e and e.health <= 0.0:
+				continue
+			count += 1
+	return count
+
+func update_enemy_count_hud() -> void:
+	if player and player.get_node_or_null("HUD"):
+		var hud = player.get_node("HUD")
+		if hud.has_method("update_enemies_remaining"):
+			var remaining: int = enemies_to_spawn + get_alive_enemy_count()
+			hud.update_enemies_remaining(remaining, is_wave_active)
 
 func prepare_wave(wave_num: int) -> void:
 	current_wave = wave_num
@@ -72,6 +101,7 @@ func prepare_wave(wave_num: int) -> void:
 	is_warming_up = true
 	is_warmup_paused = false
 	warmup_time_left = 10.0
+	update_enemy_count_hud()
 	
 	if player and player.get_node_or_null("HUD"):
 		player.get_node("HUD").set_wave(current_wave)
@@ -126,6 +156,16 @@ func prepare_wave(wave_num: int) -> void:
 			2: yellow_count += 1
 			3: green_count += 1
 			4: drone_count += 1
+			
+	# Requirement 9: Double the number of Shahed drones spawned every wave!
+	var extra_drones = drone_count
+	if current_wave >= 2 and extra_drones == 0:
+		extra_drones = 2
+	for d in range(extra_drones):
+		enemy_types_pool.append(4)
+		drone_count += 1
+		total_count += 1
+	enemy_types_pool.shuffle()
 			
 	var intel_parts: Array[String] = []
 	if red_count > 0: intel_parts.append("🔴 %d Красных" % red_count)
@@ -218,6 +258,10 @@ func start_wave() -> void:
 	
 	if minivan_shop and minivan_shop.has_method("on_wave_started"):
 		minivan_shop.on_wave_started()
+	var shops = get_tree().get_nodes_in_group("shop_building")
+	for s in shops:
+		if s.has_method("on_wave_started"):
+			s.on_wave_started()
 	
 	if player and player.get_node_or_null("HUD"):
 		player.get_node("HUD").show_wave_started()
@@ -229,6 +273,7 @@ func start_wave() -> void:
 	enemies_to_spawn = planned_total
 	enemies_alive = 0
 	spawn_timer = 0.4
+	update_enemy_count_hud()
 
 func spawn_next_enemy() -> void:
 	if not enemy_scene:
@@ -259,10 +304,44 @@ func spawn_next_enemy() -> void:
 		enemy.global_position = chosen_pt.global_position + Vector3(randf_range(-1.0, 1.0), 0, randf_range(-1.0, 1.0))
 		enemies_alive += 1
 		enemy.died.connect(_on_enemy_died)
+	update_enemy_count_hud()
 
 func _on_enemy_died(points: int) -> void:
-	enemies_alive -= 1
-	if player and player.has_method("add_money"):
-		player.add_money(points)
-	elif player and player.has_method("add_score"):
+	enemies_alive = max(0, enemies_alive - 1)
+	update_enemy_count_hud()
+	if points > 0:
+		if player and player.has_method("add_money"):
+			player.add_money(points)
+		elif player and player.has_method("add_score"):
+			player.add_score(points)
 		player.add_score(points)
+
+func restart_current_wave(half_shop_hp: bool = true) -> void:
+	# Clean up any active alive enemies
+	var existing_enemies = get_tree().get_nodes_in_group("enemy")
+	for e in existing_enemies:
+		if is_instance_valid(e):
+			e.queue_free()
+			
+	dismiss_holographic_beacons()
+	enemies_alive = 0
+	enemies_to_spawn = 0
+	is_wave_active = false
+	
+	if half_shop_hp:
+		var shops = get_tree().get_nodes_in_group("shop_building")
+		for s in shops:
+			if s.has_method("reset_to_half_health"):
+				s.reset_to_half_health()
+				
+	# Reopen shop doors
+	var shops_to_open = get_tree().get_nodes_in_group("shop_building")
+	for s in shops_to_open:
+		if s.has_method("on_wave_cleared"):
+			s.on_wave_cleared()
+			
+	if minivan_shop and minivan_shop.has_method("on_wave_cleared"):
+		minivan_shop.on_wave_cleared()
+		
+	# Prepare the current wave afresh
+	prepare_wave(current_wave)

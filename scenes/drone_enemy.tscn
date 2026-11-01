@@ -59,6 +59,15 @@ radial_segments = 8
 material = SubResource("Mat_Engine")
 size = Vector3(0.55, 0.035, 0.015)
 
+[sub_resource type="BoxMesh" id="Mesh_PropBladeCross"]
+material = SubResource("Mat_Engine")
+size = Vector3(0.035, 0.55, 0.015)
+
+[sub_resource type="SphereMesh" id="Mesh_PropHub"]
+material = SubResource("Mat_Engine")
+radius = 0.045
+height = 0.07
+
 [sub_resource type="StandardMaterial3D" id="Mat_GreenCrewmate"]
 albedo_color = Color(0.15, 0.85, 0.25, 1)
 roughness = 0.35
@@ -128,7 +137,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.01, -0.11)
 mesh = SubResource("Mesh_GreenBackpack")
 
 [node name="NoseCone" type="MeshInstance3D" parent="Visuals"]
-transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0.85)
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0.85)
 mesh = SubResource("Mesh_NoseCone")
 
 [node name="DeltaWing" type="MeshInstance3D" parent="Visuals"]
@@ -154,6 +163,13 @@ mesh = SubResource("Mesh_Engine")
 [node name="Propeller" type="MeshInstance3D" parent="Visuals"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, -0.82)
 mesh = SubResource("Mesh_PropBlade")
+
+[node name="BladeCross" type="MeshInstance3D" parent="Visuals/Propeller"]
+mesh = SubResource("Mesh_PropBladeCross")
+
+[node name="HubSpinner" type="MeshInstance3D" parent="Visuals/Propeller"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.02)
+mesh = SubResource("Mesh_PropHub")
 
 [node name="SubViewport" type="SubViewport" parent="."]
 transparent_bg = true

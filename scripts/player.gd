@@ -461,12 +461,63 @@ func die() -> void:
 	if is_dead:
 		return
 	is_dead = true
+	
+	# Requirement 7: Halve reserve ammo for each weapon, keeping exact same magazine ammo
+	if weapon_manager and weapon_manager.weapons:
+		for w in weapon_manager.weapons:
+			w.reserve_ammo = int(ceil(float(w.reserve_ammo) / 2.0))
+		if weapon_manager.has_method("emit_ammo_state"):
+			weapon_manager.emit_ammo_state()
+			
+	# All other inventory items (vodka_count, armor) remain preserved in full
 	player_died.emit()
-	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	
 	var tween: Tween = create_tween()
 	tween.tween_property(camera, "position:y", 0.25, 0.5)
 	tween.parallel().tween_property(camera, "rotation:z", deg_to_rad(45.0), 0.5)
+
+func respawn_at_shop() -> void:
+	# 1. Reset camera
+	camera.position = Vector3(0, 1.6, 0)
+	camera.rotation = Vector3.ZERO
+	
+	# 2. Teleport to shop entrance doors
+	var spawn_pos = Vector3(0.0, 0.1, -0.5)
+	var shops = get_tree().get_nodes_in_group("shop_building")
+	if shops.size() > 0:
+		var s = shops[0]
+		spawn_pos = Vector3(0.0, 0.1, s.global_position.z - 11.2)
+	global_position = spawn_pos
+	velocity = Vector3.ZERO
+	
+	# 3. Restore player health
+	health = max_health
+	health_changed.emit(health, max_health)
+	
+	# 4. Clear dead flag and resume controls
+	is_dead = false
+	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	
+	# 5. Update weapon HUD
+	if weapon_manager and weapon_manager.has_method("emit_ammo_state"):
+		weapon_manager.emit_ammo_state()
+
+func reset_after_wave_restart() -> void:
+	camera.position = Vector3(0, 1.6, 0)
+	camera.rotation = Vector3.ZERO
+	var spawn_pos = Vector3(0.0, 0.1, -0.5)
+	var shops = get_tree().get_nodes_in_group("shop_building")
+	if shops.size() > 0:
+		var s = shops[0]
+		spawn_pos = Vector3(0.0, 0.1, s.global_position.z - 11.2)
+	global_position = spawn_pos
+	velocity = Vector3.ZERO
+	health = max_health
+	health_changed.emit(health, max_health)
+	is_dead = false
+	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	if weapon_manager and weapon_manager.has_method("emit_ammo_state"):
+		weapon_manager.emit_ammo_state()
 
 func restart_game() -> void:
 	get_tree().reload_current_scene()
