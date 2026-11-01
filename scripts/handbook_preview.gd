@@ -2276,4 +2276,3 @@ func create_armor_plate_preview() -> Node3D:
 	root.add_child(lbl)
 	
 	return root
-

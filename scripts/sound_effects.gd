@@ -1,4 +1,4 @@
-﻿class_name SoundEffects
+class_name SoundEffects
 extends Node
 
 # Procedural Sound Generator for FPS

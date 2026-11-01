@@ -115,4 +115,3 @@ static func create_knife() -> Weapon:
 	w.recoil_pitch = 0.0
 	w.recoil_yaw = 0.0
 	return w
-
