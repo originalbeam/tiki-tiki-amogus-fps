@@ -1,4 +1,4 @@
-[gd_scene load_steps=2 format=3 uid="uid://minivanshop001"]
+[gd_scene format=3 uid="uid://c3uq5mgi83dw7"]
 
 [ext_resource type="Script" path="res://scripts/minivan_shop.gd" id="1_shop"]
 
