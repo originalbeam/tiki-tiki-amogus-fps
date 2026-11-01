@@ -487,14 +487,14 @@ func build_awp_visuals(parent: Node3D) -> void:
 	mid_chassis.position = Vector3(0, -0.01, -0.04)
 	parent.add_child(mid_chassis)
 
-	# Pistol Grip (front of thumbhole)
+	# Pistol Grip (front of thumbhole, authentic slant towards stock)
 	var grip = MeshInstance3D.new()
 	var gr_m = BoxMesh.new()
 	gr_m.size = Vector3(0.058, 0.13, 0.07)
 	grip.mesh = gr_m
 	grip.material_override = mat_awp_green
 	grip.position = Vector3(0, -0.09, -0.14)
-	grip.rotation.x = deg_to_rad(-16.0)
+	grip.rotation.x = deg_to_rad(16.0)
 	parent.add_child(grip)
 
 	# Upper Stock Comb (bridge above thumbhole)

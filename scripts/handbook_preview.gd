@@ -118,7 +118,7 @@ func show_item(item_id: String) -> void:
 			camera.position = Vector3(0, 0.0, 2.35)
 		"enemy_shahed", "shahed":
 			current_model_node = create_shahed_preview()
-			camera.position = Vector3(0, 0.4, 2.2)
+			camera.position = Vector3(0, 0.25, 2.2)
 		"armor_vest":
 			current_model_node = create_armor_preview()
 			camera.position = Vector3(0, 0.0, 0.95)
@@ -145,7 +145,46 @@ func show_item(item_id: String) -> void:
 		model_pivot.add_child(current_model_node)
 	camera.look_at(Vector3(0, 0, 0), Vector3.UP)
 
+func get_player_weapon_copy(weapon_node_name: String) -> Node3D:
+	var player_scene = load("res://scenes/player.tscn")
+	if not player_scene:
+		return null
+	var inst = player_scene.instantiate()
+	if not inst:
+		return null
+	var w_node = inst.get_node_or_null("Head/Camera3D/WeaponHolder/" + weapon_node_name)
+	if not w_node:
+		inst.queue_free()
+		return null
+	var copy: Node3D = w_node.duplicate()
+	copy.visible = true
+	inst.queue_free()
+	return copy
+
+func get_drone_visuals_copy() -> Node3D:
+	var drone_scene = load("res://scenes/drone_enemy.tscn")
+	if not drone_scene:
+		return null
+	var inst = drone_scene.instantiate()
+	if not inst:
+		return null
+	var vis = inst.get_node_or_null("Visuals")
+	if not vis:
+		inst.queue_free()
+		return null
+	var copy: Node3D = vis.duplicate()
+	copy.visible = true
+	inst.queue_free()
+	return copy
+
 func create_ak47_preview() -> Node3D:
+	var actual_model := get_player_weapon_copy("AK47")
+	if actual_model:
+		var wrapper := Node3D.new()
+		actual_model.position = Vector3(0, 0, 0.15)
+		wrapper.add_child(actual_model)
+		return wrapper
+		
 	var root = Node3D.new()
 	var mat_metal = StandardMaterial3D.new()
 	mat_metal.albedo_color = Color(0.15, 0.16, 0.19)
@@ -178,7 +217,7 @@ func create_ak47_preview() -> Node3D:
 	# 1. Receiver Lower
 	var rec_low = MeshInstance3D.new()
 	var r_mesh = BoxMesh.new()
-	r_mesh.size = Vector3(0.055, 0.055, 0.32)
+	r_mesh.size = Vector3(0.046, 0.05, 0.28)
 	rec_low.mesh = r_mesh
 	rec_low.material_override = mat_metal
 	root.add_child(rec_low)
@@ -186,90 +225,90 @@ func create_ak47_preview() -> Node3D:
 	# 2. Receiver Top Cover (Ribbed stamped steel cover)
 	var rec_top = MeshInstance3D.new()
 	var rt_mesh = BoxMesh.new()
-	rt_mesh.size = Vector3(0.05, 0.038, 0.3)
+	rt_mesh.size = Vector3(0.042, 0.028, 0.228)
 	rec_top.mesh = rt_mesh
 	rec_top.material_override = mat_metal
-	rec_top.position = Vector3(0, 0.038, 0)
+	rec_top.position = Vector3(0, 0.035, 0.024)
 	root.add_child(rec_top)
 	
 	# Top Cover Stiffening Ribs
-	for rx in [-0.012, 0.012]:
+	for rx in [-0.011, 0.011]:
 		var rib = MeshInstance3D.new()
 		var rib_m = BoxMesh.new()
-		rib_m.size = Vector3(0.005, 0.005, 0.24)
+		rib_m.size = Vector3(0.004, 0.004, 0.18)
 		rib.mesh = rib_m
 		rib.material_override = mat_metal
-		rib.position = Vector3(rx, 0.054, 0.01)
+		rib.position = Vector3(rx, 0.05, 0.024)
 		root.add_child(rib)
 		
 	# Fire Selector Lever (Right side)
 	var selector = MeshInstance3D.new()
 	var sel_m = BoxMesh.new()
-	sel_m.size = Vector3(0.004, 0.014, 0.075)
+	sel_m.size = Vector3(0.004, 0.013, 0.075)
 	selector.mesh = sel_m
 	selector.material_override = mat_metal
-	selector.position = Vector3(0.026, 0.008, 0.02)
+	selector.position = Vector3(0.024, 0.008, 0.02)
 	root.add_child(selector)
 	
 	# Lightening Dimple (Left side milled recess)
 	var dimple = MeshInstance3D.new()
 	var dim_m = BoxMesh.new()
-	dim_m.size = Vector3(0.004, 0.016, 0.035)
+	dim_m.size = Vector3(0.003, 0.016, 0.035)
 	dimple.mesh = dim_m
 	dimple.material_override = mat_dark_recess
-	dimple.position = Vector3(-0.026, 0.006, -0.05)
+	dimple.position = Vector3(-0.024, 0.006, -0.05)
 	root.add_child(dimple)
 	
 	# Rear Sight Base & Tangent Ladder Leaf
 	var rsb = MeshInstance3D.new()
 	var rsb_m = BoxMesh.new()
-	rsb_m.size = Vector3(0.036, 0.032, 0.045)
+	rsb_m.size = Vector3(0.036, 0.034, 0.05)
 	rsb.mesh = rsb_m
 	rsb.material_override = mat_metal
-	rsb.position = Vector3(0, 0.038, -0.14)
+	rsb.position = Vector3(0, 0.032, -0.115)
 	root.add_child(rsb)
 	
 	var leaf = MeshInstance3D.new()
 	var leaf_m = BoxMesh.new()
-	leaf_m.size = Vector3(0.016, 0.008, 0.04)
+	leaf_m.size = Vector3(0.014, 0.006, 0.038)
 	leaf.mesh = leaf_m
 	leaf.material_override = mat_metal
-	leaf.position = Vector3(0, 0.044, -0.14)
+	leaf.position = Vector3(0, 0.051, -0.115)
 	root.add_child(leaf)
 	
 	# 3. Ejection Port (Right side cutout)
 	var eject_port = MeshInstance3D.new()
 	var ep_mesh = BoxMesh.new()
-	ep_mesh.size = Vector3(0.012, 0.032, 0.10)
+	ep_mesh.size = Vector3(0.008, 0.026, 0.075)
 	eject_port.mesh = ep_mesh
 	eject_port.material_override = mat_dark_recess
-	eject_port.position = Vector3(0.026, 0.03, -0.04)
+	eject_port.position = Vector3(0.022, 0.028, -0.04)
 	root.add_child(eject_port)
 	
 	# 4. Bolt Carrier (Silver steel visible inside ejection cutout)
 	var bolt = MeshInstance3D.new()
 	var b_mesh = BoxMesh.new()
-	b_mesh.size = Vector3(0.015, 0.026, 0.09)
+	b_mesh.size = Vector3(0.012, 0.022, 0.065)
 	bolt.mesh = b_mesh
 	bolt.material_override = mat_bolt
-	bolt.position = Vector3(0.024, 0.03, -0.04)
+	bolt.position = Vector3(0.022, 0.028, -0.04)
 	root.add_child(bolt)
 	
 	# 5. Charging Handle (Right side curved handle)
 	var handle = MeshInstance3D.new()
 	var h_mesh = BoxMesh.new()
-	h_mesh.size = Vector3(0.045, 0.016, 0.024)
+	h_mesh.size = Vector3(0.024, 0.014, 0.02)
 	handle.mesh = h_mesh
 	handle.material_override = mat_metal
-	handle.position = Vector3(0.042, 0.03, -0.04)
+	handle.position = Vector3(0.034, 0.026, -0.04)
 	root.add_child(handle)
 	
 	# 6. Gas Piston Tube (Upper tube above barrel)
 	var gas_tube = MeshInstance3D.new()
 	var gt_mesh = CylinderMesh.new()
-	gt_mesh.top_radius = 0.012
-	gt_mesh.bottom_radius = 0.012
-	gt_mesh.height = 0.22
+	gt_mesh.top_radius = 0.01
+	gt_mesh.bottom_radius = 0.01
+	gt_mesh.height = 0.2
 	gas_tube.mesh = gt_mesh
 	gas_tube.material_override = mat_metal
 	gas_tube.rotation.x = deg_to_rad(90)
@@ -279,22 +318,22 @@ func create_ak47_preview() -> Node3D:
 	# 7. Barrel
 	var barrel = MeshInstance3D.new()
 	var bar_mesh = CylinderMesh.new()
-	bar_mesh.top_radius = 0.011
-	bar_mesh.bottom_radius = 0.011
+	bar_mesh.top_radius = 0.01
+	bar_mesh.bottom_radius = 0.01
 	bar_mesh.height = 0.38
 	barrel.mesh = bar_mesh
 	barrel.material_override = mat_metal
 	barrel.rotation.x = deg_to_rad(90)
-	barrel.position = Vector3(0, 0.005, -0.32)
+	barrel.position = Vector3(0, 0.005, -0.33)
 	root.add_child(barrel)
 	
 	# 8. Gas Block (Angled gas port block connecting barrel & gas tube)
 	var gas_block = MeshInstance3D.new()
 	var gb_mesh = BoxMesh.new()
-	gb_mesh.size = Vector3(0.03, 0.045, 0.038)
+	gb_mesh.size = Vector3(0.024, 0.042, 0.036)
 	gas_block.mesh = gb_mesh
 	gas_block.material_override = mat_metal
-	gas_block.position = Vector3(0, 0.02, -0.36)
+	gas_block.position = Vector3(0, 0.02, -0.355)
 	root.add_child(gas_block)
 	
 	# 9. Cleaning Rod (Under barrel)
@@ -302,105 +341,105 @@ func create_ak47_preview() -> Node3D:
 	var rod_mesh = CylinderMesh.new()
 	rod_mesh.top_radius = 0.003
 	rod_mesh.bottom_radius = 0.003
-	rod_mesh.height = 0.32
+	rod_mesh.height = 0.34
 	rod.mesh = rod_mesh
 	rod.material_override = mat_metal
 	rod.rotation.x = deg_to_rad(90)
-	rod.position = Vector3(0, -0.014, -0.34)
+	rod.position = Vector3(0, -0.014, -0.35)
 	root.add_child(rod)
 	
 	# 10. Front Sight Base & Post
 	var sight = MeshInstance3D.new()
 	var s_mesh = BoxMesh.new()
-	s_mesh.size = Vector3(0.018, 0.045, 0.022)
+	s_mesh.size = Vector3(0.016, 0.04, 0.02)
 	sight.mesh = s_mesh
 	sight.material_override = mat_metal
-	sight.position = Vector3(0, 0.032, -0.48)
+	sight.position = Vector3(0, 0.034, -0.48)
 	root.add_child(sight)
 	
 	# 11. Compensator (Slant muzzle brake)
 	var comp = MeshInstance3D.new()
 	var c_mesh = CylinderMesh.new()
-	c_mesh.top_radius = 0.014
-	c_mesh.bottom_radius = 0.014
-	c_mesh.height = 0.045
+	c_mesh.top_radius = 0.012
+	c_mesh.bottom_radius = 0.012
+	c_mesh.height = 0.04
 	comp.mesh = c_mesh
 	comp.material_override = mat_metal
 	comp.rotation.x = deg_to_rad(90)
-	comp.position = Vector3(0, 0.005, -0.52)
+	comp.position = Vector3(0, 0.005, -0.525)
 	root.add_child(comp)
 	
 	# 12. Lower Handguard (Palm swell wood)
 	var wood_low = MeshInstance3D.new()
 	var wl_mesh = BoxMesh.new()
-	wl_mesh.size = Vector3(0.056, 0.054, 0.16)
+	wl_mesh.size = Vector3(0.054, 0.048, 0.15)
 	wood_low.mesh = wl_mesh
 	wood_low.material_override = mat_wood
-	wood_low.position = Vector3(0, -0.01, -0.22)
+	wood_low.position = Vector3(0, -0.008, -0.22)
 	root.add_child(wood_low)
 	
 	# 13. Upper Handguard (Wood heat shield)
 	var wood_up = MeshInstance3D.new()
 	var wu_mesh = BoxMesh.new()
-	wu_mesh.size = Vector3(0.048, 0.034, 0.13)
+	wu_mesh.size = Vector3(0.042, 0.03, 0.14)
 	wood_up.mesh = wu_mesh
 	wood_up.material_override = mat_wood
-	wood_up.position = Vector3(0, 0.036, -0.22)
+	wood_up.position = Vector3(0, 0.034, -0.22)
 	root.add_child(wood_up)
 	
 	# 14. Handguard Retainer Rings (Front & Rear steel collars)
 	var cap_front = MeshInstance3D.new()
 	var cf_mesh = BoxMesh.new()
-	cf_mesh.size = Vector3(0.058, 0.058, 0.015)
+	cf_mesh.size = Vector3(0.056, 0.056, 0.01)
 	cap_front.mesh = cf_mesh
 	cap_front.material_override = mat_metal
-	cap_front.position = Vector3(0, 0.01, -0.305)
+	cap_front.position = Vector3(0, 0.012, -0.297)
 	root.add_child(cap_front)
 	
 	var cap_rear = MeshInstance3D.new()
 	var cr_mesh = BoxMesh.new()
-	cr_mesh.size = Vector3(0.058, 0.058, 0.015)
+	cr_mesh.size = Vector3(0.056, 0.056, 0.01)
 	cap_rear.mesh = cr_mesh
 	cap_rear.material_override = mat_metal
-	cap_rear.position = Vector3(0, 0.01, -0.135)
+	cap_rear.position = Vector3(0, 0.012, -0.143)
 	root.add_child(cap_rear)
 	
 	# 15. Wooden Stock
 	var stock = MeshInstance3D.new()
 	var st_mesh = BoxMesh.new()
-	st_mesh.size = Vector3(0.048, 0.1, 0.24)
+	st_mesh.size = Vector3(0.044, 0.092, 0.23)
 	stock.mesh = st_mesh
 	stock.material_override = mat_wood
-	stock.position = Vector3(0, -0.04, 0.24)
-	stock.rotation.x = deg_to_rad(10)
+	stock.position = Vector3(0, -0.035, 0.235)
+	stock.rotation.x = deg_to_rad(8.0)
 	root.add_child(stock)
 	
 	# Steel Buttplate
 	var buttplate = MeshInstance3D.new()
 	var bp_m = BoxMesh.new()
-	bp_m.size = Vector3(0.049, 0.102, 0.008)
+	bp_m.size = Vector3(0.046, 0.094, 0.006)
 	buttplate.mesh = bp_m
 	buttplate.material_override = mat_metal
-	buttplate.position = Vector3(0, 0, 0.12)
+	buttplate.position = Vector3(0, 0, 0.116)
 	stock.add_child(buttplate)
 	
 	# 16. Pistol Grip (Authentic backward slant towards stock)
 	var grip = MeshInstance3D.new()
 	var gr_mesh = BoxMesh.new()
-	gr_mesh.size = Vector3(0.034, 0.11, 0.052)
+	gr_mesh.size = Vector3(0.032, 0.11, 0.048)
 	grip.mesh = gr_mesh
 	grip.material_override = mat_grip
-	grip.position = Vector3(0, -0.08, 0.065)
+	grip.position = Vector3(0, -0.075, 0.065)
 	grip.rotation.x = deg_to_rad(-22.0)
 	root.add_child(grip)
 	
 	# 17. Trigger Guard, Trigger & Magazine Release Latch
 	var guard = MeshInstance3D.new()
 	var gd_mesh = BoxMesh.new()
-	gd_mesh.size = Vector3(0.018, 0.04, 0.065)
+	gd_mesh.size = Vector3(0.016, 0.036, 0.065)
 	guard.mesh = gd_mesh
 	guard.material_override = mat_metal
-	guard.position = Vector3(0, -0.045, 0.02)
+	guard.position = Vector3(0, -0.042, 0.02)
 	root.add_child(guard)
 	
 	var trig = MeshInstance3D.new()
@@ -408,7 +447,7 @@ func create_ak47_preview() -> Node3D:
 	tr_mesh.size = Vector3(0.008, 0.024, 0.012)
 	trig.mesh = tr_mesh
 	trig.material_override = mat_metal
-	trig.position = Vector3(0, -0.042, 0.025)
+	trig.position = Vector3(0, -0.04, 0.025)
 	trig.rotation.x = deg_to_rad(-18)
 	root.add_child(trig)
 	
@@ -417,18 +456,18 @@ func create_ak47_preview() -> Node3D:
 	ml_m.size = Vector3(0.012, 0.024, 0.008)
 	mag_latch.mesh = ml_m
 	mag_latch.material_override = mat_metal
-	mag_latch.position = Vector3(0, -0.035, -0.018)
+	mag_latch.position = Vector3(0, -0.032, -0.018)
 	root.add_child(mag_latch)
 	
 	# 18. Detailed Curved Steel Magazine (Authentic forward curve towards muzzle)
 	var mag_node = Node3D.new()
-	mag_node.position = Vector3(0, -0.12, -0.07)
+	mag_node.position = Vector3(0, -0.115, -0.065)
 	mag_node.rotation.x = deg_to_rad(22.0)
 	root.add_child(mag_node)
 	
 	var mag_body = MeshInstance3D.new()
 	var mb_mesh = BoxMesh.new()
-	mb_mesh.size = Vector3(0.036, 0.19, 0.09)
+	mb_mesh.size = Vector3(0.03, 0.2, 0.09)
 	mag_body.mesh = mb_mesh
 	mag_body.material_override = mat_mag
 	mag_node.add_child(mag_body)
@@ -436,16 +475,16 @@ func create_ak47_preview() -> Node3D:
 	# Magazine Base Plate (Steel)
 	var mag_base = MeshInstance3D.new()
 	var b_base_mesh = BoxMesh.new()
-	b_base_mesh.size = Vector3(0.040, 0.012, 0.096)
+	b_base_mesh.size = Vector3(0.034, 0.01, 0.094)
 	mag_base.mesh = b_base_mesh
 	mag_base.material_override = mat_metal
-	mag_base.position = Vector3(0, -0.096, 0)
+	mag_base.position = Vector3(0, -0.098, 0)
 	mag_node.add_child(mag_base)
 	
 	# Magazine Strengthening Ribs
 	var mag_rib1 = MeshInstance3D.new()
 	var mr_mesh = BoxMesh.new()
-	mr_mesh.size = Vector3(0.038, 0.008, 0.086)
+	mr_mesh.size = Vector3(0.033, 0.008, 0.084)
 	mag_rib1.mesh = mr_mesh
 	mag_rib1.material_override = mat_mag
 	mag_rib1.position = Vector3(0, -0.03, 0)
@@ -460,6 +499,13 @@ func create_ak47_preview() -> Node3D:
 	return root
 
 func create_shotgun_preview() -> Node3D:
+	var actual_model := get_player_weapon_copy("Shotgun")
+	if actual_model:
+		var wrapper := Node3D.new()
+		actual_model.position = Vector3(0, 0, 0.12)
+		wrapper.add_child(actual_model)
+		return wrapper
+		
 	var root = Node3D.new()
 	var mat_metal = StandardMaterial3D.new()
 	mat_metal.albedo_color = Color(0.18, 0.19, 0.22)
@@ -645,6 +691,13 @@ func create_shotgun_preview() -> Node3D:
 	return root
 
 func create_pistol_preview() -> Node3D:
+	var actual_model := get_player_weapon_copy("Pistol")
+	if actual_model:
+		var wrapper := Node3D.new()
+		actual_model.position = Vector3(0, 0.02, 0.0)
+		wrapper.add_child(actual_model)
+		return wrapper
+		
 	var root = Node3D.new()
 	var mat_slide = StandardMaterial3D.new()
 	mat_slide.albedo_color = Color(0.2, 0.21, 0.24)
@@ -673,26 +726,26 @@ func create_pistol_preview() -> Node3D:
 	# 1. Slide
 	var slide = MeshInstance3D.new()
 	var sl_mesh = BoxMesh.new()
-	sl_mesh.size = Vector3(0.040, 0.038, 0.198)
+	sl_mesh.size = Vector3(0.038, 0.036, 0.20)
 	slide.mesh = sl_mesh
 	slide.material_override = mat_slide
-	slide.position = Vector3(0, 0.021, 0)
+	slide.position = Vector3(0, 0.020, 0)
 	root.add_child(slide)
 	
 	# Ejection Port
 	var ep = MeshInstance3D.new()
 	var ep_mesh = BoxMesh.new()
-	ep_mesh.size = Vector3(0.008, 0.018, 0.052)
+	ep_mesh.size = Vector3(0.012, 0.018, 0.050)
 	ep.mesh = ep_mesh
 	ep.material_override = mat_recess
-	ep.position = Vector3(0.019, 0.016, 0.010)
+	ep.position = Vector3(0.015, 0.009, 0.010)
 	slide.add_child(ep)
 	
 	# Slide Serrations (Rear & Front)
 	for s_z in [0.06, 0.045, -0.06]:
 		var ser = MeshInstance3D.new()
 		var ser_mesh = BoxMesh.new()
-		ser_mesh.size = Vector3(0.042, 0.034, 0.006)
+		ser_mesh.size = Vector3(0.040, 0.030, 0.005)
 		ser.mesh = ser_mesh
 		ser.material_override = mat_recess
 		ser.position = Vector3(0, 0.004, s_z)
@@ -701,10 +754,10 @@ func create_pistol_preview() -> Node3D:
 	# Rear Sight with Dual Green Dots
 	var rs = MeshInstance3D.new()
 	var rs_mesh = BoxMesh.new()
-	rs_mesh.size = Vector3(0.032, 0.018, 0.016)
+	rs_mesh.size = Vector3(0.030, 0.016, 0.015)
 	rs.mesh = rs_mesh
 	rs.material_override = mat_slide
-	rs.position = Vector3(0, 0.032, 0.085)
+	rs.position = Vector3(0, 0.024, 0.085)
 	slide.add_child(rs)
 	
 	for d_x in [-0.01, 0.01]:
@@ -719,10 +772,10 @@ func create_pistol_preview() -> Node3D:
 	# Front Sight with Green Dot
 	var fs = MeshInstance3D.new()
 	var fs_mesh = BoxMesh.new()
-	fs_mesh.size = Vector3(0.012, 0.016, 0.018)
+	fs_mesh.size = Vector3(0.011, 0.015, 0.016)
 	fs.mesh = fs_mesh
 	fs.material_override = mat_slide
-	fs.position = Vector3(0, 0.032, -0.085)
+	fs.position = Vector3(0, 0.024, -0.085)
 	slide.add_child(fs)
 	
 	var fdot = MeshInstance3D.new()
@@ -733,58 +786,58 @@ func create_pistol_preview() -> Node3D:
 	fdot.position = Vector3(0, 0.003, 0.008)
 	fs.add_child(fdot)
 	
-	# 2. Frame & Chamber Block (Clean separation, zero Z-fighting)
+	# 2. Frame & Chamber Block (Interlocked flush contact, zero levitation, zero Z-fighting)
 	var frame = MeshInstance3D.new()
 	var fr_mesh = BoxMesh.new()
-	fr_mesh.size = Vector3(0.038, 0.022, 0.176)
+	fr_mesh.size = Vector3(0.034, 0.024, 0.180)
 	frame.mesh = fr_mesh
 	frame.material_override = mat_frame
-	frame.position = Vector3(0, -0.012, 0.006)
+	frame.position = Vector3(0, -0.009, 0.006)
 	root.add_child(frame)
 	
 	var chamber = MeshInstance3D.new()
 	var ch_mesh = BoxMesh.new()
-	ch_mesh.size = Vector3(0.032, 0.024, 0.046)
+	ch_mesh.size = Vector3(0.026, 0.020, 0.044)
 	chamber.mesh = ch_mesh
 	chamber.material_override = mat_barrel
-	chamber.position = Vector3(0, 0.026, 0.012)
+	chamber.position = Vector3(0, 0.025, 0.012)
 	frame.add_child(chamber)
 	
 	var btip = MeshInstance3D.new()
 	var bt_mesh = CylinderMesh.new()
-	bt_mesh.top_radius = 0.011
-	bt_mesh.bottom_radius = 0.011
+	bt_mesh.top_radius = 0.010
+	bt_mesh.bottom_radius = 0.010
 	bt_mesh.height = 0.03
 	btip.mesh = bt_mesh
 	btip.material_override = mat_barrel
 	btip.rotation.x = deg_to_rad(90)
-	btip.position = Vector3(0, 0.033, -0.115)
+	btip.position = Vector3(0, 0.029, -0.112)
 	frame.add_child(btip)
 	
 	# Picatinny Rail
 	var rail = MeshInstance3D.new()
 	var rail_mesh = BoxMesh.new()
-	rail_mesh.size = Vector3(0.036, 0.010, 0.075)
+	rail_mesh.size = Vector3(0.034, 0.010, 0.075)
 	rail.mesh = rail_mesh
 	rail.material_override = mat_frame
-	rail.position = Vector3(0, -0.018, -0.045)
+	rail.position = Vector3(0, -0.015, -0.045)
 	frame.add_child(rail)
 	
 	# Combat Trigger Guard & Trigger
 	var tg = MeshInstance3D.new()
 	var tg_mesh = BoxMesh.new()
-	tg_mesh.size = Vector3(0.016, 0.036, 0.058)
+	tg_mesh.size = Vector3(0.015, 0.032, 0.058)
 	tg.mesh = tg_mesh
 	tg.material_override = mat_frame
-	tg.position = Vector3(0, -0.024, -0.015)
+	tg.position = Vector3(0, -0.020, -0.015)
 	frame.add_child(tg)
 	
 	var tr = MeshInstance3D.new()
 	var tr_mesh = BoxMesh.new()
-	tr_mesh.size = Vector3(0.008, 0.024, 0.012)
+	tr_mesh.size = Vector3(0.008, 0.022, 0.012)
 	tr.mesh = tr_mesh
 	tr.material_override = mat_slide
-	tr.position = Vector3(0, -0.020, 0.002)
+	tr.position = Vector3(0, -0.016, 0.002)
 	tr.rotation.x = deg_to_rad(-18)
 	frame.add_child(tr)
 	
@@ -815,16 +868,16 @@ func create_pistol_preview() -> Node3D:
 	sr_mesh.size = Vector3(0.004, 0.008, 0.020)
 	s_rel.mesh = sr_mesh
 	s_rel.material_override = mat_slide
-	s_rel.position = Vector3(-0.020, 0.015, 0.030)
+	s_rel.position = Vector3(-0.019, 0.012, 0.030)
 	frame.add_child(s_rel)
 	
 	# 3. Grip & Magazine with Extended Bumper Pad (Authentic backward Glock slant)
 	var grip = MeshInstance3D.new()
 	var gr_mesh = BoxMesh.new()
-	gr_mesh.size = Vector3(0.034, 0.12, 0.058)
+	gr_mesh.size = Vector3(0.032, 0.12, 0.056)
 	grip.mesh = gr_mesh
 	grip.material_override = mat_frame
-	grip.position = Vector3(0, -0.08, 0.045)
+	grip.position = Vector3(0, -0.075, 0.045)
 	grip.rotation.x = deg_to_rad(-22.0)
 	root.add_child(grip)
 	
@@ -839,7 +892,7 @@ func create_pistol_preview() -> Node3D:
 		grip.add_child(fg)
 	
 	var mag_node = Node3D.new()
-	mag_node.position = Vector3(0, -0.08, 0.045)
+	mag_node.position = Vector3(0, -0.075, 0.045)
 	mag_node.rotation.x = deg_to_rad(-22.0)
 	root.add_child(mag_node)
 	
@@ -852,7 +905,7 @@ func create_pistol_preview() -> Node3D:
 	
 	var bumper = MeshInstance3D.new()
 	var b_mesh = BoxMesh.new()
-	b_mesh.size = Vector3(0.036, 0.016, 0.060)
+	b_mesh.size = Vector3(0.035, 0.016, 0.058)
 	bumper.mesh = b_mesh
 	bumper.material_override = mat_frame
 	bumper.position = Vector3(0, -0.065, 0.004)
@@ -935,81 +988,115 @@ func create_crewmate_preview(color: Color, enemy_type: int = 0) -> Node3D:
 	return root
 
 func equip_preview_ak(parent: Node3D) -> void:
-	var mat_m = StandardMaterial3D.new()
-	mat_m.albedo_color = Color(0.18, 0.19, 0.22)
-	mat_m.metallic = 0.85
+	var mat_metal = StandardMaterial3D.new()
+	mat_metal.albedo_color = Color(0.18, 0.19, 0.22)
+	mat_metal.metallic = 0.88
+	mat_metal.roughness = 0.32
 	
-	var mat_w = StandardMaterial3D.new()
-	mat_w.albedo_color = Color(0.48, 0.22, 0.1)
+	var mat_wood = StandardMaterial3D.new()
+	mat_wood.albedo_color = Color(0.48, 0.22, 0.1)
+	mat_wood.roughness = 0.65
 	
-	var mat_mag = StandardMaterial3D.new()
-	mat_mag.albedo_color = Color(0.68, 0.3, 0.12)
+	var mat_grip = StandardMaterial3D.new()
+	mat_grip.albedo_color = Color(0.38, 0.18, 0.10)
+	mat_grip.roughness = 0.45
 	
+	# Receiver
 	var rec = MeshInstance3D.new()
 	var rec_m = BoxMesh.new()
-	rec_m.size = Vector3(0.08, 0.1, 0.38)
+	rec_m.size = Vector3(0.065, 0.08, 0.36)
 	rec.mesh = rec_m
-	rec.material_override = mat_m
+	rec.material_override = mat_metal
 	parent.add_child(rec)
 	
+	# Barrel
 	var bar = MeshInstance3D.new()
 	var bar_m = CylinderMesh.new()
-	bar_m.top_radius = 0.02
-	bar_m.bottom_radius = 0.02
-	bar_m.height = 0.38
+	bar_m.top_radius = 0.014
+	bar_m.bottom_radius = 0.014
+	bar_m.height = 0.36
 	bar.mesh = bar_m
-	bar.material_override = mat_m
+	bar.material_override = mat_metal
 	bar.rotation.x = deg_to_rad(90.0)
-	bar.position = Vector3(0, 0.02, 0.35)
+	bar.position = Vector3(0, 0.015, 0.34)
 	parent.add_child(bar)
 	
+	# Wood Lower & Upper Handguards
 	var hg = MeshInstance3D.new()
 	var hg_m = BoxMesh.new()
-	hg_m.size = Vector3(0.085, 0.09, 0.2)
+	hg_m.size = Vector3(0.072, 0.076, 0.18)
 	hg.mesh = hg_m
-	hg.material_override = mat_w
-	hg.position = Vector3(0, 0, 0.22)
+	hg.material_override = mat_wood
+	hg.position = Vector3(0, 0.005, 0.22)
 	parent.add_child(hg)
 	
+	# Wood Buttstock
 	var st = MeshInstance3D.new()
 	var st_m = BoxMesh.new()
-	st_m.size = Vector3(0.07, 0.12, 0.26)
+	st_m.size = Vector3(0.06, 0.11, 0.24)
 	st.mesh = st_m
-	st.material_override = mat_w
-	st.position = Vector3(0, -0.02, -0.28)
+	st.material_override = mat_wood
+	st.position = Vector3(0, -0.02, -0.26)
+	st.rotation.x = deg_to_rad(-8.0)
 	parent.add_child(st)
 	
+	# Pistol Grip (slants backward towards stock)
+	var grip = MeshInstance3D.new()
+	var gr_m = BoxMesh.new()
+	gr_m.size = Vector3(0.045, 0.12, 0.06)
+	grip.mesh = gr_m
+	grip.material_override = mat_grip
+	grip.position = Vector3(0, -0.08, -0.06)
+	grip.rotation.x = deg_to_rad(20.0)
+	parent.add_child(grip)
+	
+	# Curved 30-round Steel Magazine (curves forward towards muzzle)
 	var mag = MeshInstance3D.new()
 	var mag_m = BoxMesh.new()
-	mag_m.size = Vector3(0.05, 0.22, 0.1)
+	mag_m.size = Vector3(0.042, 0.20, 0.09)
 	mag.mesh = mag_m
-	mag.material_override = mat_mag
-	mag.position = Vector3(0, -0.14, 0.08)
-	mag.rotation.x = deg_to_rad(16.0)
+	mag.material_override = mat_metal
+	mag.position = Vector3(0, -0.12, 0.08)
+	mag.rotation.x = deg_to_rad(-20.0)
 	parent.add_child(mag)
 
 func equip_preview_pistol(parent: Node3D) -> void:
-	var mat_s = StandardMaterial3D.new()
-	mat_s.albedo_color = Color(0.2, 0.22, 0.26)
-	mat_s.metallic = 0.8
+	var mat_slide = StandardMaterial3D.new()
+	mat_slide.albedo_color = Color(0.18, 0.20, 0.22)
+	mat_slide.metallic = 0.88
+	mat_slide.roughness = 0.28
 	
-	var mat_f = StandardMaterial3D.new()
-	mat_f.albedo_color = Color(0.1, 0.11, 0.12)
+	var mat_frame = StandardMaterial3D.new()
+	mat_frame.albedo_color = Color(0.12, 0.13, 0.14)
+	mat_frame.roughness = 0.75
 	
+	# Slide (Glock square steel profile)
 	var slide = MeshInstance3D.new()
-	var sm = BoxMesh.new()
-	sm.size = Vector3(0.065, 0.06, 0.28)
-	slide.mesh = sm
-	slide.material_override = mat_s
+	var s_m = BoxMesh.new()
+	s_m.size = Vector3(0.052, 0.048, 0.24)
+	slide.mesh = s_m
+	slide.material_override = mat_slide
+	slide.position = Vector3(0, 0.024, 0.0)
 	parent.add_child(slide)
 	
+	# Frame (Polymer receiver)
+	var frame = MeshInstance3D.new()
+	var fr_m = BoxMesh.new()
+	fr_m.size = Vector3(0.048, 0.030, 0.22)
+	frame.mesh = fr_m
+	frame.material_override = mat_frame
+	frame.position = Vector3(0, -0.014, 0.005)
+	parent.add_child(frame)
+	
+	# Grip (slants backward towards wrist at 20 deg)
 	var grip = MeshInstance3D.new()
-	var gm = BoxMesh.new()
-	gm.size = Vector3(0.058, 0.16, 0.085)
-	grip.mesh = gm
-	grip.material_override = mat_f
-	grip.position = Vector3(0, -0.09, -0.06)
-	grip.rotation.x = deg_to_rad(-14.0)
+	var g_m = BoxMesh.new()
+	g_m.size = Vector3(0.044, 0.14, 0.07)
+	grip.mesh = g_m
+	grip.material_override = mat_frame
+	grip.position = Vector3(0, -0.085, -0.04)
+	grip.rotation.x = deg_to_rad(20.0)
+	parent.add_child(grip)
 	parent.add_child(grip)
 
 func equip_preview_axe(parent: Node3D) -> void:
@@ -1206,14 +1293,14 @@ func equip_preview_awp(parent: Node3D) -> void:
 	mid_chassis.position = Vector3(0, -0.01, -0.04)
 	parent.add_child(mid_chassis)
 
-	# Pistol Grip (front of thumbhole)
+	# Pistol Grip (front of thumbhole, authentic slant towards stock)
 	var grip = MeshInstance3D.new()
 	var gr_m = BoxMesh.new()
 	gr_m.size = Vector3(0.058, 0.13, 0.07)
 	grip.mesh = gr_m
 	grip.material_override = mat_awp_green
 	grip.position = Vector3(0, -0.09, -0.14)
-	grip.rotation.x = deg_to_rad(-16.0)
+	grip.rotation.x = deg_to_rad(16.0)
 	parent.add_child(grip)
 
 	# Upper Stock Comb (bridge above thumbhole)
@@ -1801,6 +1888,15 @@ func create_medkit_preview() -> Node3D:
 	return root
 
 func create_shahed_preview() -> Node3D:
+	var actual_model := get_drone_visuals_copy()
+	if actual_model:
+		var wrapper := Node3D.new()
+		# In drone_enemy.tscn, the drone faces +Z (nose at +0.85).
+		# Rotate 180 so the sharp nose faces the preview camera for 3/4 showcase view.
+		actual_model.rotation_degrees = Vector3(0, 180, 0)
+		wrapper.add_child(actual_model)
+		return wrapper
+		
 	var root = Node3D.new()
 	
 	var mat_body = StandardMaterial3D.new()
@@ -1861,6 +1957,46 @@ func create_shahed_preview() -> Node3D:
 	wing_fwd.material_override = mat_body
 	wing_fwd.position = Vector3(0, 0, -0.28)
 	root.add_child(wing_fwd)
+	
+	# Green Crewmate Head
+	var mat_green = StandardMaterial3D.new()
+	mat_green.albedo_color = Color(0.15, 0.85, 0.25)
+	mat_green.roughness = 0.35
+	
+	var mat_visor = StandardMaterial3D.new()
+	mat_visor.albedo_color = Color(0.45, 0.85, 0.95)
+	mat_visor.metallic = 0.4
+	mat_visor.roughness = 0.1
+	
+	var head_root = Node3D.new()
+	head_root.position = Vector3(0, 0.20, -0.15)
+	root.add_child(head_root)
+	
+	var dome = MeshInstance3D.new()
+	var dm = CapsuleMesh.new()
+	dm.radius = 0.15
+	dm.height = 0.38
+	dm.radial_segments = 14
+	dm.rings = 4
+	dome.mesh = dm
+	dome.material_override = mat_green
+	head_root.add_child(dome)
+	
+	var visor = MeshInstance3D.new()
+	var vm = BoxMesh.new()
+	vm.size = Vector3(0.18, 0.10, 0.08)
+	visor.mesh = vm
+	visor.material_override = mat_visor
+	visor.position = Vector3(0, 0.04, -0.11)
+	head_root.add_child(visor)
+	
+	var backpack = MeshInstance3D.new()
+	var bpm = BoxMesh.new()
+	bpm.size = Vector3(0.18, 0.24, 0.11)
+	backpack.mesh = bpm
+	backpack.material_override = mat_green
+	backpack.position = Vector3(0, -0.01, 0.11)
+	head_root.add_child(backpack)
 	
 	# Vertical wingtip fins
 	for x_pos in [-1.04, 1.04]:

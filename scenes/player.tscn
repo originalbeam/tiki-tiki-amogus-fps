@@ -40,59 +40,59 @@ roughness = 0.6
 
 [sub_resource type="BoxMesh" id="Mesh_AK_RecLower"]
 material = SubResource("Mat_GunMetal")
-size = Vector3(0.046, 0.054, 0.28)
+size = Vector3(0.046, 0.05, 0.28)
 
 [sub_resource type="BoxMesh" id="Mesh_AK_RecTop"]
 material = SubResource("Mat_AK_SteelTop")
-size = Vector3(0.042, 0.032, 0.26)
+size = Vector3(0.042, 0.028, 0.228)
 
 [sub_resource type="BoxMesh" id="Mesh_AK_TopCoverRib"]
 material = SubResource("Mat_AK_SteelTop")
-size = Vector3(0.005, 0.005, 0.24)
+size = Vector3(0.004, 0.004, 0.18)
 
 [sub_resource type="BoxMesh" id="Mesh_AK_Selector"]
 material = SubResource("Mat_GunMetal")
-size = Vector3(0.004, 0.014, 0.075)
+size = Vector3(0.004, 0.013, 0.075)
 
 [sub_resource type="BoxMesh" id="Mesh_AK_Dimple"]
 material = SubResource("Mat_AK_EjectRecess")
-size = Vector3(0.004, 0.016, 0.035)
+size = Vector3(0.003, 0.016, 0.035)
 
 [sub_resource type="BoxMesh" id="Mesh_AK_RSB"]
 material = SubResource("Mat_GunMetal")
-size = Vector3(0.036, 0.032, 0.045)
+size = Vector3(0.036, 0.034, 0.05)
 
 [sub_resource type="BoxMesh" id="Mesh_AK_SightLeaf"]
 material = SubResource("Mat_GunMetal")
-size = Vector3(0.016, 0.008, 0.04)
+size = Vector3(0.014, 0.006, 0.038)
 
 [sub_resource type="BoxMesh" id="Mesh_AK_WoodLower"]
 material = SubResource("Mat_AK_Wood")
-size = Vector3(0.056, 0.05, 0.16)
+size = Vector3(0.054, 0.048, 0.15)
 
 [sub_resource type="BoxMesh" id="Mesh_AK_WoodUpper"]
 material = SubResource("Mat_AK_Wood")
-size = Vector3(0.044, 0.032, 0.13)
+size = Vector3(0.042, 0.03, 0.14)
 
 [sub_resource type="BoxMesh" id="Mesh_AK_HandguardCap"]
 material = SubResource("Mat_GunMetal")
-size = Vector3(0.058, 0.056, 0.012)
+size = Vector3(0.056, 0.056, 0.01)
 
 [sub_resource type="CylinderMesh" id="Mesh_AK_GasTube"]
 material = SubResource("Mat_GunMetal")
-top_radius = 0.011
-bottom_radius = 0.011
-height = 0.22
+top_radius = 0.01
+bottom_radius = 0.01
+height = 0.2
 radial_segments = 8
 
 [sub_resource type="BoxMesh" id="Mesh_AK_GasBlock"]
 material = SubResource("Mat_GunMetal")
-size = Vector3(0.026, 0.044, 0.038)
+size = Vector3(0.024, 0.042, 0.036)
 
 [sub_resource type="CylinderMesh" id="Mesh_AK_Barrel"]
 material = SubResource("Mat_GunMetal")
-top_radius = 0.011
-bottom_radius = 0.011
+top_radius = 0.01
+bottom_radius = 0.01
 height = 0.38
 radial_segments = 8
 
@@ -100,31 +100,31 @@ radial_segments = 8
 material = SubResource("Mat_GunMetal")
 top_radius = 0.003
 bottom_radius = 0.003
-height = 0.32
+height = 0.34
 radial_segments = 6
 
 [sub_resource type="BoxMesh" id="Mesh_AK_Sight"]
 material = SubResource("Mat_GunMetal")
-size = Vector3(0.018, 0.042, 0.02)
+size = Vector3(0.016, 0.04, 0.02)
 
 [sub_resource type="CylinderMesh" id="Mesh_AK_Comp"]
 material = SubResource("Mat_GunMetal")
-top_radius = 0.013
-bottom_radius = 0.013
-height = 0.042
+top_radius = 0.012
+bottom_radius = 0.012
+height = 0.04
 radial_segments = 6
 
 [sub_resource type="BoxMesh" id="Mesh_AK_Stock"]
 material = SubResource("Mat_AK_Wood")
-size = Vector3(0.046, 0.095, 0.24)
+size = Vector3(0.044, 0.092, 0.23)
 
 [sub_resource type="BoxMesh" id="Mesh_AK_Buttplate"]
 material = SubResource("Mat_GunMetal")
-size = Vector3(0.047, 0.096, 0.008)
+size = Vector3(0.046, 0.094, 0.006)
 
 [sub_resource type="BoxMesh" id="Mesh_AK_TriggerGuard"]
 material = SubResource("Mat_GunMetal")
-size = Vector3(0.016, 0.038, 0.065)
+size = Vector3(0.016, 0.036, 0.065)
 
 [sub_resource type="BoxMesh" id="Mesh_AK_Trigger"]
 material = SubResource("Mat_GunMetal")
@@ -140,27 +140,27 @@ size = Vector3(0.032, 0.11, 0.048)
 
 [sub_resource type="BoxMesh" id="Mesh_AK_Mag"]
 material = SubResource("Mat_AK_SteelTop")
-size = Vector3(0.032, 0.2, 0.092)
+size = Vector3(0.03, 0.2, 0.09)
 
 [sub_resource type="BoxMesh" id="Mesh_AK_MagRib"]
 material = SubResource("Mat_AK_SteelTop")
-size = Vector3(0.034, 0.008, 0.088)
+size = Vector3(0.033, 0.008, 0.084)
 
 [sub_resource type="BoxMesh" id="Mesh_AK_MagBase"]
 material = SubResource("Mat_GunMetal")
-size = Vector3(0.038, 0.012, 0.096)
+size = Vector3(0.034, 0.01, 0.094)
 
 [sub_resource type="BoxMesh" id="Mesh_AK_EjectionPort"]
 material = SubResource("Mat_AK_EjectRecess")
-size = Vector3(0.008, 0.028, 0.085)
+size = Vector3(0.008, 0.026, 0.075)
 
 [sub_resource type="BoxMesh" id="Mesh_AK_Handle"]
 material = SubResource("Mat_GunMetal")
-size = Vector3(0.042, 0.015, 0.022)
+size = Vector3(0.024, 0.014, 0.02)
 
 [sub_resource type="BoxMesh" id="Mesh_AK_Bolt"]
 material = SubResource("Mat_AK_Bolt")
-size = Vector3(0.018, 0.024, 0.085)
+size = Vector3(0.012, 0.022, 0.065)
 
 [sub_resource type="Gradient" id="Gradient_PreviewBG"]
 offsets = PackedFloat32Array(0, 0.65, 1)
@@ -226,7 +226,7 @@ size = Vector3(0.038, 0.036, 0.2)
 
 [sub_resource type="BoxMesh" id="Mesh_Pistol_Frame"]
 material = SubResource("Mat_Pistol_Polymer")
-size = Vector3(0.034, 0.022, 0.18)
+size = Vector3(0.034, 0.024, 0.18)
 
 [sub_resource type="BoxMesh" id="Mesh_Pistol_Grip"]
 material = SubResource("Mat_Pistol_Polymer")
@@ -308,11 +308,11 @@ size = Vector3(0.076, 0.078, 0.014)
 
 [sub_resource type="BoxMesh" id="Mesh_Pistol_EjectionPort"]
 material = SubResource("Mat_AK_EjectRecess")
-size = Vector3(0.014, 0.018, 0.05)
+size = Vector3(0.012, 0.018, 0.05)
 
 [sub_resource type="BoxMesh" id="Mesh_Pistol_Chamber"]
 material = SubResource("Mat_GunMetal")
-size = Vector3(0.024, 0.02, 0.044)
+size = Vector3(0.026, 0.02, 0.044)
 
 [sub_resource type="CylinderMesh" id="Mesh_Pistol_BarrelTip"]
 material = SubResource("Mat_GunMetal")
@@ -327,7 +327,7 @@ size = Vector3(0.04, 0.03, 0.005)
 
 [sub_resource type="BoxMesh" id="Mesh_Pistol_TriggerGuard"]
 material = SubResource("Mat_Pistol_Polymer")
-size = Vector3(0.015, 0.034, 0.058)
+size = Vector3(0.015, 0.032, 0.058)
 
 [sub_resource type="BoxMesh" id="Mesh_Pistol_Trigger"]
 material = SubResource("Mat_GunMetal")
@@ -576,35 +576,35 @@ camera = NodePath("..")
 mesh = SubResource("Mesh_AK_RecLower")
 
 [node name="ReceiverTop" type="MeshInstance3D" parent="Head/Camera3D/WeaponHolder/AK47"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.038, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.035, 0.024)
 mesh = SubResource("Mesh_AK_RecTop")
 
 [node name="TopCoverRib1" type="MeshInstance3D" parent="Head/Camera3D/WeaponHolder/AK47"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.012, 0.054, 0.01)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.011, 0.05, 0.024)
 mesh = SubResource("Mesh_AK_TopCoverRib")
 
 [node name="TopCoverRib2" type="MeshInstance3D" parent="Head/Camera3D/WeaponHolder/AK47"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.012, 0.054, 0.01)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.011, 0.05, 0.024)
 mesh = SubResource("Mesh_AK_TopCoverRib")
 
 [node name="EjectionPort" type="MeshInstance3D" parent="Head/Camera3D/WeaponHolder/AK47"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.026, 0.03, -0.04)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.022, 0.028, -0.04)
 mesh = SubResource("Mesh_AK_EjectionPort")
 
 [node name="SelectorLever" type="MeshInstance3D" parent="Head/Camera3D/WeaponHolder/AK47"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.026, 0.008, 0.02)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.024, 0.008, 0.02)
 mesh = SubResource("Mesh_AK_Selector")
 
 [node name="LightningCut" type="MeshInstance3D" parent="Head/Camera3D/WeaponHolder/AK47"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.026, 0.006, -0.05)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.024, 0.006, -0.05)
 mesh = SubResource("Mesh_AK_Dimple")
 
 [node name="RearSightBlock" type="MeshInstance3D" parent="Head/Camera3D/WeaponHolder/AK47"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.038, -0.14)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.032, -0.115)
 mesh = SubResource("Mesh_AK_RSB")
 
 [node name="RearSightLeaf" type="MeshInstance3D" parent="Head/Camera3D/WeaponHolder/AK47"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.044, -0.14)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.051, -0.115)
 mesh = SubResource("Mesh_AK_SightLeaf")
 
 [node name="GasTube" type="MeshInstance3D" parent="Head/Camera3D/WeaponHolder/AK47"]
@@ -612,71 +612,71 @@ transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0.0
 mesh = SubResource("Mesh_AK_GasTube")
 
 [node name="Barrel" type="MeshInstance3D" parent="Head/Camera3D/WeaponHolder/AK47"]
-transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0.005, -0.32)
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0.005, -0.33)
 mesh = SubResource("Mesh_AK_Barrel")
 
 [node name="GasBlock" type="MeshInstance3D" parent="Head/Camera3D/WeaponHolder/AK47"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, -0.36)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, -0.355)
 mesh = SubResource("Mesh_AK_GasBlock")
 
 [node name="CleaningRod" type="MeshInstance3D" parent="Head/Camera3D/WeaponHolder/AK47"]
-transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, -0.014, -0.34)
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, -0.014, -0.35)
 mesh = SubResource("Mesh_AK_CleaningRod")
 
 [node name="Compensator" type="MeshInstance3D" parent="Head/Camera3D/WeaponHolder/AK47"]
-transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0.005, -0.52)
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0.005, -0.525)
 mesh = SubResource("Mesh_AK_Comp")
 
 [node name="FrontSight" type="MeshInstance3D" parent="Head/Camera3D/WeaponHolder/AK47"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.032, -0.48)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.034, -0.48)
 mesh = SubResource("Mesh_AK_Sight")
 
 [node name="WoodLower" type="MeshInstance3D" parent="Head/Camera3D/WeaponHolder/AK47"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.01, -0.22)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.008, -0.22)
 mesh = SubResource("Mesh_AK_WoodLower")
 
 [node name="WoodUpper" type="MeshInstance3D" parent="Head/Camera3D/WeaponHolder/AK47"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.035, -0.22)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.034, -0.22)
 mesh = SubResource("Mesh_AK_WoodUpper")
 
 [node name="HandguardCapFront" type="MeshInstance3D" parent="Head/Camera3D/WeaponHolder/AK47"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.01, -0.305)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.012, -0.297)
 mesh = SubResource("Mesh_AK_HandguardCap")
 
 [node name="HandguardCapRear" type="MeshInstance3D" parent="Head/Camera3D/WeaponHolder/AK47"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.01, -0.135)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.012, -0.143)
 mesh = SubResource("Mesh_AK_HandguardCap")
 
 [node name="Stock" type="MeshInstance3D" parent="Head/Camera3D/WeaponHolder/AK47"]
-transform = Transform3D(1, 0, 0, 0, 0.990268, 0.139173, 0, -0.139173, 0.990268, 0, -0.035, 0.24)
+transform = Transform3D(1, 0, 0, 0, 0.990268, 0.139173, 0, -0.139173, 0.990268, 0, -0.035, 0.235)
 mesh = SubResource("Mesh_AK_Stock")
 
 [node name="StockButtplate" type="MeshInstance3D" parent="Head/Camera3D/WeaponHolder/AK47/Stock"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.12)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.116)
 mesh = SubResource("Mesh_AK_Buttplate")
 
 [node name="PistolGrip" type="MeshInstance3D" parent="Head/Camera3D/WeaponHolder/AK47"]
-transform = Transform3D(1, 0, 0, 0, 0.927184, -0.374607, 0, 0.374607, 0.927184, 0, -0.08, 0.065)
+transform = Transform3D(1, 0, 0, 0, 0.927184, 0.374607, 0, -0.374607, 0.927184, 0, -0.075, 0.065)
 mesh = SubResource("Mesh_AK_Grip")
 
 [node name="TriggerGuard" type="MeshInstance3D" parent="Head/Camera3D/WeaponHolder/AK47"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.045, 0.02)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.042, 0.02)
 mesh = SubResource("Mesh_AK_TriggerGuard")
 
 [node name="Trigger" type="MeshInstance3D" parent="Head/Camera3D/WeaponHolder/AK47"]
-transform = Transform3D(1, 0, 0, 0, 0.951057, -0.309017, 0, 0.309017, 0.951057, 0, -0.042, 0.025)
+transform = Transform3D(1, 0, 0, 0, 0.951057, 0.309017, 0, -0.309017, 0.951057, 0, -0.04, 0.025)
 mesh = SubResource("Mesh_AK_Trigger")
 
 [node name="MagLatch" type="MeshInstance3D" parent="Head/Camera3D/WeaponHolder/AK47"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.035, -0.018)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.032, -0.018)
 mesh = SubResource("Mesh_AK_MagLatch")
 
 [node name="Magazine" type="MeshInstance3D" parent="Head/Camera3D/WeaponHolder/AK47"]
-transform = Transform3D(1, 0, 0, 0, 0.927184, 0.374607, 0, -0.374607, 0.927184, 0, -0.12, -0.07)
+transform = Transform3D(1, 0, 0, 0, 0.927184, -0.374607, 0, 0.374607, 0.927184, 0, -0.115, -0.065)
 mesh = SubResource("Mesh_AK_Mag")
 
 [node name="MagBase" type="MeshInstance3D" parent="Head/Camera3D/WeaponHolder/AK47/Magazine"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.098, 0)
 mesh = SubResource("Mesh_AK_MagBase")
 
 [node name="MagRib1" type="MeshInstance3D" parent="Head/Camera3D/WeaponHolder/AK47/Magazine"]
@@ -688,18 +688,18 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, 0)
 mesh = SubResource("Mesh_AK_MagRib")
 
 [node name="ChargingHandle" type="MeshInstance3D" parent="Head/Camera3D/WeaponHolder/AK47"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.038, 0.02, -0.04)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.034, 0.026, -0.04)
 mesh = SubResource("Mesh_AK_Handle")
 
 [node name="BoltCarrier" type="MeshInstance3D" parent="Head/Camera3D/WeaponHolder/AK47/ChargingHandle"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.014, 0.008, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.012, 0.002, 0)
 mesh = SubResource("Mesh_AK_Bolt")
 
 [node name="Muzzle" type="Marker3D" parent="Head/Camera3D/WeaponHolder/AK47"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.005, -0.55)
 
 [node name="EjectMarker" type="Marker3D" parent="Head/Camera3D/WeaponHolder/AK47"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.04, 0.025, -0.04)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.035, 0.028, -0.04)
 
 [node name="Shotgun" type="Node3D" parent="Head/Camera3D/WeaponHolder"]
 visible = false
@@ -790,15 +790,15 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.045, 0.035, -0.06)
 visible = false
 
 [node name="Slide" type="MeshInstance3D" parent="Head/Camera3D/WeaponHolder/Pistol"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.021, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, 0)
 mesh = SubResource("Mesh_Pistol_Slide")
 
 [node name="EjectionPort" type="MeshInstance3D" parent="Head/Camera3D/WeaponHolder/Pistol/Slide"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.016, 0.012, 0.01)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.015, 0.009, 0.01)
 mesh = SubResource("Mesh_Pistol_EjectionPort")
 
 [node name="RearSight" type="MeshInstance3D" parent="Head/Camera3D/WeaponHolder/Pistol/Slide"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.032, 0.085)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.024, 0.085)
 mesh = SubResource("Mesh_Pistol_RearSight")
 
 [node name="RearDotL" type="MeshInstance3D" parent="Head/Camera3D/WeaponHolder/Pistol/Slide/RearSight"]
@@ -810,7 +810,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.01, 0.003, 0.008)
 mesh = SubResource("Mesh_Pistol_SightDot")
 
 [node name="FrontSight" type="MeshInstance3D" parent="Head/Camera3D/WeaponHolder/Pistol/Slide"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.032, -0.085)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.024, -0.085)
 mesh = SubResource("Mesh_Pistol_FrontSight")
 
 [node name="FrontDot" type="MeshInstance3D" parent="Head/Camera3D/WeaponHolder/Pistol/Slide/FrontSight"]
@@ -830,23 +830,23 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.004, -0.06)
 mesh = SubResource("Mesh_Pistol_Serration")
 
 [node name="Frame" type="MeshInstance3D" parent="Head/Camera3D/WeaponHolder/Pistol"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.012, 0.006)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.009, 0.006)
 mesh = SubResource("Mesh_Pistol_Frame")
 
 [node name="BarrelChamber" type="MeshInstance3D" parent="Head/Camera3D/WeaponHolder/Pistol/Frame"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.026, 0.012)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.025, 0.012)
 mesh = SubResource("Mesh_Pistol_Chamber")
 
 [node name="BarrelTip" type="MeshInstance3D" parent="Head/Camera3D/WeaponHolder/Pistol/Frame"]
-transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0.033, -0.115)
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0.029, -0.112)
 mesh = SubResource("Mesh_Pistol_BarrelTip")
 
 [node name="TriggerGuard" type="MeshInstance3D" parent="Head/Camera3D/WeaponHolder/Pistol/Frame"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.024, -0.015)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.02, -0.015)
 mesh = SubResource("Mesh_Pistol_TriggerGuard")
 
 [node name="Trigger" type="MeshInstance3D" parent="Head/Camera3D/WeaponHolder/Pistol/Frame"]
-transform = Transform3D(1, 0, 0, 0, 0.951057, -0.309017, 0, 0.309017, 0.951057, 0, -0.020, 0.002)
+transform = Transform3D(1, 0, 0, 0, 0.951057, 0.309017, 0, -0.309017, 0.951057, 0, -0.016, 0.002)
 mesh = SubResource("Mesh_Pistol_Trigger")
 
 [node name="TriggerSafety" type="MeshInstance3D" parent="Head/Camera3D/WeaponHolder/Pistol/Frame/Trigger"]
@@ -854,19 +854,19 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.002, -0.006)
 mesh = SubResource("Mesh_Pistol_TriggerSafety")
 
 [node name="SlideRelease" type="MeshInstance3D" parent="Head/Camera3D/WeaponHolder/Pistol/Frame"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.020, 0.015, 0.030)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.019, 0.012, 0.03)
 mesh = SubResource("Mesh_Pistol_SlideRelease")
 
 [node name="PicatinnyRail" type="MeshInstance3D" parent="Head/Camera3D/WeaponHolder/Pistol/Frame"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.018, -0.045)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.015, -0.045)
 mesh = SubResource("Mesh_Pistol_Rail")
 
 [node name="Grip" type="MeshInstance3D" parent="Head/Camera3D/WeaponHolder/Pistol"]
-transform = Transform3D(1, 0, 0, 0, 0.927184, -0.374607, 0, 0.374607, 0.927184, 0, -0.08, 0.045)
+transform = Transform3D(1, 0, 0, 0, 0.927184, 0.374607, 0, -0.374607, 0.927184, 0, -0.075, 0.045)
 mesh = SubResource("Mesh_Pistol_Grip")
 
 [node name="Magazine" type="MeshInstance3D" parent="Head/Camera3D/WeaponHolder/Pistol"]
-transform = Transform3D(1, 0, 0, 0, 0.927184, -0.374607, 0, 0.374607, 0.927184, 0, -0.08, 0.045)
+transform = Transform3D(1, 0, 0, 0, 0.927184, 0.374607, 0, -0.374607, 0.927184, 0, -0.075, 0.045)
 mesh = SubResource("Mesh_Pistol_Mag")
 
 [node name="MagBasePad" type="MeshInstance3D" parent="Head/Camera3D/WeaponHolder/Pistol/Magazine"]
@@ -877,7 +877,7 @@ mesh = SubResource("Mesh_Pistol_MagBasePad")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, -0.12)
 
 [node name="EjectMarker" type="Marker3D" parent="Head/Camera3D/WeaponHolder/Pistol"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.03, 0.025, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.025, 0.028, 0.01)
 
 [node name="MuzzleFlash" type="Node3D" parent="Head/Camera3D/WeaponHolder"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.005, -0.58)

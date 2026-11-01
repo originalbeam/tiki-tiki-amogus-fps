@@ -3,9 +3,9 @@ extends Node3D
 @onready var particles: CPUParticles3D = $CPUParticles3D
 
 func init(is_blood: bool) -> void:
+	var mat := StandardMaterial3D.new()
+	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	if is_blood:
-		var mat = StandardMaterial3D.new()
-		mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 		mat.albedo_color = Color(0.9, 0.08, 0.08)
 		particles.material_override = mat
 		particles.amount = 16
@@ -13,8 +13,6 @@ func init(is_blood: bool) -> void:
 		particles.initial_velocity_min = 3.0
 		particles.initial_velocity_max = 6.0
 	else:
-		var mat = StandardMaterial3D.new()
-		mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 		mat.albedo_color = Color(1.0, 0.9, 0.3)
 		particles.material_override = mat
 

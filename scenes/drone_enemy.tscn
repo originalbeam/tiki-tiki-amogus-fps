@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://drone0000001"]
+[gd_scene load_steps=23 format=3 uid="uid://drone0000001"]
 
 [ext_resource type="Script" path="res://scripts/drone_enemy.gd" id="1_drone"]
 
@@ -59,6 +59,30 @@ radial_segments = 8
 material = SubResource("Mat_Engine")
 size = Vector3(0.55, 0.035, 0.015)
 
+[sub_resource type="StandardMaterial3D" id="Mat_GreenCrewmate"]
+albedo_color = Color(0.15, 0.85, 0.25, 1)
+roughness = 0.35
+
+[sub_resource type="StandardMaterial3D" id="Mat_GreenVisor"]
+albedo_color = Color(0.45, 0.85, 0.95, 1)
+metallic = 0.4
+roughness = 0.1
+
+[sub_resource type="CapsuleMesh" id="Mesh_GreenHead"]
+material = SubResource("Mat_GreenCrewmate")
+radius = 0.15
+height = 0.38
+radial_segments = 14
+rings = 4
+
+[sub_resource type="BoxMesh" id="Mesh_GreenVisor"]
+material = SubResource("Mat_GreenVisor")
+size = Vector3(0.18, 0.1, 0.08)
+
+[sub_resource type="BoxMesh" id="Mesh_GreenBackpack"]
+material = SubResource("Mat_GreenCrewmate")
+size = Vector3(0.18, 0.24, 0.11)
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bg"]
 bg_color = Color(0.15, 0.15, 0.15, 0.8)
 corner_radius_top_left = 3
@@ -88,6 +112,20 @@ shape = SubResource("SphereShape3D_root")
 
 [node name="Fuselage" type="MeshInstance3D" parent="Visuals"]
 mesh = SubResource("Mesh_Fuselage")
+
+[node name="GreenCrewmateHead" type="Node3D" parent="Visuals"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0.15)
+
+[node name="Dome" type="MeshInstance3D" parent="Visuals/GreenCrewmateHead"]
+mesh = SubResource("Mesh_GreenHead")
+
+[node name="Visor" type="MeshInstance3D" parent="Visuals/GreenCrewmateHead"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04, 0.11)
+mesh = SubResource("Mesh_GreenVisor")
+
+[node name="Backpack" type="MeshInstance3D" parent="Visuals/GreenCrewmateHead"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.01, -0.11)
+mesh = SubResource("Mesh_GreenBackpack")
 
 [node name="NoseCone" type="MeshInstance3D" parent="Visuals"]
 transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0.85)

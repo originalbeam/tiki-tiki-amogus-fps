@@ -1,4 +1,4 @@
-class_name SoundEffects
+﻿class_name SoundEffects
 extends Node
 
 # Procedural Sound Generator for FPS
@@ -560,6 +560,8 @@ static func create_sniper_charge_sound() -> AudioStreamWAV:
 	wav.data = byte_array
 	return wav
 
+
+
 # --- SHAHED DRONE SOUNDS ---
 
 static func create_shahed_engine_sound() -> AudioStreamWAV:
@@ -571,6 +573,7 @@ static func create_shahed_engine_sound() -> AudioStreamWAV:
 	
 	for i in range(total_samples):
 		var t := float(i) / mix_rate
+		# 2-stroke motor buzz (~88 Hz fundamental with rich harmonics)
 		var f := 88.0 + sin(t * 3.0 * TAU) * 3.0
 		var h1 := sin(t * f * TAU) * 0.45
 		var h2 := sin(t * f * 2.0 * TAU) * 0.35
@@ -599,6 +602,7 @@ static func create_shahed_dive_sound() -> AudioStreamWAV:
 	for i in range(total_samples):
 		var t := float(i) / mix_rate
 		var progress := t / duration
+		# Accelerating high-RPM motor pitch rising from 110Hz to 380Hz + piercing siren undertone
 		var motor_f := 110.0 + progress * progress * 290.0
 		var motor := sin(t * motor_f * TAU) * 0.5 + sin(t * motor_f * 2.0 * TAU) * 0.35
 		var howl_f := 420.0 + progress * 680.0
@@ -625,8 +629,11 @@ static func create_shahed_explosion_sound() -> AudioStreamWAV:
 	for i in range(total_samples):
 		var t := float(i) / mix_rate
 		var env := exp(-t * 2.8)
+		# Deep sub-bass boom (42Hz down to 22Hz)
 		var boom := sin(t * (42.0 - t * 12.0) * TAU) * 0.85 * env
+		# Mid blast crunch
 		var crunch := (randf() * 2.0 - 1.0) * exp(-t * 7.5) * 0.75
+		# Low rumble tail
 		var rumble := sin(t * 30.0 * TAU) * (randf() * 0.4) * exp(-t * 1.8)
 		var sample := clampf(boom + crunch + rumble, -1.0, 1.0)
 		var val16 := int(sample * 32767.0)
@@ -650,16 +657,19 @@ static func create_vodka_drink_sound() -> AudioStreamWAV:
 	for i in range(total_samples):
 		var t := float(i) / mix_rate
 		var sample := 0.0
+		# 0.0 - 0.18: Cork pop "POP!"
 		if t < 0.18:
 			var pop_env := exp(-t * 32.0)
 			var pop := sin(t * 480.0 * TAU) * pop_env * 0.9
 			sample += pop
+		# 0.20 - 0.70: Liquid glug/gulp
 		if t >= 0.20 and t < 0.75:
 			var gt := t - 0.20
 			var glug_period := fmod(gt, 0.15)
 			var glug_env := sin((glug_period / 0.15) * PI)
 			var glug := sin(gt * 320.0 * TAU) * glug_env * 0.55
 			sample += glug
+		# 0.75 - 1.0: Glass clink / sigh
 		if t >= 0.75:
 			var ct := t - 0.75
 			var clink_env := exp(-ct * 18.0)
@@ -685,6 +695,7 @@ static func create_heavy_armor_equip_sound() -> AudioStreamWAV:
 	
 	for i in range(total_samples):
 		var t := float(i) / mix_rate
+		# Heavy vest strap click + ceramic thud
 		var thud := sin(t * 60.0 * TAU) * exp(-t * 9.0) * 0.8
 		var buckle := 0.0
 		if t > 0.18 and t < 0.40:
@@ -710,6 +721,7 @@ static func create_armor_plate_insert_sound() -> AudioStreamWAV:
 	
 	for i in range(total_samples):
 		var t := float(i) / mix_rate
+		# Plate slide into pouch + velcro tear/press
 		var slide := sin(t * 180.0 * TAU) * exp(-t * 8.0) * 0.4
 		var velcro := (randf() * 2.0 - 1.0) * 0.35 * exp(-absf(t - 0.25) * 16.0)
 		var snap := 0.0
@@ -718,6 +730,72 @@ static func create_armor_plate_insert_sound() -> AudioStreamWAV:
 			snap = sin(st * 950.0 * TAU) * exp(-st * 28.0) * 0.7
 		var sample := clampf(slide + velcro + snap, -1.0, 1.0)
 		var val16 := int(sample * 32767.0)
+		byte_array.encode_s16(i * 2, val16)
+		
+	var wav := AudioStreamWAV.new()
+	wav.format = AudioStreamWAV.FORMAT_16_BITS
+	wav.mix_rate = mix_rate
+	wav.data = byte_array
+	return wav
+
+
+static func create_van_engine_sound() -> AudioStreamWAV:
+	var mix_rate := 22050
+	var duration := 2.5
+	var total_samples := int(mix_rate * duration)
+	var byte_array := PackedByteArray()
+	byte_array.resize(total_samples * 2)
+	
+	for i in range(total_samples):
+		var t := float(i) / mix_rate
+		var rpm := lerpf(60.0, 140.0, clampf(t / 2.0, 0.0, 1.0))
+		var cyl := sin(t * rpm * TAU) * 0.45 + sin(t * rpm * 2.0 * TAU) * 0.3 + sin(t * rpm * 4.0 * TAU) * 0.15
+		var rumble := (randf() * 2.0 - 1.0) * 0.08
+		var sample := clampf((cyl + rumble) * 0.65, -1.0, 1.0)
+		var val16 := int(sample * 32767.0)
+		byte_array.encode_s16(i * 2, val16)
+		
+	var wav := AudioStreamWAV.new()
+	wav.format = AudioStreamWAV.FORMAT_16_BITS
+	wav.mix_rate = mix_rate
+	wav.data = byte_array
+	return wav
+
+static func create_van_horn_sound() -> AudioStreamWAV:
+	var mix_rate := 22050
+	var duration := 0.45
+	var total_samples := int(mix_rate * duration)
+	var byte_array := PackedByteArray()
+	byte_array.resize(total_samples * 2)
+	
+	for i in range(total_samples):
+		var t := float(i) / mix_rate
+		var tone1 := sin(t * 370.0 * TAU) * 0.5
+		var tone2 := sin(t * 440.0 * TAU) * 0.45
+		var env := sin(clampf(t / duration, 0.0, 1.0) * PI)
+		var sample := clampf((tone1 + tone2) * env * 0.7, -1.0, 1.0)
+		var val16 := int(sample * 32767.0)
+		byte_array.encode_s16(i * 2, val16)
+		
+	var wav := AudioStreamWAV.new()
+	wav.format = AudioStreamWAV.FORMAT_16_BITS
+	wav.mix_rate = mix_rate
+	wav.data = byte_array
+	return wav
+static func create_van_reverse_beep() -> AudioStreamWAV:
+	var mix_rate := 22050
+	var duration := 1.5
+	var total_samples := int(mix_rate * duration)
+	var byte_array := PackedByteArray()
+	byte_array.resize(total_samples * 2)
+	
+	for i in range(total_samples):
+		var t := float(i) / mix_rate
+		var cycle := fmod(t, 0.45)
+		var beep_active := 1.0 if cycle < 0.22 else 0.0
+		var tone := sin(t * 1050.0 * TAU) * 0.45
+		var sample := tone * beep_active
+		var val16 := int(clampf(sample, -1.0, 1.0) * 32767.0)
 		byte_array.encode_s16(i * 2, val16)
 		
 	var wav := AudioStreamWAV.new()

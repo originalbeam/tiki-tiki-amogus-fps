@@ -16,6 +16,7 @@ var spawn_timer: float = 0.0
 
 var player: CharacterBody3D = null
 var active_beacons: Array[Node3D] = []
+var minivan_shop: Node3D = null
 
 # Map: Node3D (spawn point) -> Array[int] (enemy types to spawn at this point)
 var spawn_point_assignments: Dictionary = {}
@@ -26,6 +27,8 @@ func _ready() -> void:
 	var players = get_tree().get_nodes_in_group("player")
 	if players.size() > 0:
 		player = players[0]
+		
+	minivan_shop = get_parent().get_node_or_null("MinivanShop")
 		
 	# Find spawn points if not assigned
 	if spawn_points.is_empty():
@@ -40,13 +43,7 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	if is_warming_up:
-		if not is_warmup_paused:
-			warmup_time_left -= delta
-			var sec_int: int = int(ceil(maxf(0.0, warmup_time_left)))
-			if player and player.get_node_or_null("HUD"):
-				player.get_node("HUD").update_wave_warmup_countdown(current_wave, sec_int)
-			if warmup_time_left <= 0.0:
-				start_wave()
+		# Intermission break is infinite until [F] is pressed
 		return
 
 	if not is_wave_active:
@@ -61,6 +58,8 @@ func _process(delta: float) -> void:
 	elif enemies_alive <= 0:
 		# Wave clear! Next wave after short delay
 		is_wave_active = false
+		if minivan_shop and minivan_shop.has_method("on_wave_cleared"):
+			minivan_shop.on_wave_cleared()
 		await get_tree().create_timer(3.0).timeout
 		prepare_wave(current_wave + 1)
 
@@ -206,15 +205,19 @@ func pause_warmup(paused: bool) -> void:
 	is_warmup_paused = paused
 
 func rush_warmup() -> void:
-	if is_warming_up and warmup_time_left > 3.0:
-		warmup_time_left = 3.0
-		if player and player.get_node_or_null("HUD"):
-			player.get_node("HUD").update_wave_warmup_countdown(current_wave, 3)
+	start_wave_from_intermission()
+
+func start_wave_from_intermission() -> void:
+	if is_warming_up:
+		start_wave()
 
 func start_wave() -> void:
 	is_warming_up = false
 	is_wave_active = true
 	dismiss_holographic_beacons()
+	
+	if minivan_shop and minivan_shop.has_method("on_wave_started"):
+		minivan_shop.on_wave_started()
 	
 	if player and player.get_node_or_null("HUD"):
 		player.get_node("HUD").show_wave_started()
