@@ -5,10 +5,11 @@ var damage: float = 12.0
 var direction: Vector3 = Vector3.FORWARD
 var life_time: float = 4.0
 
-func init(dir: Vector3, dmg: float = 12.0, color: Color = Color(1.0, 0.2, 0.2), custom_speed: float = 24.0) -> void:
+func init(dir: Vector3, dmg: float = 12.0, color: Color = Color(1.0, 0.2, 0.2), custom_speed: float = 24.0, custom_lifetime: float = 4.0) -> void:
 	direction = dir.normalized()
 	damage = dmg
 	speed = custom_speed
+	life_time = custom_lifetime
 	if absf(direction.dot(Vector3.UP)) > 0.99:
 		look_at(global_position + direction, Vector3.RIGHT)
 	else:
@@ -38,5 +39,7 @@ func _on_body_entered(body: Node3D) -> void:
 			body.take_damage(damage)
 		queue_free()
 	elif not body.is_in_group("enemy"):
-		# Hit wall or obstacle
+		# Hit wall, obstacle or shop building
+		if body.is_in_group("shop_building") and body.has_method("take_damage"):
+			body.take_damage(damage)
 		queue_free()

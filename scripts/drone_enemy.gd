@@ -14,6 +14,10 @@ var score_value: int = 8
 
 var current_state: State = State.CRUISE
 var player: Node3D = null
+var shop_building: Node3D = null
+var target_is_shop: bool = true
+var ignores_player: bool = false
+var aggro_distance: float = 20.0
 
 # Flight parameters
 var cruise_speed: float = 7.0
@@ -47,10 +51,20 @@ func _ready() -> void:
 		health_bar.max_value = max_health
 		health_bar.value = health
 		
-	# Find player
+	# Find player and shop
 	var players = get_tree().get_nodes_in_group("player")
 	if players.size() > 0:
 		player = players[0]
+		
+	var shops = get_tree().get_nodes_in_group("shop_building")
+	if shops.size() > 0:
+		shop_building = shops[0]
+		
+	# Requirement 5: 50% of Shahed drones ignore player completely (fly to shop)
+	# The other 50% fly to shop until player gets within a per-drone randomized proximity distance, then aggro on player!
+	ignores_player = (randf() < 0.50)
+	aggro_distance = randf_range(12.0, 32.0)
+	target_is_shop = is_instance_valid(shop_building)
 		
 	attack_countdown = randf_range(2.5, 5.0)
 	
@@ -81,6 +95,19 @@ func _physics_process(delta: float) -> void:
 			player = players[0]
 		move_and_slide()
 		return
+
+	# Requirement 5 targeting: 50% ignore player (fly to shop), 50% aggro on player if within aggro_distance
+	var shop_active = is_instance_valid(shop_building) and not (shop_building.has_method("is_destroyed") and shop_building.is_destroyed)
+	if not shop_active:
+		target_is_shop = false
+	elif ignores_player:
+		target_is_shop = true
+	else:
+		var dist_to_player = global_position.distance_to(player.global_position)
+		if dist_to_player <= aggro_distance:
+			target_is_shop = false
+		else:
+			target_is_shop = true
 		
 	match current_state:
 		State.CRUISE:
@@ -89,7 +116,10 @@ func _physics_process(delta: float) -> void:
 			process_dive(delta)
 
 func process_cruise(delta: float) -> void:
-	var target_pos: Vector3 = player.global_position
+	var target_pos: Vector3 = player.global_position if is_instance_valid(player) else Vector3.ZERO
+	if target_is_shop and is_instance_valid(shop_building):
+		target_pos = shop_building.get_attack_target_position(global_position)
+		
 	var target_altitude: float = target_pos.y + cruise_altitude
 	
 	var horizontal_dir := Vector3(target_pos.x - global_position.x, 0, target_pos.z - global_position.z)
@@ -125,7 +155,7 @@ func process_cruise(delta: float) -> void:
 	
 	# Attack countdown
 	attack_countdown -= delta
-	if attack_countdown <= 0.0 and horiz_dist < 24.0:
+	if attack_countdown <= 0.0 and horiz_dist < 26.0:
 		start_dive_attack()
 
 func start_dive_attack() -> void:
@@ -139,17 +169,24 @@ func start_dive_attack() -> void:
 		audio_dive.stream = SoundEffects.create_shahed_dive_sound()
 		audio_dive.play()
 		
-	# Calculate dive lead towards player
-	var target_pt: Vector3 = player.global_position + Vector3(0, 0.9, 0)
-	if player is CharacterBody3D:
-		# Add lead based on player movement
-		target_pt += player.velocity * 0.45
-		
+	var target_pt: Vector3 = Vector3.ZERO
+	if target_is_shop and is_instance_valid(shop_building):
+		target_pt = shop_building.get_attack_target_position(global_position) + Vector3(0, 1.6, 0)
+	elif is_instance_valid(player):
+		target_pt = player.global_position + Vector3(0, 0.9, 0)
+		if player is CharacterBody3D:
+			target_pt += player.velocity * 0.45
+			
 	dive_vector = (target_pt - global_position).normalized()
 
 func process_dive(delta: float) -> void:
 	# Keep updating dive direction with slight tracking homing
-	var target_pt: Vector3 = player.global_position + Vector3(0, 0.8, 0)
+	var target_pt: Vector3 = Vector3.ZERO
+	if target_is_shop and is_instance_valid(shop_building):
+		target_pt = shop_building.get_attack_target_position(global_position) + Vector3(0, 1.6, 0)
+	elif is_instance_valid(player):
+		target_pt = player.global_position + Vector3(0, 0.8, 0)
+		
 	var desired_dir := (target_pt - global_position).normalized()
 	dive_vector = dive_vector.lerp(desired_dir, delta * 2.8).normalized()
 	
@@ -167,9 +204,9 @@ func process_dive(delta: float) -> void:
 		
 	var collision = move_and_collide(velocity * delta)
 	
-	# Check proximity to player or collision with floor/walls
-	var dist_to_player := global_position.distance_to(player.global_position + Vector3(0, 0.8, 0))
-	if dist_to_player <= 1.8 or collision != null:
+	# Check proximity to target or collision with floor/walls
+	var dist_to_target := global_position.distance_to(target_pt)
+	if dist_to_target <= 2.2 or collision != null:
 		detonate(false)
 
 func take_damage(amount: float, is_shotgun: bool = false) -> void:
@@ -214,8 +251,11 @@ func detonate(killed_by_player: bool) -> void:
 		return
 	is_dead = true
 	
+	# Always emit died so enemy spawner can decrement alive count and advance wave
 	if killed_by_player:
 		died.emit(score_value)
+	else:
+		died.emit(0)
 		
 	# 1. Damage Player if within explosion radius (-50 HP)
 	if is_instance_valid(player):
@@ -224,7 +264,14 @@ func detonate(killed_by_player: bool) -> void:
 			if player.has_method("take_damage"):
 				player.take_damage(explosion_damage)
 				
-	# 2. Damage nearby enemies (-50 HP to enemies in radius)
+	# 2. Damage Shop Building with x10 modifier (-500 HP to shop)
+	if is_instance_valid(shop_building):
+		var shop_dist := global_position.distance_to(shop_building.get_closest_point(global_position))
+		if shop_dist <= explosion_radius + 2.5:
+			var shop_damage := explosion_damage * 10.0 # x10 modifier for Shahed!
+			shop_building.take_damage(shop_damage, self)
+				
+	# 3. Damage nearby enemies (-50 HP to enemies in radius)
 	var all_enemies = get_tree().get_nodes_in_group("enemy")
 	for e in all_enemies:
 		if is_instance_valid(e) and e != self:

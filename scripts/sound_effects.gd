@@ -492,6 +492,28 @@ static func create_player_hurt_sound() -> AudioStreamWAV:
 	wav.data = byte_array
 	return wav
 
+static func create_player_jump_sound() -> AudioStreamWAV:
+	var mix_rate := 22050
+	var duration := 0.14
+	var total_samples := int(mix_rate * duration)
+	var byte_array := PackedByteArray()
+	byte_array.resize(total_samples * 2)
+	
+	for i in range(total_samples):
+		var t := float(i) / mix_rate
+		var env := exp(-t * 22.0)
+		var whoosh := sin(t * (180.0 + t * 400.0) * TAU) * 0.6
+		var puff := (randf() * 2.0 - 1.0) * 0.25
+		var sample := clampf((whoosh + puff) * env, -1.0, 1.0)
+		var val16 := int(sample * 32767.0)
+		byte_array.encode_s16(i * 2, val16)
+		
+	var wav := AudioStreamWAV.new()
+	wav.format = AudioStreamWAV.FORMAT_16_BITS
+	wav.mix_rate = mix_rate
+	wav.data = byte_array
+	return wav
+
 static func create_axe_swing_sound() -> AudioStreamWAV:
 	var mix_rate := 22050
 	var duration := 0.32

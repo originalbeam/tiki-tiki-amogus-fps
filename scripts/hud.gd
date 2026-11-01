@@ -31,6 +31,27 @@ extends CanvasLayer
 @onready var game_over_panel: Panel = $GameOverPanel
 @onready var death_stats_label: Label = $GameOverPanel/VBox/StatsLabel
 
+# Shop Defense Health Bar
+var shop_hp_container: Control = null
+var shop_hp_bar: ProgressBar = null
+var shop_hp_label: Label = null
+var shop_hp_title: Label = null
+var style_shop_fill_normal: StyleBoxFlat = null
+var style_shop_fill_warn: StyleBoxFlat = null
+var style_shop_fill_danger: StyleBoxFlat = null
+var shop_pulse_tween: Tween = null
+
+# Player Respawn Countdown Overlay
+var respawn_overlay: Panel = null
+var respawn_title: Label = null
+var respawn_timer_label: Label = null
+var respawn_countdown: float = 0.0
+var is_respawning: bool = false
+
+# Top-Right Enemy Counter UI
+var enemy_counter_container: PanelContainer = null
+var enemy_counter_label: Label = null
+
 # Pause Menu
 @onready var pause_panel: Panel = $PausePanel
 
@@ -294,10 +315,10 @@ var handbook_db = {
 		"bars": [
 			{"name": "Здоровье: 30 HP", "val": 30.0, "max": 100.0},
 			{"name": "Скорость пике: Высокая", "val": 95.0, "max": 100.0},
-			{"name": "Урон взрыва: 50 HP (АОЕ)", "val": 50.0, "max": 100.0},
+			{"name": "Урон по стенам: 10x (500 HP)", "val": 100.0, "max": 100.0},
 			{"name": "Уязвимость к дробовику: 1 выстрел", "val": 100.0, "max": 100.0}
 		],
-		"stats": "• Тип: Летающий барражирующий боеприпас / дрон-камикадзе\n• Здоровье: 30 HP\n• Маневр: Полет во всех 3 плоскостях (X, Y, Z), барражирование на высоте\n• Атака: Стремительное пикирование с леденящим воем двигателя и мощный взрыв (-50 HP) по игроку и врагам в радиусе 5.5м!\n• Критическая уязвимость: Дробовик уничтожает дрон С ОДНОГО ПОПАДАНИЯ ДАЖЕ ОДНОЙ КАРТЕЧЬЮ!\n\nТактическое досье:\nНизколетящий треугольный кошмар с характерным звуком двухтактного мотора мопеда. Заметив игрока, начинает крутое пике с пронзительным воем сирены. Не подпускайте в упор! Однако широкая картечь дробовика превращает дрон в металлолом с одного попадания на любой дистанции — цельтесь навстречу и стреляйте!"
+		"stats": "• Тип: Барражирующий дрон-камикадзе с 4-лопастным толкающим винтом и обтекаемым носовым конусом\n• Здоровье: 30 HP\n• Маневр: Полет во всех 3 плоскостях (X, Y, Z), барражирование на высоте\n• Атака: Стремительное пикирование с леденящим воем двигателя и мощный взрыв (-50 HP игроку в радиусе 5.5м)\n• КРИТИЧЕСКИЙ УРОН ПО МАГАЗИНУ: Наносит сокрушительный 10x урон (-500 HP за таран по стенам магазина)!\n• Поведение: 50% дронов целенаправленно штурмуют стены магазина, а другие 50% летят к магазину, но при приближении игрока на дистанцию 12-32м переключаются в пике на игрока!\n• Критическая уязвимость: Дробовик уничтожает дрон С ОДНОГО ПОПАДАНИЯ ДАЖЕ ОДНОЙ КАРТЕЧЬЮ!"
 	},
 	"vodka": {
 		"title": "ВОДКА \"ЧЕКУНЕЦ 67\"",
@@ -307,7 +328,7 @@ var handbook_db = {
 			{"name": "Скорость бега: +50%", "val": 75.0, "max": 100.0},
 			{"name": "Длительность эффекта: 15 сек", "val": 15.0, "max": 30.0}
 		],
-		"stats": "• Тип: Тактический стимулятор / крепкий алкогольный напиток\n• Объем / Крепость: 0.25 л / 40% об.\n• Слот инвентаря: Клавиша [5] (вместимость до 3 бутылок)\n• Эффект:\n  - Мгновенно заживляет 6-7 HP здоровья\n  - Удваивает максимальную выносливость со 150 до 300 пунктов!\n  - Увеличивает скорость спринта в 1.5 раза\n  - Полностью отключает штрафы усталости и отдышки на 15 секунд!\n\nТактическое досье:\nТот самый \"Чекунец 67\" в компактной плоской бутылке. В критический момент боя глоток чекунца прочищает разум, снимает усталость и дарует богатырский спринт, позволяя уйти из окружения или разорвать дистанцию с толпой предателей."
+		"stats": "• Тип: Тактический стимулятор / крепкий алкогольный напиток\n• Объем / Крепость: 0.25 л / 40% об.\n• Слот инвентаря: Клавиша [5] (вместимость до 3 бутылок)\n• Эффект:\n  - Мгновенно заживляет 6-7 HP здоровья\n  - Удваивает максимальную выносливость со 150 до 300 пунктов!\n  - Увеличивает скорость спринта в 1.5 раза\n  - Полностью отключает штрафы усталости и отдышки на 15 секунд!\n• Сохранение: При гибели игрока и респавне водка в слоте [5] сохраняется полностью!"
 	},
 	"heavy_armor": {
 		"title": "СВЕРХТЯЖЕЛЫЙ БРОНЕЖИЛЕТ (150 БР)",
@@ -328,6 +349,26 @@ var handbook_db = {
 			{"name": "Требование: Сверхтяжелый (>= 76)", "val": 100.0, "max": 100.0}
 		],
 		"stats": "• Тип: Комплект титано-керамических бронепластин BR-5+\n• Эффект: Мгновенно восстанавливает +30 единиц брони сверхтяжелого бронежилета (вплоть до 150)\n• Условие покупки: Нельзя купить без активного сверхтяжелого бронежилета (требуется наличие жилета и текущая броня >= 76)\n\nТактическое досье:\nЗапасная бронеплита позволяет поддерживать ресурс сверхтяжелого бронежилета выше критического порога в 76 единиц, не допуская разрушения композитной матрицы."
+	},
+	"shop_defense": {
+		"title": "ОБОРОНА МАГАЗИНА (ПРОЧНОСТЬ СТЕН)",
+		"bars": [
+			{"name": "Прочность стен: 5000 HP", "val": 100.0, "max": 100.0},
+			{"name": "Урон Шахеда: 10x (500 ед.)", "val": 100.0, "max": 100.0},
+			{"name": "Урон Тяжеловеса: 2x (76 ед.)", "val": 50.0, "max": 100.0},
+			{"name": "Восстановление при рестарте: 50%", "val": 50.0, "max": 100.0}
+		],
+		"stats": "• Базовая прочность стен: 5000 HP (полоска внизу слева под HP и выносливостью)\n• Приоритеты врагов:\n  - Часть нападающих целенаправленно идет крушить стены магазина, а часть преследует игрока.\n• Модификаторы урона по стенам:\n  - Дрон Шахед наносит КРИТИЧЕСКИЙ 10x урон взрывом (-500 HP за таран!)\n  - Желтый тяжеловес наносит 2x урон топором (-76 HP за удар по стенам)\n  - Пули Красного (1.35с) и Синего (1.20с) врагов растворяются через ~33м, поэтому они могут обстреливать магазин только подойдя в упор.\n• Ворота и изоляция:\n  - Между волнами массивные двери на петлях распахнуты, внутри можно рассматривать оружейные витрины.\n  - При начале волны двери закрываются, а игрока автоматически телепортирует наружу перед входом.\n• Перезапуск при прорыве:\n  - Если прочность стен упадет до 0, игрок может перезапустить текущую волну с 50% прочности магазина (2500 HP) с сохранением всего инвентаря и оружия!"
+	},
+	"game_rules": {
+		"title": "ВОЗРОЖДЕНИЕ И ТАКТИКА ВОЛН",
+		"bars": [
+			{"name": "Время возрождения: 10 сек", "val": 10.0, "max": 30.0},
+			{"name": "Сохранение запаса патронов: 50%", "val": 50.0, "max": 100.0},
+			{"name": "Сохранение патронов в магазине: 100%", "val": 100.0, "max": 100.0},
+			{"name": "Сохранение водки: 100%", "val": 100.0, "max": 100.0}
+		],
+		"stats": "• Система возрождения игрока:\n  - При гибели персонажа включается 10-секундный таймер.\n  - Через 10 секунд игрок возрождается прямо у дверей магазина с полным здоровьем.\n  - Патроны в магазине текущего оружия сохраняются полностью, запас патронов восстанавливается на 50%, а бутылки водки в слоте [5] сохраняются в полном объеме!\n• Разведка маяков (Beacon Intel):\n  - Перед каждой волной над позициями врагов горят голографические маяки с точным числом и типами штурмующих сил.\n• Счётчик врагов:\n  - В правом верхнем углу экрана отображается точное количество оставшихся врагов текущей волны.\n• Быстрый нож [V]:\n  - Нажатие [V] совершает скоростной отцентрованный удар ножом (70 ед. урона) прямо по перекрестию прицела."
 	}
 }
 
@@ -379,6 +420,23 @@ func _ready() -> void:
 	highlight_weapon_card(1)
 	if stamina_label:
 		stamina_label.modulate = Color(0.25, 0.65, 1.0)
+	build_shop_health_bar()
+	build_respawn_overlay()
+	setup_enemy_counter_ui()
+	setup_handbook_extra_buttons()
+
+func _process(delta: float) -> void:
+	if is_respawning:
+		respawn_countdown -= delta
+		if respawn_timer_label:
+			respawn_timer_label.text = "Возрождение у дверей магазина через: %d сек..." % maxi(0, int(ceil(respawn_countdown)))
+		if respawn_countdown <= 0.0:
+			is_respawning = false
+			if respawn_overlay:
+				respawn_overlay.visible = false
+			var p = get_parent()
+			if p and p.has_method("respawn_at_shop"):
+				p.respawn_at_shop()
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
@@ -451,6 +509,110 @@ func select_handbook_item(item_id: String) -> void:
 						pbars[i].value = bars[i]["val"]
 				else:
 					boxes[i].visible = false
+
+func setup_enemy_counter_ui() -> void:
+	enemy_counter_container = PanelContainer.new()
+	enemy_counter_container.name = "EnemyCounter"
+	
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.06, 0.07, 0.10, 0.65)
+	style.border_width_left = 0
+	style.border_width_top = 0
+	style.border_width_right = 0
+	style.border_width_bottom = 0
+	style.corner_radius_top_left = 6
+	style.corner_radius_top_right = 6
+	style.corner_radius_bottom_right = 6
+	style.corner_radius_bottom_left = 6
+	style.content_margin_left = 8.0
+	style.content_margin_right = 10.0
+	style.content_margin_top = 4.0
+	style.content_margin_bottom = 4.0
+	enemy_counter_container.add_theme_stylebox_override("panel", style)
+	
+	var hbox := HBoxContainer.new()
+	hbox.alignment = BoxContainer.ALIGNMENT_BEGIN
+	hbox.add_theme_constant_override("separation", 6)
+	enemy_counter_container.add_child(hbox)
+	
+	var icon := Label.new()
+	icon.text = "💀"
+	icon.add_theme_font_size_override("font_size", 16)
+	hbox.add_child(icon)
+	
+	enemy_counter_label = Label.new()
+	enemy_counter_label.text = "ВРАГИ: --"
+	enemy_counter_label.add_theme_font_size_override("font_size", 15)
+	enemy_counter_label.modulate = Color(1.0, 0.35, 0.30)
+	hbox.add_child(enemy_counter_label)
+	
+	var tl = get_node_or_null("TopLeft")
+	if tl:
+		tl.add_child(enemy_counter_container)
+	else:
+		add_child(enemy_counter_container)
+		enemy_counter_container.set_anchors_preset(Control.PRESET_TOP_LEFT)
+		enemy_counter_container.position = Vector2(24, 96)
+
+func update_enemies_remaining(count: int, is_active: bool) -> void:
+	if not enemy_counter_label:
+		return
+	if not is_active:
+		enemy_counter_label.text = "ВОЛНА ЗАЧИЩЕНА"
+		enemy_counter_label.modulate = Color(0.4, 1.0, 0.5)
+	else:
+		enemy_counter_label.text = "ОСТАЛОСЬ ВРАГОВ: %d" % count
+		if count <= 3:
+			enemy_counter_label.modulate = Color(1.0, 0.85, 0.2)
+		else:
+			enemy_counter_label.modulate = Color(1.0, 0.35, 0.30)
+
+func setup_handbook_extra_buttons() -> void:
+	var list_container = get_node_or_null("HandbookPanel/HBox/LeftCol/VBox/Scroll/List")
+	if not list_container:
+		return
+		
+	if not list_container.has_node("BtnHB_ShopDefense"):
+		var btn_shop := Button.new()
+		btn_shop.name = "BtnHB_ShopDefense"
+		btn_shop.text = "Оборона магазина (5000 HP)"
+		btn_shop.custom_minimum_size = Vector2(0, 36)
+		btn_shop.add_theme_font_size_override("font_size", 13)
+		var style := StyleBoxFlat.new()
+		style.bg_color = Color(0.20, 0.16, 0.10, 0.9)
+		style.border_color = Color(0.85, 0.65, 0.25, 0.8)
+		style.border_width_left = 1
+		style.border_width_top = 1
+		style.border_width_right = 1
+		style.border_width_bottom = 1
+		style.corner_radius_top_left = 4
+		style.corner_radius_top_right = 4
+		style.corner_radius_bottom_right = 4
+		style.corner_radius_bottom_left = 4
+		btn_shop.add_theme_stylebox_override("normal", style)
+		list_container.add_child(btn_shop)
+		btn_shop.pressed.connect(func(): select_handbook_item("shop_defense"))
+
+	if not list_container.has_node("BtnHB_GameRules"):
+		var btn_rules := Button.new()
+		btn_rules.name = "BtnHB_GameRules"
+		btn_rules.text = "Тактика и возрождение"
+		btn_rules.custom_minimum_size = Vector2(0, 36)
+		btn_rules.add_theme_font_size_override("font_size", 13)
+		var style_r := StyleBoxFlat.new()
+		style_r.bg_color = Color(0.12, 0.18, 0.22, 0.9)
+		style_r.border_color = Color(0.35, 0.75, 0.95, 0.8)
+		style_r.border_width_left = 1
+		style_r.border_width_top = 1
+		style_r.border_width_right = 1
+		style_r.border_width_bottom = 1
+		style_r.corner_radius_top_left = 4
+		style_r.corner_radius_top_right = 4
+		style_r.corner_radius_bottom_right = 4
+		style_r.corner_radius_bottom_left = 4
+		btn_rules.add_theme_stylebox_override("normal", style_r)
+		list_container.add_child(btn_rules)
+		btn_rules.pressed.connect(func(): select_handbook_item("game_rules"))
 
 func _on_close_handbook_pressed() -> void:
 	handbook_panel.visible = false
@@ -878,29 +1040,75 @@ func show_hitmarker() -> void:
 	hitmarker_tween.tween_property(hitmarker, "modulate:a", 0.0, 0.15)
 
 func _on_player_died() -> void:
-	is_game_over = true
-	game_over_panel.visible = true
-	pause_panel.visible = false
-	handbook_panel.visible = false
+	if is_game_over:
+		return
+	is_respawning = true
+	respawn_countdown = 10.0
+	if respawn_overlay:
+		respawn_overlay.visible = true
 	if shop_panel:
 		shop_panel.visible = false
-	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	if handbook_panel:
+		handbook_panel.visible = false
+	if pause_panel:
+		pause_panel.visible = false
+
+func build_respawn_overlay() -> void:
+	respawn_overlay = Panel.new()
+	respawn_overlay.name = "RespawnOverlay"
+	respawn_overlay.anchors_preset = Control.PRESET_FULL_RECT
+	respawn_overlay.anchor_right = 1.0
+	respawn_overlay.anchor_bottom = 1.0
+	respawn_overlay.visible = false
 	
-	var diff_str: String = "Нормальная"
-	if GlobalSettings:
-		match GlobalSettings.current_difficulty:
-			0:
-				diff_str = "Легкая"
-			2:
-				diff_str = "Сложная"
-				
-	if death_stats_label:
-		death_stats_label.text = "Волна: %d  |  Деньги: $ %d  |  Сложность: %s" % [current_wave_num, final_score, diff_str]
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.12, 0.02, 0.02, 0.88)
+	respawn_overlay.add_theme_stylebox_override("panel", sb)
+	
+	var vbox := VBoxContainer.new()
+	vbox.anchors_preset = Control.PRESET_CENTER
+	vbox.anchor_left = 0.5
+	vbox.anchor_top = 0.5
+	vbox.anchor_right = 0.5
+	vbox.anchor_bottom = 0.5
+	vbox.offset_left = -300
+	vbox.offset_right = 300
+	vbox.offset_top = -80
+	vbox.offset_bottom = 80
+	vbox.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	vbox.grow_vertical = Control.GROW_DIRECTION_BOTH
+	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	vbox.add_theme_constant_override("separation", 14)
+	respawn_overlay.add_child(vbox)
+	
+	respawn_title = Label.new()
+	respawn_title.text = "В Ы   П О Г И Б Л И"
+	respawn_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	respawn_title.add_theme_font_size_override("font_size", 44)
+	respawn_title.add_theme_color_override("font_color", Color(1.0, 0.25, 0.25))
+	vbox.add_child(respawn_title)
+	
+	respawn_timer_label = Label.new()
+	respawn_timer_label.text = "Возрождение у дверей магазина через: 10 сек..."
+	respawn_timer_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	respawn_timer_label.add_theme_font_size_override("font_size", 20)
+	respawn_timer_label.add_theme_color_override("font_color", Color(0.9, 0.9, 0.9))
+	vbox.add_child(respawn_timer_label)
+	
+	add_child(respawn_overlay)
 
 func _on_restart_wave_pressed() -> void:
-	if GlobalSettings:
-		GlobalSettings.last_wave = current_wave_num
-	get_tree().reload_current_scene()
+	is_game_over = false
+	game_over_panel.visible = false
+	
+	# Restart current wave in EnemySpawner with 50% shop HP and preserved inventory
+	var spawner = get_tree().root.find_child("EnemySpawner", true, false)
+	if spawner and spawner.has_method("restart_current_wave"):
+		spawner.restart_current_wave(true)
+		
+	var player = get_parent()
+	if player and player.has_method("reset_after_wave_restart"):
+		player.reset_after_wave_restart()
 
 func _on_menu_button_pressed() -> void:
 	get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
@@ -924,3 +1132,146 @@ func _on_vodka_buff_updated(is_active: bool, time_left: float) -> void:
 		var p = get_parent()
 		var count: int = p.vodka_count if (p and "vodka_count" in p) else 0
 		_on_vodka_count_changed(count)
+
+# --- SHOP DEFENSE HEALTH BAR ---
+
+func build_shop_health_bar() -> void:
+	var bottom_left = get_node_or_null("BottomLeft")
+	
+	# Wall HP Container placed cleanly directly beneath HP and Stamina (No outer frame/border/ободок)
+	shop_hp_container = VBoxContainer.new()
+	shop_hp_container.name = "ShopHealthContainer"
+	shop_hp_container.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	shop_hp_container.add_theme_constant_override("separation", 2)
+	shop_hp_container.custom_minimum_size = Vector2(375.0, 38.0)
+	
+	var hbox := HBoxContainer.new()
+	hbox.custom_minimum_size = Vector2(375.0, 20.0)
+	shop_hp_container.add_child(hbox)
+	
+	shop_hp_title = Label.new()
+	shop_hp_title.text = "Прочность стен"
+	shop_hp_title.add_theme_font_size_override("font_size", 16)
+	shop_hp_title.add_theme_color_override("font_color", Color(1.0, 0.85, 0.50))
+	shop_hp_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	hbox.add_child(shop_hp_title)
+	
+	shop_hp_label = Label.new()
+	shop_hp_label.text = "5000 / 5000"
+	shop_hp_label.add_theme_font_size_override("font_size", 15)
+	shop_hp_label.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0))
+	hbox.add_child(shop_hp_label)
+	
+	shop_hp_bar = ProgressBar.new()
+	# Exactly 1.5x of 250px stamina bar = 375px width, 14px height matching player bars
+	shop_hp_bar.custom_minimum_size = Vector2(375.0, 14.0)
+	shop_hp_bar.show_percentage = false
+	shop_hp_bar.max_value = 5000.0
+	shop_hp_bar.value = 5000.0
+	
+	# Background stylebox - clean, NO border/rim (ободок)
+	var bg_sb := StyleBoxFlat.new()
+	bg_sb.bg_color = Color(0.12, 0.12, 0.15, 0.85)
+	bg_sb.corner_radius_top_left = 4
+	bg_sb.corner_radius_top_right = 4
+	bg_sb.corner_radius_bottom_left = 4
+	bg_sb.corner_radius_bottom_right = 4
+	shop_hp_bar.add_theme_stylebox_override("background", bg_sb)
+	
+	# Fill styles - clean, NO border/rim (ободок)
+	style_shop_fill_normal = StyleBoxFlat.new()
+	style_shop_fill_normal.bg_color = Color(0.20, 0.72, 0.32)
+	style_shop_fill_normal.corner_radius_top_left = 4
+	style_shop_fill_normal.corner_radius_top_right = 4
+	style_shop_fill_normal.corner_radius_bottom_left = 4
+	style_shop_fill_normal.corner_radius_bottom_right = 4
+	
+	style_shop_fill_warn = StyleBoxFlat.new()
+	style_shop_fill_warn.bg_color = Color(0.95, 0.70, 0.15)
+	style_shop_fill_warn.corner_radius_top_left = 4
+	style_shop_fill_warn.corner_radius_top_right = 4
+	style_shop_fill_warn.corner_radius_bottom_left = 4
+	style_shop_fill_warn.corner_radius_bottom_right = 4
+	
+	style_shop_fill_danger = StyleBoxFlat.new()
+	style_shop_fill_danger.bg_color = Color(0.95, 0.20, 0.20)
+	style_shop_fill_danger.corner_radius_top_left = 4
+	style_shop_fill_danger.corner_radius_top_right = 4
+	style_shop_fill_danger.corner_radius_bottom_left = 4
+	style_shop_fill_danger.corner_radius_bottom_right = 4
+	
+	shop_hp_bar.add_theme_stylebox_override("fill", style_shop_fill_normal)
+	shop_hp_container.add_child(shop_hp_bar)
+	
+	if bottom_left:
+		bottom_left.add_child(shop_hp_container)
+	else:
+		shop_hp_container.anchors_preset = Control.PRESET_BOTTOM_LEFT
+		shop_hp_container.anchor_top = 1.0
+		shop_hp_container.anchor_bottom = 1.0
+		shop_hp_container.offset_left = 24.0
+		shop_hp_container.offset_bottom = -20.0
+		add_child(shop_hp_container)
+
+func update_shop_health(current: float, max_val: float) -> void:
+	if not shop_hp_bar:
+		return
+	shop_hp_bar.max_value = max_val
+	shop_hp_bar.value = current
+	var pct = (current / maxf(1.0, max_val)) * 100.0
+	if shop_hp_label:
+		shop_hp_label.text = "%d / %d (%d%%)" % [int(ceil(current)), int(max_val), int(ceil(pct))]
+		
+	if pct > 45.0:
+		shop_hp_bar.add_theme_stylebox_override("fill", style_shop_fill_normal)
+		if shop_hp_title:
+			shop_hp_title.add_theme_color_override("font_color", Color(1.0, 0.85, 0.50))
+	elif pct > 20.0:
+		shop_hp_bar.add_theme_stylebox_override("fill", style_shop_fill_warn)
+		if shop_hp_title:
+			shop_hp_title.add_theme_color_override("font_color", Color(1.0, 0.75, 0.20))
+	else:
+		shop_hp_bar.add_theme_stylebox_override("fill", style_shop_fill_danger)
+		if shop_hp_title:
+			shop_hp_title.add_theme_color_override("font_color", Color(1.0, 0.30, 0.30))
+			
+	if shop_hp_bar:
+		if shop_pulse_tween:
+			shop_pulse_tween.kill()
+		shop_pulse_tween = create_tween()
+		shop_pulse_tween.tween_property(shop_hp_bar, "modulate", Color(1.5, 0.6, 0.6), 0.08)
+		shop_pulse_tween.tween_property(shop_hp_bar, "modulate", Color(1.0, 1.0, 1.0), 0.20)
+
+func trigger_shop_destroyed() -> void:
+	is_game_over = true
+	if respawn_overlay:
+		respawn_overlay.visible = false
+	is_respawning = false
+	
+	game_over_panel.visible = true
+	var title = game_over_panel.get_node_or_null("VBox/Title")
+	if title:
+		title.text = "МАГАЗИН УНИЧТОЖЕН!"
+	var subtitle = game_over_panel.get_node_or_null("VBox/Subtitle")
+	if subtitle:
+		subtitle.text = "Стены магазина не выдержали натиска! Повторите волну с 50% прочности."
+	var r_btn = game_over_panel.get_node_or_null("VBox/RestartWaveBtn")
+	if r_btn:
+		r_btn.text = "↺ ПОВТОРИТЬ ВОЛНУ (50% ПРОЧНОСТИ)"
+		
+	pause_panel.visible = false
+	handbook_panel.visible = false
+	if shop_panel:
+		shop_panel.visible = false
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	
+	var diff_str: String = "Нормальная"
+	if GlobalSettings:
+		match GlobalSettings.current_difficulty:
+			0:
+				diff_str = "Легкая"
+			2:
+				diff_str = "Сложная"
+				
+	if death_stats_label:
+		death_stats_label.text = "Волна: %d  |  Деньги: $ %d  |  Сложность: %s" % [current_wave_num, final_score, diff_str]

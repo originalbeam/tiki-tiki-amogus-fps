@@ -3,10 +3,10 @@ extends Node3D
 # Minivan Shop with Gray Crewmate & Decorative Inventory
 # Driven by EnemySpawner wave lifecycle
 
-const PARK_POS: Vector3 = Vector3(-24.0, 0.0, 8.0)
-const AWAY_POS: Vector3 = Vector3(-55.0, 0.0, 8.0)
+const PARK_POS: Vector3 = Vector3(-15.5, 0.0, -5.5)
+const AWAY_POS: Vector3 = Vector3(-45.0, 0.0, -5.5)
 const PARK_ROT: Vector3 = Vector3(0.0, 68.0, 0.0)
-const OVERSHOOT_POS: Vector3 = Vector3(-26.7, 0.0, 14.68)
+const OVERSHOOT_POS: Vector3 = Vector3(-17.8, 0.0, -3.5)
 const OVERSHOOT_ROT: Vector3 = Vector3(0.0, 68.0, 0.0)
 
 var van_root: Node3D = null
@@ -24,7 +24,7 @@ var is_driving: bool = false
 # Stand positions for crewmate relative to van_root
 const CREWMATE_SHOP_POS: Vector3 = Vector3(1.35, 0.0, 1.85)
 const CREWMATE_SHOP_ROT: Vector3 = Vector3(0.0, -52.0, 0.0)
-const CREWMATE_CABIN_POS: Vector3 = Vector3(-1.15, 0.55, 0.40)
+const CREWMATE_CABIN_POS: Vector3 = Vector3(-1.15, 0.38, 0.40)
 const CREWMATE_CABIN_ROT: Vector3 = Vector3(0.0, 90.0, 0.0)
 
 func _ready() -> void:
@@ -677,7 +677,17 @@ func build_gray_crewmate() -> void:
 	mat_visor.metallic = 0.4
 	mat_visor.roughness = 0.1
 	
-	# Body
+	# Top Hat Materials
+	var mat_hat := StandardMaterial3D.new()
+	mat_hat.albedo_color = Color(0.08, 0.08, 0.10) # Classy matte/satin black
+	mat_hat.roughness = 0.45
+	mat_hat.metallic = 0.05
+	
+	var mat_ribbon := StandardMaterial3D.new()
+	mat_ribbon.albedo_color = Color(0.80, 0.08, 0.14) # Hat crimson ribbon
+	mat_ribbon.roughness = 0.35
+	
+	# 1. Crewmate Body Capsule
 	var body := MeshInstance3D.new()
 	var bm := CapsuleMesh.new()
 	bm.radius = 0.36
@@ -689,7 +699,7 @@ func build_gray_crewmate() -> void:
 	body.position = Vector3(0, 0.78, 0)
 	crewmate.add_child(body)
 	
-	# Visor (looking forward +Z)
+	# 2. Visor (looking forward +Z)
 	var visor := MeshInstance3D.new()
 	var vm := BoxMesh.new()
 	vm.size = Vector3(0.44, 0.24, 0.20)
@@ -698,7 +708,7 @@ func build_gray_crewmate() -> void:
 	visor.position = Vector3(0, 0.98, 0.28)
 	crewmate.add_child(visor)
 	
-	# Backpack (-Z)
+	# 3. Backpack (-Z)
 	var bp := MeshInstance3D.new()
 	var bpm := BoxMesh.new()
 	bpm.size = Vector3(0.44, 0.62, 0.24)
@@ -707,7 +717,7 @@ func build_gray_crewmate() -> void:
 	bp.position = Vector3(0, 0.78, -0.30)
 	crewmate.add_child(bp)
 	
-	# Legs
+	# 4. Legs
 	for lx in [-0.20, 0.20]:
 		var leg := MeshInstance3D.new()
 		var lm := CapsuleMesh.new()
@@ -718,7 +728,62 @@ func build_gray_crewmate() -> void:
 		leg.material_override = mat_gray
 		leg.position = Vector3(lx, 0.24, 0)
 		crewmate.add_child(leg)
-		
+
+	# --- GENTLEMAN TOP HAT (ШЛЯПА-ЦИЛИНДР) ---
+	var hat_root := Node3D.new()
+	hat_root.name = "TopHat"
+	hat_root.position = Vector3(0.0, 1.36, 0.02)
+	hat_root.rotation_degrees = Vector3(-3.0, 0.0, 4.0) # Confident stylish merchant tilt
+	crewmate.add_child(hat_root)
+	
+	# Hat Brim (Поля цилиндра)
+	var brim := MeshInstance3D.new()
+	var brim_m := CylinderMesh.new()
+	brim_m.top_radius = 0.40
+	brim_m.bottom_radius = 0.40
+	brim_m.height = 0.035
+	brim_m.radial_segments = 18
+	brim.mesh = brim_m
+	brim.material_override = mat_hat
+	brim.position = Vector3(0, 0, 0)
+	hat_root.add_child(brim)
+	
+	# Hat Silk Ribbon Band (Шелковая красная лента)
+	var ribbon := MeshInstance3D.new()
+	var ribbon_m := CylinderMesh.new()
+	ribbon_m.top_radius = 0.272
+	ribbon_m.bottom_radius = 0.272
+	ribbon_m.height = 0.075
+	ribbon_m.radial_segments = 16
+	ribbon.mesh = ribbon_m
+	ribbon.material_override = mat_ribbon
+	ribbon.position = Vector3(0, 0.055, 0)
+	hat_root.add_child(ribbon)
+	
+	# Hat Crown (Высокая тулья цилиндра)
+	var crown := MeshInstance3D.new()
+	var crown_m := CylinderMesh.new()
+	crown_m.top_radius = 0.270
+	crown_m.bottom_radius = 0.262
+	crown_m.height = 0.46
+	crown_m.radial_segments = 16
+	crown.mesh = crown_m
+	crown.material_override = mat_hat
+	crown.position = Vector3(0, 0.245, 0)
+	hat_root.add_child(crown)
+	
+	# Top rim cap (Верхушка цилиндра)
+	var crown_top := MeshInstance3D.new()
+	var ct_m := CylinderMesh.new()
+	ct_m.top_radius = 0.275
+	ct_m.bottom_radius = 0.275
+	ct_m.height = 0.02
+	ct_m.radial_segments = 16
+	crown_top.mesh = ct_m
+	crown_top.material_override = mat_hat
+	crown_top.position = Vector3(0, 0.475, 0)
+	hat_root.add_child(crown_top)
+	
 	crewmate.position = CREWMATE_SHOP_POS
 	crewmate.rotation_degrees = CREWMATE_SHOP_ROT
 
@@ -730,9 +795,9 @@ func build_shop_zone() -> void:
 	
 	var col := CollisionShape3D.new()
 	var shape := BoxShape3D.new()
-	shape.size = Vector3(4.0, 2.5, 3.4)
+	shape.size = Vector3(3.2, 2.5, 2.6)
 	col.shape = shape
-	col.position = Vector3(0.4, 1.25, 2.6)
+	col.position = Vector3(0.4, 1.25, 2.4)
 	shop_zone.add_child(col)
 	
 	shop_zone.body_entered.connect(_on_shop_zone_body_entered)
@@ -742,7 +807,7 @@ func build_shop_zone() -> void:
 	# Floor marker ring / pad with glowing border
 	floor_marker = Node3D.new()
 	floor_marker.name = "FloorMarker"
-	floor_marker.position = Vector3(0.4, 0.02, 2.6)
+	floor_marker.position = Vector3(0.4, 0.02, 2.4)
 	add_child(floor_marker)
 	
 	var mat_neon := StandardMaterial3D.new()
@@ -752,9 +817,9 @@ func build_shop_zone() -> void:
 	mat_neon.emission = Color(0.2, 0.85, 1.0)
 	mat_neon.emission_energy_multiplier = 1.8
 	
-	# Border strips forming a 4.2m x 3.6m shopping pad
-	var half_w := 2.0
-	var half_d := 1.7
+	# Border strips forming a shopping pad
+	var half_w := 1.5
+	var half_d := 1.2
 	var th := 0.05
 	
 	var borders = [
@@ -865,7 +930,7 @@ func on_wave_cleared() -> void:
 		
 	# Stage 1: Minivan drives in forward along the road, approaches parking spot and makes a sharp turn outward to overshoot
 	var drive_in := create_tween()
-	drive_in.tween_property(self, "position", Vector3(-38.0, 0.0, 8.2), 0.9).set_trans(Tween.TRANS_LINEAR)
+	drive_in.tween_property(self, "position", Vector3(-26.0, 0.0, -5.5), 0.9).set_trans(Tween.TRANS_LINEAR)
 	drive_in.tween_property(self, "position", OVERSHOOT_POS, 1.1).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	drive_in.parallel().tween_property(self, "rotation_degrees:y", OVERSHOOT_ROT.y, 1.1).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
 	await drive_in.finished

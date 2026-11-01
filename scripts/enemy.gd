@@ -36,7 +36,20 @@ var is_bursting: bool = false
 var burst_shots_left: int = 0
 var burst_shot_timer: float = 0.0
 
+enum TargetType {
+	SHOP,
+	PLAYER
+}
+var movement_goal: TargetType = TargetType.SHOP
+var current_target_type: TargetType = TargetType.PLAYER
 var player: Node3D = null
+var shop_building: Node3D = null
+var nav_manager: Node3D = null
+
+var nav_path: PackedVector3Array = PackedVector3Array()
+var nav_path_index: int = 0
+var repath_timer: float = 0.0
+var stuck_timer: float = 0.0
 var gravity: float = 14.0
 var walk_cycle: float = 0.0
 
@@ -71,6 +84,30 @@ func _ready() -> void:
 	var players = get_tree().get_nodes_in_group("player")
 	if players.size() > 0:
 		player = players[0]
+		
+	var shops = get_tree().get_nodes_in_group("shop_building")
+	if shops.size() > 0:
+		shop_building = shops[0]
+		
+	var navs = get_tree().get_nodes_in_group("nav_manager")
+	if navs.size() > 0:
+		nav_manager = navs[0]
+		
+	repath_timer = randf_range(0.1, 0.4)
+	
+	# Initial movement goal assignment based on enemy type
+	match enemy_type:
+		EnemyType.YELLOW_HEAVY:
+			movement_goal = TargetType.SHOP if randf() < 0.75 else TargetType.PLAYER
+		EnemyType.RED_STANDARD:
+			movement_goal = TargetType.SHOP if randf() < 0.50 else TargetType.PLAYER
+		EnemyType.BLUE_SCOUT:
+			movement_goal = TargetType.PLAYER if randf() < 0.65 else TargetType.SHOP
+		EnemyType.GREEN_SNIPER:
+			movement_goal = TargetType.PLAYER if randf() < 0.60 else TargetType.SHOP
+		_:
+			movement_goal = TargetType.SHOP
+	current_target_type = TargetType.PLAYER
 		
 	if health_bar:
 		health_bar.max_value = max_health
@@ -824,38 +861,149 @@ func _physics_process(delta: float) -> void:
 		var players = get_tree().get_nodes_in_group("player")
 		if players.size() > 0:
 			player = players[0]
+			
+	if not is_instance_valid(shop_building):
+		var shops = get_tree().get_nodes_in_group("shop_building")
+		if shops.size() > 0:
+			shop_building = shops[0]
+			
+	if not is_instance_valid(nav_manager):
+		var navs = get_tree().get_nodes_in_group("nav_manager")
+		if navs.size() > 0:
+			nav_manager = navs[0]
+
+	# --- PRIORITY & TARGETING SYSTEM ---
+	var dist_to_player := 999.0
+	if is_instance_valid(player):
+		dist_to_player = global_position.distance_to(player.global_position)
+		
+	var dist_to_shop := 999.0
+	if is_instance_valid(shop_building):
+		dist_to_shop = global_position.distance_to(shop_building.get_attack_target_position(global_position))
+		
+	var shop_active = is_instance_valid(shop_building) and not (shop_building.has_method("is_destroyed") and shop_building.is_destroyed)
+	if not shop_active:
+		movement_goal = TargetType.PLAYER
+		
+	# Requirement 3: Enemies only shoot at shop when in close proximity to it (dist_to_shop <= 15.0).
+	# At all other times, they shoot at the player (while preserving movement of part of them to the shop).
+	if shop_active and movement_goal == TargetType.SHOP and dist_to_shop <= 15.0 and dist_to_player >= 4.0:
+		current_target_type = TargetType.SHOP
+	else:
+		current_target_type = TargetType.PLAYER
+		
+	var target_dest := Vector3.ZERO
+	if movement_goal == TargetType.SHOP and shop_active:
+		target_dest = shop_building.get_attack_target_position(global_position)
+	elif is_instance_valid(player):
+		target_dest = player.global_position
+	else:
 		move_and_slide()
 		return
 
-	var dist_to_player = global_position.distance_to(player.global_position)
-	var dir_to_player = (player.global_position - global_position)
-	dir_to_player.y = 0
-	dir_to_player = dir_to_player.normalized()
+	# --- PATHFINDING & NAVIGATION AI ---
+	repath_timer -= delta
+	if repath_timer <= 0.0:
+		repath_timer = randf_range(0.45, 0.75)
+		if nav_manager and nav_manager.has_method("get_navigation_path"):
+			nav_path = nav_manager.get_navigation_path(global_position, target_dest)
+			nav_path_index = 0
+
+	var move_dir := Vector3.ZERO
+	if nav_path.size() > 0 and nav_path_index < nav_path.size():
+		var wp := nav_path[nav_path_index]
+		var to_wp := wp - global_position
+		to_wp.y = 0
+		var wp_len := to_wp.length()
+		if wp_len < 1.4:
+			nav_path_index += 1
+			if nav_path_index < nav_path.size():
+				wp = nav_path[nav_path_index]
+				to_wp = wp - global_position
+				to_wp.y = 0
+				wp_len = to_wp.length()
+		if wp_len > 0.05:
+			move_dir = to_wp.normalized()
+	else:
+		var direct := target_dest - global_position
+		direct.y = 0
+		if direct.length_squared() > 0.05:
+			move_dir = direct.normalized()
+
+	# Dynamic Whisker Obstacle Avoidance
+	var space_state = get_world_3d().direct_space_state
+	var forward = move_dir if move_dir.length_squared() > 0.01 else -transform.basis.z
+	var whisker_l = forward.rotated(Vector3.UP, deg_to_rad(32.0)) * 2.2
+	var whisker_r = forward.rotated(Vector3.UP, deg_to_rad(-32.0)) * 2.2
 	
-	# Look towards player
-	if dir_to_player.length_squared() > 0.001:
-		var target_rot = atan2(dir_to_player.x, dir_to_player.z)
+	var ray_l = PhysicsRayQueryParameters3D.create(global_position + Vector3(0, 0.6, 0), global_position + Vector3(0, 0.6, 0) + whisker_l)
+	ray_l.collision_mask = 1 # World / obstacles
+	ray_l.exclude = [get_rid()]
+	var ray_r = PhysicsRayQueryParameters3D.create(global_position + Vector3(0, 0.6, 0), global_position + Vector3(0, 0.6, 0) + whisker_r)
+	ray_r.collision_mask = 1
+	ray_r.exclude = [get_rid()]
+	
+	var hit_l = space_state.intersect_ray(ray_l)
+	var hit_r = space_state.intersect_ray(ray_r)
+	if not hit_l.is_empty():
+		move_dir = (move_dir + forward.cross(Vector3.UP) * 0.8).normalized()
+	elif not hit_r.is_empty():
+		move_dir = (move_dir - forward.cross(Vector3.UP) * 0.8).normalized()
+
+	# Look towards shooting target (facing player while shooting player, or facing shop when attacking shop)
+	var look_target := target_dest
+	if current_target_type == TargetType.PLAYER and is_instance_valid(player):
+		look_target = player.global_position
+	elif current_target_type == TargetType.SHOP and shop_active:
+		look_target = shop_building.get_attack_target_position(global_position)
+	var dir_to_look := (look_target - global_position)
+	dir_to_look.y = 0
+	if dir_to_look.length_squared() > 0.01:
+		var target_rot = atan2(dir_to_look.x, dir_to_look.z)
 		rotation.y = lerp_angle(rotation.y, target_rot, delta * 7.0)
 
 	# Movement logic
 	var desired_velocity = Vector3.ZERO
+	var active_dist = dist_to_player if current_target_type == TargetType.PLAYER else global_position.distance_to(target_dest)
+	
 	if is_melee:
-		# Berserker Yellow rushes directly at player
-		desired_velocity = dir_to_player * move_speed
+		# Berserker Yellow rushes directly along path to target
+		if active_dist > 2.0:
+			desired_velocity = move_dir * move_speed
+		else:
+			desired_velocity = move_dir * (move_speed * 0.3)
 	else:
 		# Ranged enemies maintain preferred distance
-		if dist_to_player > preferred_distance + 1.2:
-			desired_velocity = dir_to_player * move_speed
-		elif dist_to_player < preferred_distance - 2.5:
-			desired_velocity = -dir_to_player * (move_speed * 0.7)
-		else:
-			# Strafe left/right around player
-			var strafe_dir = dir_to_player.cross(Vector3.UP)
-			desired_velocity = strafe_dir * (move_speed * 0.5)
+		if current_target_type == TargetType.PLAYER:
+			if dist_to_player > preferred_distance + 1.2:
+				desired_velocity = move_dir * move_speed
+			elif dist_to_player < preferred_distance - 2.5:
+				desired_velocity = -move_dir * (move_speed * 0.7)
+			else:
+				var strafe_player = dir_to_look.normalized().cross(Vector3.UP)
+				desired_velocity = strafe_player * (move_speed * 0.5)
+		else: # Targeting shop
+			if active_dist > preferred_distance:
+				desired_velocity = move_dir * move_speed
+			else:
+				var strafe_shop = dir_to_look.normalized().cross(Vector3.UP)
+				desired_velocity = strafe_shop * (move_speed * 0.35)
 
 	# Sniper slows down while aiming with glint
 	if is_sniper and glint_active:
 		desired_velocity *= 0.15
+
+	# Stuck recovery
+	var horiz_vel = Vector2(velocity.x, velocity.z).length()
+	if horiz_vel < 0.25 and desired_velocity.length_squared() > 0.5:
+		stuck_timer += delta
+		if stuck_timer > 0.75:
+			stuck_timer = 0.0
+			repath_timer = 0.0
+			velocity.x += randf_range(-2.5, 2.5)
+			velocity.z += randf_range(-2.5, 2.5)
+	else:
+		stuck_timer = 0.0
 
 	velocity.x = lerpf(velocity.x, desired_velocity.x, delta * 5.0)
 	velocity.z = lerpf(velocity.z, desired_velocity.z, delta * 5.0)
@@ -875,11 +1023,11 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 	
 	# Attack Handling
-	handle_attacks(delta, dist_to_player)
+	handle_attacks(delta, active_dist)
 
-func handle_attacks(delta: float, dist_to_player: float) -> void:
+func handle_attacks(delta: float, active_dist: float) -> void:
 	if is_melee:
-		handle_melee_axe(delta, dist_to_player)
+		handle_melee_axe(delta, active_dist)
 	elif is_sniper:
 		handle_sniper_attack(delta)
 	elif enemy_type == EnemyType.RED_STANDARD:
@@ -887,7 +1035,7 @@ func handle_attacks(delta: float, dist_to_player: float) -> void:
 	else: # Blue Scout semi-auto
 		handle_pistol_attack(delta)
 
-func handle_melee_axe(delta: float, dist_to_player: float) -> void:
+func handle_melee_axe(delta: float, active_dist: float) -> void:
 	shoot_timer -= delta
 	
 	if is_swinging_axe:
@@ -903,7 +1051,13 @@ func handle_melee_axe(delta: float, dist_to_player: float) -> void:
 				weapon_holder.rotation.x = lerpf(deg_to_rad(-55.0), deg_to_rad(65.0), chop_p)
 			if not axe_hit_registered and chop_p >= 0.5:
 				axe_hit_registered = true
-				if is_instance_valid(player) and global_position.distance_to(player.global_position) <= 2.4:
+				if current_target_type == TargetType.SHOP and is_instance_valid(shop_building):
+					var dist_to_shop = global_position.distance_to(shop_building.get_attack_target_position(global_position))
+					if dist_to_shop <= 3.2:
+						# Requirement 9: Heavyweight deals x2 damage to shop! (38 * 2 = 76 HP)
+						shop_building.take_damage(melee_damage * 2.0, self)
+						play_sfx(SoundEffects.create_axe_hit_sound())
+				elif is_instance_valid(player) and global_position.distance_to(player.global_position) <= 2.4:
 					if player.has_method("take_damage"):
 						player.take_damage(melee_damage)
 					play_sfx(SoundEffects.create_axe_hit_sound())
@@ -916,7 +1070,13 @@ func handle_melee_axe(delta: float, dist_to_player: float) -> void:
 			if weapon_holder:
 				weapon_holder.rotation.x = 0.0
 	else:
-		if dist_to_player <= 2.2 and shoot_timer <= 0.0:
+		var can_swing := false
+		if current_target_type == TargetType.SHOP and is_instance_valid(shop_building):
+			can_swing = global_position.distance_to(shop_building.get_attack_target_position(global_position)) <= 2.8
+		elif is_instance_valid(player):
+			can_swing = global_position.distance_to(player.global_position) <= 2.2
+			
+		if can_swing and shoot_timer <= 0.0:
 			shoot_timer = shoot_interval
 			is_swinging_axe = true
 			axe_swing_timer = 0.0
@@ -952,17 +1112,17 @@ func handle_sniper_attack(delta: float) -> void:
 		glint_active = false
 
 func spawn_sniper_shot() -> void:
-	if not bullet_scene or not is_instance_valid(player):
+	if not bullet_scene:
 		return
-	var bullet = bullet_scene.instantiate()
+	var target_pos := get_current_target_center()
 	var spawn_pos: Vector3 = muzzle_marker.global_position if muzzle_marker else (global_position + Vector3(0, 0.8, 0))
+	var bullet = bullet_scene.instantiate()
 	get_parent().add_child(bullet)
 	bullet.global_position = spawn_pos
 	
-	var target_pos: Vector3 = player.global_position + Vector3(0, 0.9, 0)
 	var shoot_dir: Vector3 = (target_pos - spawn_pos).normalized()
-	# Sniper bullet flies at 55.0 m/s with 48 damage
-	bullet.init(shoot_dir, bullet_damage, laser_color, 55.0)
+	# Sniper bullet flies at 55.0 m/s with 48 damage and long 3.2s flight time
+	bullet.init(shoot_dir, bullet_damage, laser_color, 55.0, 3.2)
 	play_sfx(SoundEffects.create_awp_sound())
 
 func handle_burst_attack(delta: float) -> void:
@@ -992,22 +1152,32 @@ func handle_pistol_attack(delta: float) -> void:
 		if has_line_of_sight():
 			spawn_standard_bullet()
 
+func get_current_target_center() -> Vector3:
+	if current_target_type == TargetType.SHOP and is_instance_valid(shop_building):
+		return shop_building.get_attack_target_position(global_position) + Vector3(0, 1.2, 0)
+	elif is_instance_valid(player):
+		return player.global_position + Vector3(0, 0.85, 0)
+	return global_position + Vector3(0, 1.0, 5.0)
+
 func spawn_standard_bullet() -> void:
-	if not bullet_scene or not is_instance_valid(player):
+	if not bullet_scene:
 		return
-	var bullet = bullet_scene.instantiate()
+	var target_center := get_current_target_center()
 	var spawn_pos: Vector3 = muzzle_marker.global_position if muzzle_marker else (global_position + Vector3(0, 0.8, 0))
+	var bullet = bullet_scene.instantiate()
 	get_parent().add_child(bullet)
 	bullet.global_position = spawn_pos
 	
 	var spread: float = 0.08 if enemy_type == EnemyType.BLUE_SCOUT else 0.12
-	var target_pos: Vector3 = player.global_position + Vector3(
+	var target_pos: Vector3 = target_center + Vector3(
 		randf_range(-spread, spread),
-		0.85 + randf_range(-spread, spread),
+		randf_range(-spread, spread),
 		randf_range(-spread, spread)
 	)
 	var shoot_dir: Vector3 = (target_pos - spawn_pos).normalized()
-	bullet.init(shoot_dir, bullet_damage, laser_color, 26.0)
+	# Red and Blue bullets have limited lifetime so they cannot reach the shop from the middle of the arena
+	var bullet_lifetime: float = 1.20 if enemy_type == EnemyType.BLUE_SCOUT else 1.35
+	bullet.init(shoot_dir, bullet_damage, laser_color, 26.0, bullet_lifetime)
 	if enemy_type == EnemyType.RED_STANDARD:
 		play_sfx(SoundEffects.create_ak47_sound())
 	else:
@@ -1015,22 +1185,24 @@ func spawn_standard_bullet() -> void:
 
 # Robust raycast check ignoring other enemies and hitting layer 1 (world)
 func has_line_of_sight() -> bool:
-	if not is_instance_valid(player):
-		return false
+	var target_center := get_current_target_center()
 	var space_state = get_world_3d().direct_space_state
 	var from_pos: Vector3 = global_position + Vector3(0, 1.1, 0)
-	var to_pos: Vector3 = player.global_position + Vector3(0, 0.9, 0)
-	var query = PhysicsRayQueryParameters3D.create(from_pos, to_pos)
+	var query = PhysicsRayQueryParameters3D.create(from_pos, target_center)
 	query.collision_mask = 1 # World layer
 	query.exclude = [get_rid()]
 	var result = space_state.intersect_ray(query)
 	if result.is_empty():
 		return true
-	if result.collider == player or (result.collider and result.collider.is_in_group("player")):
-		return true
+	if current_target_type == TargetType.SHOP and is_instance_valid(shop_building):
+		if result.collider == shop_building or (result.collider and result.collider.is_in_group("shop_building")):
+			return true
+	if current_target_type == TargetType.PLAYER and is_instance_valid(player):
+		if result.collider == player or (result.collider and result.collider.is_in_group("player")):
+			return true
 	var dist_to_hit: float = from_pos.distance_to(result.position)
-	var dist_to_player: float = from_pos.distance_to(to_pos)
-	return dist_to_hit >= (dist_to_player - 0.4)
+	var dist_to_target: float = from_pos.distance_to(target_center)
+	return dist_to_hit >= (dist_to_target - 0.6)
 
 func play_sfx(stream: AudioStream) -> void:
 	if audio_player and stream:

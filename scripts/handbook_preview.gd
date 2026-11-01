@@ -140,6 +140,12 @@ func show_item(item_id: String) -> void:
 		"armor_plate":
 			current_model_node = create_armor_plate_preview()
 			camera.position = Vector3(0, 0.0, 0.65)
+		"shop_defense", "shop":
+			current_model_node = create_shop_preview()
+			camera.position = Vector3(0, 0.35, 3.8)
+		"game_rules", "beacon":
+			current_model_node = create_beacon_preview()
+			camera.position = Vector3(0, 0.15, 1.6)
 			
 	if current_model_node:
 		model_pivot.add_child(current_model_node)
@@ -2276,3 +2282,337 @@ func create_armor_plate_preview() -> Node3D:
 	root.add_child(lbl)
 	
 	return root
+
+func create_shop_preview() -> Node3D:
+	var root = Node3D.new()
+	
+	# Materials
+	var mat_wood = StandardMaterial3D.new()
+	mat_wood.albedo_color = Color(0.48, 0.32, 0.20)
+	mat_wood.roughness = 0.78
+	
+	var mat_wood_dark = StandardMaterial3D.new()
+	mat_wood_dark.albedo_color = Color(0.28, 0.18, 0.11)
+	mat_wood_dark.roughness = 0.85
+	
+	var mat_roof = StandardMaterial3D.new()
+	mat_roof.albedo_color = Color(0.22, 0.16, 0.14)
+	mat_roof.roughness = 0.9
+	
+	var mat_glass = StandardMaterial3D.new()
+	mat_glass.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mat_glass.albedo_color = Color(0.55, 0.8, 0.95, 0.45)
+	mat_glass.roughness = 0.15
+	mat_glass.metallic = 0.1
+	
+	var mat_brass = StandardMaterial3D.new()
+	mat_brass.albedo_color = Color(0.9, 0.75, 0.3)
+	mat_brass.metallic = 0.85
+	mat_brass.roughness = 0.3
+	
+	# Foundation / Floor
+	var floor_m = MeshInstance3D.new()
+	var fm = BoxMesh.new()
+	fm.size = Vector3(3.2, 0.12, 2.3)
+	floor_m.mesh = fm
+	floor_m.material_override = mat_wood_dark
+	floor_m.position = Vector3(0, -0.06, 0)
+	root.add_child(floor_m)
+	
+	# Back Wall
+	var back_w = MeshInstance3D.new()
+	var bwm = BoxMesh.new()
+	bwm.size = Vector3(3.0, 1.4, 0.1)
+	back_w.mesh = bwm
+	back_w.material_override = mat_wood
+	back_w.position = Vector3(0, 0.7, -1.0)
+	root.add_child(back_w)
+	
+	# Left Wall
+	var left_w = MeshInstance3D.new()
+	var lwm = BoxMesh.new()
+	lwm.size = Vector3(0.1, 1.4, 2.0)
+	left_w.mesh = lwm
+	left_w.material_override = mat_wood
+	left_w.position = Vector3(-1.45, 0.7, 0)
+	root.add_child(left_w)
+	
+	# Right Wall
+	var right_w = MeshInstance3D.new()
+	var rwm = BoxMesh.new()
+	rwm.size = Vector3(0.1, 1.4, 2.0)
+	right_w.mesh = rwm
+	right_w.material_override = mat_wood
+	right_w.position = Vector3(1.45, 0.7, 0)
+	root.add_child(right_w)
+	
+	# Front Wall Left & Right
+	var front_l = MeshInstance3D.new()
+	var flm = BoxMesh.new()
+	flm.size = Vector3(0.85, 1.4, 0.1)
+	front_l.mesh = flm
+	front_l.material_override = mat_wood
+	front_l.position = Vector3(-1.05, 0.7, 1.0)
+	root.add_child(front_l)
+	
+	var front_r = MeshInstance3D.new()
+	var frm = BoxMesh.new()
+	frm.size = Vector3(0.85, 1.4, 0.1)
+	front_r.mesh = frm
+	front_r.material_override = mat_wood
+	front_r.position = Vector3(1.05, 0.7, 1.0)
+	root.add_child(front_r)
+	
+	# Lintel over entrance
+	var lintel = MeshInstance3D.new()
+	var lnm = BoxMesh.new()
+	lnm.size = Vector3(1.3, 0.35, 0.12)
+	lintel.mesh = lnm
+	lintel.material_override = mat_wood_dark
+	lintel.position = Vector3(0, 1.225, 1.0)
+	root.add_child(lintel)
+	
+	# Panoramic Windows (Left & Right)
+	var win_l = MeshInstance3D.new()
+	var wlm = BoxMesh.new()
+	wlm.size = Vector3(0.65, 0.85, 0.04)
+	win_l.mesh = wlm
+	win_l.material_override = mat_glass
+	win_l.position = Vector3(-1.05, 0.72, 1.02)
+	root.add_child(win_l)
+	
+	var win_r = MeshInstance3D.new()
+	var wrm = BoxMesh.new()
+	wrm.size = Vector3(0.65, 0.85, 0.04)
+	win_r.mesh = wrm
+	win_r.material_override = mat_glass
+	win_r.position = Vector3(1.05, 0.72, 1.02)
+	root.add_child(win_r)
+	
+	# Double Entrance Doors
+	var door_l = MeshInstance3D.new()
+	var dlm = BoxMesh.new()
+	dlm.size = Vector3(0.56, 1.0, 0.05)
+	door_l.mesh = dlm
+	door_l.material_override = mat_wood_dark
+	door_l.position = Vector3(-0.29, 0.52, 0.98)
+	root.add_child(door_l)
+	
+	var door_r = MeshInstance3D.new()
+	var drm = BoxMesh.new()
+	drm.size = Vector3(0.56, 1.0, 0.05)
+	door_r.mesh = drm
+	door_r.material_override = mat_wood_dark
+	door_r.position = Vector3(0.29, 0.52, 0.98)
+	root.add_child(door_r)
+	
+	# Door Handles
+	for x_side in [-0.06, 0.06]:
+		var handle = MeshInstance3D.new()
+		var hm = CylinderMesh.new()
+		hm.top_radius = 0.015
+		hm.bottom_radius = 0.015
+		hm.height = 0.12
+		handle.mesh = hm
+		handle.material_override = mat_brass
+		handle.position = Vector3(x_side, 0.52, 1.02)
+		root.add_child(handle)
+	
+	# Pitched Roof
+	var roof_l = MeshInstance3D.new()
+	var rlm = BoxMesh.new()
+	rlm.size = Vector3(1.8, 0.08, 2.5)
+	roof_l.mesh = rlm
+	roof_l.material_override = mat_roof
+	roof_l.position = Vector3(-0.75, 1.62, 0)
+	roof_l.rotation.z = deg_to_rad(-22.0)
+	root.add_child(roof_l)
+	
+	var roof_r = MeshInstance3D.new()
+	var rrm = BoxMesh.new()
+	rrm.size = Vector3(1.8, 0.08, 2.5)
+	roof_r.mesh = rrm
+	roof_r.material_override = mat_roof
+	roof_r.position = Vector3(0.75, 1.62, 0)
+	roof_r.rotation.z = deg_to_rad(22.0)
+	root.add_child(roof_r)
+	
+	# Storefront Sign
+	var sign_board = MeshInstance3D.new()
+	var sbm = BoxMesh.new()
+	sbm.size = Vector3(1.5, 0.28, 0.06)
+	sign_board.mesh = sbm
+	sign_board.material_override = mat_wood_dark
+	sign_board.position = Vector3(0, 1.36, 1.08)
+	root.add_child(sign_board)
+	
+	var sign_lbl = Label3D.new()
+	sign_lbl.text = "ОРУЖИЕ & ПРИПАСЫ"
+	sign_lbl.font_size = 28
+	sign_lbl.modulate = Color(1.0, 0.85, 0.4)
+	sign_lbl.outline_modulate = Color.BLACK
+	sign_lbl.outline_size = 4
+	sign_lbl.position = Vector3(0, 1.36, 1.12)
+	sign_lbl.pixel_size = 0.0016
+	root.add_child(sign_lbl)
+	
+	# Floating Tactical Status Badge
+	var hp_lbl = Label3D.new()
+	hp_lbl.text = "🛡️ БАЗА: 5000 HP\nЗАКРЫВАЕТСЯ НА ВРЕМЯ ВОЛНЫ"
+	hp_lbl.font_size = 26
+	hp_lbl.modulate = Color(0.3, 1.0, 0.45)
+	hp_lbl.outline_modulate = Color.BLACK
+	hp_lbl.outline_size = 4
+	hp_lbl.position = Vector3(0, 2.15, 0)
+	hp_lbl.pixel_size = 0.0022
+	root.add_child(hp_lbl)
+	
+	# Interior Warm OmniLight
+	var warm_light = OmniLight3D.new()
+	warm_light.color = Color(1.0, 0.85, 0.55)
+	warm_light.light_energy = 1.4
+	warm_light.omni_range = 4.5
+	warm_light.position = Vector3(0, 0.8, 0.2)
+	root.add_child(warm_light)
+	
+	return root
+
+func create_beacon_preview() -> Node3D:
+	var root = Node3D.new()
+	
+	# Materials
+	var mat_metal_dark = StandardMaterial3D.new()
+	mat_metal_dark.albedo_color = Color(0.18, 0.2, 0.23)
+	mat_metal_dark.metallic = 0.85
+	mat_metal_dark.roughness = 0.35
+	
+	var mat_metal_steel = StandardMaterial3D.new()
+	mat_metal_steel.albedo_color = Color(0.55, 0.58, 0.62)
+	mat_metal_steel.metallic = 0.9
+	mat_metal_steel.roughness = 0.25
+	
+	var mat_glow_cyan = StandardMaterial3D.new()
+	mat_glow_cyan.albedo_color = Color(0.2, 0.8, 1.0)
+	mat_glow_cyan.emission_enabled = true
+	mat_glow_cyan.emission = Color(0.2, 0.8, 1.0)
+	mat_glow_cyan.emission_energy_multiplier = 2.0
+	
+	var mat_glow_orange = StandardMaterial3D.new()
+	mat_glow_orange.albedo_color = Color(1.0, 0.5, 0.1)
+	mat_glow_orange.emission_enabled = true
+	mat_glow_orange.emission = Color(1.0, 0.5, 0.1)
+	mat_glow_orange.emission_energy_multiplier = 2.5
+	
+	var mat_glow_green = StandardMaterial3D.new()
+	mat_glow_green.albedo_color = Color(0.2, 1.0, 0.3)
+	mat_glow_green.emission_enabled = true
+	mat_glow_green.emission = Color(0.2, 1.0, 0.3)
+	mat_glow_green.emission_energy_multiplier = 2.0
+	
+	# Base Pedestal (Layer 1)
+	var base1 = MeshInstance3D.new()
+	var b1m = CylinderMesh.new()
+	b1m.top_radius = 0.42
+	b1m.bottom_radius = 0.48
+	b1m.height = 0.12
+	base1.mesh = b1m
+	base1.material_override = mat_metal_dark
+	base1.position = Vector3(0, -0.2, 0)
+	root.add_child(base1)
+	
+	# Base Console Body (Layer 2)
+	var base2 = MeshInstance3D.new()
+	var b2m = CylinderMesh.new()
+	b2m.top_radius = 0.34
+	b2m.bottom_radius = 0.4
+	b2m.height = 0.28
+	base2.mesh = b2m
+	base2.material_override = mat_metal_steel
+	base2.position = Vector3(0, 0.0, 0)
+	root.add_child(base2)
+	
+	# Central Mast / Core Pillar
+	var mast = MeshInstance3D.new()
+	var mm = CylinderMesh.new()
+	mm.top_radius = 0.06
+	mm.bottom_radius = 0.08
+	mm.height = 0.85
+	mast.mesh = mm
+	mast.material_override = mat_metal_dark
+	mast.position = Vector3(0, 0.55, 0)
+	root.add_child(mast)
+	
+	# Holographic Emitter Torus Rings
+	for i in range(3):
+		var ring = MeshInstance3D.new()
+		var rm = TorusMesh.new()
+		rm.inner_radius = 0.16 + float(i) * 0.07
+		rm.outer_radius = 0.19 + float(i) * 0.07
+		ring.mesh = rm
+		ring.material_override = mat_glow_cyan
+		ring.position = Vector3(0, 0.32 + float(i) * 0.22, 0)
+		root.add_child(ring)
+	
+	# Top Radar Dish / Sensor Dome
+	var dish = MeshInstance3D.new()
+	var dm = CylinderMesh.new()
+	dm.top_radius = 0.24
+	dm.bottom_radius = 0.04
+	dm.height = 0.12
+	dish.mesh = dm
+	dish.material_override = mat_metal_steel
+	dish.position = Vector3(0, 0.96, 0)
+	dish.rotation.x = deg_to_rad(25.0)
+	dish.rotation.y = deg_to_rad(30.0)
+	root.add_child(dish)
+	
+	# Tip Beacon Light Bulb
+	var beacon_bulb = MeshInstance3D.new()
+	var bbm = SphereMesh.new()
+	bbm.radius = 0.05
+	bbm.height = 0.1
+	beacon_bulb.mesh = bbm
+	beacon_bulb.material_override = mat_glow_orange
+	beacon_bulb.position = Vector3(0, 1.08, 0)
+	root.add_child(beacon_bulb)
+	
+	# Indicator LEDs on console base
+	var led_g = MeshInstance3D.new()
+	var lm1 = SphereMesh.new()
+	lm1.radius = 0.025
+	lm1.height = 0.05
+	led_g.mesh = lm1
+	led_g.material_override = mat_glow_green
+	led_g.position = Vector3(-0.15, 0.08, 0.32)
+	root.add_child(led_g)
+	
+	var led_c = MeshInstance3D.new()
+	var lm2 = SphereMesh.new()
+	lm2.radius = 0.025
+	lm2.height = 0.05
+	led_c.mesh = lm2
+	led_c.material_override = mat_glow_cyan
+	led_c.position = Vector3(0.15, 0.08, 0.32)
+	root.add_child(led_c)
+	
+	# Light source
+	var p_light = OmniLight3D.new()
+	p_light.color = Color(0.2, 0.8, 1.0)
+	p_light.light_energy = 1.6
+	p_light.omni_range = 3.0
+	p_light.position = Vector3(0, 0.6, 0)
+	root.add_child(p_light)
+	
+	# Floating Tactical Info Label
+	var lbl = Label3D.new()
+	lbl.text = "МАЯК РАЗВЕДКИ & СВЯЗИ\nПРАВИЛА БОЯ И ЭВАКУАЦИИ"
+	lbl.font_size = 26
+	lbl.modulate = Color(0.2, 0.9, 1.0)
+	lbl.outline_modulate = Color.BLACK
+	lbl.outline_size = 4
+	lbl.position = Vector3(0, 1.35, 0)
+	lbl.pixel_size = 0.0022
+	root.add_child(lbl)
+	
+	return root
+

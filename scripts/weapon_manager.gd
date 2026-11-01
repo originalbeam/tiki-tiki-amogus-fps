@@ -83,7 +83,7 @@ var pistol_mag_initial_rot: Vector3 = Vector3.ZERO
 var is_quick_knifing: bool = false
 var knife_model: Node3D = null
 var air_slash_mesh: MeshInstance3D = null
-var knife_idle_pos: Vector3 = Vector3(0.08, -0.16, -0.32)
+var knife_idle_pos: Vector3 = Vector3(0.28, -0.16, -0.22)
 var knife_idle_rot: Vector3 = Vector3(-8.0, 15.0, -12.0)
 
 func _ready() -> void:
@@ -494,21 +494,27 @@ func fire_pellet(from_pos: Vector3) -> void:
 	) * 400.0
 	var screen_pos: Vector2 = center + spread_offset
 	
-	var ray_origin: Vector3 = camera.project_ray_origin(screen_pos)
 	var ray_dir: Vector3 = camera.project_ray_normal(screen_pos)
+	# Start ray outside player collision capsule so it never collides with player's own body
+	var ray_origin: Vector3 = camera.project_ray_origin(screen_pos) + ray_dir * 0.45
 	var ray_end: Vector3 = ray_origin + ray_dir * 120.0
-	
-	var query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.create(ray_origin, ray_end)
-	query.collide_with_areas = false
-	query.collide_with_bodies = true
 	
 	var player_body: CollisionObject3D = owner as CollisionObject3D
 	if not player_body:
 		var players: Array[Node] = get_tree().get_nodes_in_group("player")
 		if players.size() > 0:
 			player_body = players[0] as CollisionObject3D
+	var exclude_rids: Array[RID] = []
 	if player_body:
-		query.exclude = [player_body.get_rid()]
+		exclude_rids.append(player_body.get_rid())
+	for shop in get_tree().get_nodes_in_group("shop_building"):
+		if shop is CollisionObject3D:
+			exclude_rids.append(shop.get_rid())
+			
+	var query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.create(ray_origin, ray_end)
+	query.exclude = exclude_rids
+	query.collide_with_areas = false
+	query.collide_with_bodies = true
 	
 	var result: Dictionary = space_state.intersect_ray(query)
 	var hit_pos: Vector3 = ray_end
@@ -516,9 +522,18 @@ func fire_pellet(from_pos: Vector3) -> void:
 	var hit_an_enemy: bool = false
 	
 	if result:
+		var collider: Object = result.collider
+		# Ignore player body if hit accidentally
+		if collider == player_body or (collider and collider.is_in_group("player")):
+			spawn_tracer(from_pos, ray_end)
+			return
+		# Ignore shop building to prevent unwanted sparks at entrance
+		if collider and (collider.is_in_group("shop_building") or collider.name == "ShopBuilding"):
+			spawn_tracer(from_pos, result.position)
+			return
+			
 		hit_pos = result.position
 		hit_something = true
-		var collider: Object = result.collider
 		if collider and collider.is_in_group("enemy"):
 			hit_an_enemy = true
 			var dist: float = from_pos.distance_to(hit_pos)
@@ -806,12 +821,10 @@ func _update_knife_slash(progress: float) -> void:
 	if not knife_model:
 		return
 	var t: float = clampf(progress, 0.0, 1.0)
-	# Parametric curve: L-shape lying on side
-	# 1st half: sweeps forward in convex arc away from player (-Z)
-	# 2nd half: curls downward into lower-left corner and moves back toward player (+Z)
-	var x: float = lerpf(0.0, -1.25, t)
-	var y: float = -0.02 + sin(t * PI) * 0.045 - (t * t) * 0.16
-	var z: float = 0.02 - 0.18 * sin(t * PI) + 0.06 * (t * t)
+	# Centered slashing curve passing directly through the crosshair at screen center
+	var x: float = lerpf(0.24, -0.24, t)
+	var y: float = -0.04 + sin(t * PI) * 0.06 - (t * t) * 0.14
+	var z: float = -0.05 - 0.20 * sin(t * PI) + 0.05 * (t * t)
 	knife_model.position = Vector3(x, y, z)
 	
 	var rx: float = -5.0 + 17.0 * (t * t)
@@ -912,25 +925,36 @@ func perform_knife_hit_detection() -> void:
 	var cam_pos = camera.global_position
 	var forward = -camera.global_transform.basis.z.normalized()
 	
-	# 1) Direct Ray query 2.8m in front
+	# 1) Direct Ray query 2.8m in front (starts 0.45m outside player capsule)
+	var ray_origin = cam_pos + forward * 0.45
 	var ray_end = cam_pos + forward * 2.8
-	var query = PhysicsRayQueryParameters3D.create(cam_pos, ray_end)
+	var player_body: CollisionObject3D = owner as CollisionObject3D
+	var exclude_rids: Array[RID] = []
+	if player_body:
+		exclude_rids.append(player_body.get_rid())
+	for shop in get_tree().get_nodes_in_group("shop_building"):
+		if shop is CollisionObject3D:
+			exclude_rids.append(shop.get_rid())
+	var query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.create(ray_origin, ray_end)
+	query.exclude = exclude_rids
 	query.collide_with_areas = true
 	query.collide_with_bodies = true
-	var result = space_state.intersect_ray(query)
+	var result: Dictionary = space_state.intersect_ray(query)
 	
 	var hit_enemy_target: Node = null
 	var hit_pos: Vector3 = ray_end
 	var hit_norm: Vector3 = -forward
 	
 	if not result.is_empty():
-		var col = result.collider
-		hit_pos = result.position
-		hit_norm = result.normal
-		if col.is_in_group("enemy"):
-			hit_enemy_target = col
-		elif col.get_parent() and col.get_parent().is_in_group("enemy"):
-			hit_enemy_target = col.get_parent()
+		var col: Object = result.collider
+		if col != player_body and not (col and col.is_in_group("player")):
+			if not (col.is_in_group("shop_building") or col.name == "ShopBuilding"):
+				hit_pos = result.position
+				hit_norm = result.normal
+				if col.is_in_group("enemy"):
+					hit_enemy_target = col
+				elif col.get_parent() and col.get_parent().is_in_group("enemy"):
+					hit_enemy_target = col.get_parent()
 			
 	# 2) Cone check for nearby enemies within 2.6m
 	if not hit_enemy_target:
@@ -1089,14 +1113,14 @@ func build_air_slash_mesh() -> MeshInstance3D:
 		var t0: float = float(i) / float(segments)
 		var t1: float = float(i + 1) / float(segments)
 		
-		# Arc curve: sweeping from weapon position (X=0.0) with convex outward arc to bottom-left hook (X=-1.25)
-		var x0: float = lerpf(0.0, -1.25, t0)
-		var y0: float = -0.02 + sin(t0 * PI) * 0.045 - (t0 * t0) * 0.16
-		var z0: float = 0.02 - 0.18 * sin(t0 * PI) + 0.06 * (t0 * t0)
+		# Arc curve: centered slash passing through screen crosshair
+		var x0: float = lerpf(0.24, -0.24, t0)
+		var y0: float = -0.04 + sin(t0 * PI) * 0.06 - (t0 * t0) * 0.14
+		var z0: float = -0.05 - 0.20 * sin(t0 * PI) + 0.05 * (t0 * t0)
 		
-		var x1: float = lerpf(0.0, -1.25, t1)
-		var y1: float = -0.02 + sin(t1 * PI) * 0.045 - (t1 * t1) * 0.16
-		var z1: float = 0.02 - 0.18 * sin(t1 * PI) + 0.06 * (t1 * t1)
+		var x1: float = lerpf(0.24, -0.24, t1)
+		var y1: float = -0.04 + sin(t1 * PI) * 0.06 - (t1 * t1) * 0.14
+		var z1: float = -0.05 - 0.20 * sin(t1 * PI) + 0.05 * (t1 * t1)
 		
 		var a0: float = sin(t0 * PI) * 0.75
 		var a1: float = sin(t1 * PI) * 0.75
