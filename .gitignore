@@ -1,4 +1,4 @@
 .godot/
-.nomedia
 builds/
-
+*.uid
+*.import
