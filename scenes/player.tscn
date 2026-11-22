@@ -397,155 +397,170 @@ material = SubResource("Mat_Sparks")
 size = Vector3(0.026, 0.026, 0.026)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_Card"]
-bg_color = Color(0.1, 0.12, 0.16, 0.75)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.3, 0.6, 0.9, 0.8)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
+bg_color = Color(0.09, 0.10, 0.12, 0.90)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.32, 0.35, 0.40, 0.75)
+corner_radius_top_left = 0
+corner_radius_top_right = 0
+corner_radius_bottom_right = 0
+corner_radius_bottom_left = 0
 content_margin_left = 8.0
 content_margin_top = 4.0
 content_margin_right = 8.0
 content_margin_bottom = 4.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_HP_BG"]
-bg_color = Color(0.12, 0.12, 0.15, 0.85)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
+bg_color = Color(0.08, 0.09, 0.10, 0.95)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.20, 0.22, 0.25, 0.8)
+corner_radius_top_left = 0
+corner_radius_top_right = 0
+corner_radius_bottom_right = 0
+corner_radius_bottom_left = 0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_HP_FG"]
-bg_color = Color(0.12, 0.52, 0.24, 1)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
+bg_color = Color(0.65, 0.16, 0.16, 1)
+corner_radius_top_left = 0
+corner_radius_top_right = 0
+corner_radius_bottom_right = 0
+corner_radius_bottom_left = 0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_Armor_FG"]
-bg_color = Color(0.2, 0.55, 1.0, 1)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
+bg_color = Color(0.38, 0.44, 0.52, 1)
+corner_radius_top_left = 0
+corner_radius_top_right = 0
+corner_radius_bottom_right = 0
+corner_radius_bottom_left = 0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_Stamina_FG"]
-bg_color = Color(0.2, 0.55, 1.0, 1)
-corner_radius_top_left = 3
-corner_radius_top_right = 3
-corner_radius_bottom_right = 3
-corner_radius_bottom_left = 3
+bg_color = Color(0.36, 0.52, 0.30, 1)
+corner_radius_top_left = 0
+corner_radius_top_right = 0
+corner_radius_bottom_right = 0
+corner_radius_bottom_left = 0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_GameOver"]
-bg_color = Color(0.06, 0.07, 0.1, 0.95)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.9, 0.2, 0.2, 1)
-corner_radius_top_left = 14
-corner_radius_top_right = 14
-corner_radius_bottom_right = 14
-corner_radius_bottom_left = 14
+bg_color = Color(0.06, 0.07, 0.08, 0.98)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.65, 0.16, 0.16, 0.9)
+corner_radius_top_left = 0
+corner_radius_top_right = 0
+corner_radius_bottom_right = 0
+corner_radius_bottom_left = 0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_Pause"]
-bg_color = Color(0.07, 0.08, 0.12, 0.95)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.2, 0.5, 0.85, 0.8)
-corner_radius_top_left = 14
-corner_radius_top_right = 14
-corner_radius_bottom_right = 14
-corner_radius_bottom_left = 14
+bg_color = Color(0.07, 0.08, 0.09, 0.96)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.45, 0.40, 0.30, 0.7)
+corner_radius_top_left = 0
+corner_radius_top_right = 0
+corner_radius_bottom_right = 0
+corner_radius_bottom_left = 0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_Banner"]
-bg_color = Color(0.08, 0.1, 0.16, 0.9)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(1, 0.3, 0.3, 0.9)
-corner_radius_top_left = 10
-corner_radius_top_right = 10
-corner_radius_bottom_right = 10
-corner_radius_bottom_left = 10
+bg_color = Color(0.08, 0.09, 0.10, 0.95)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.68, 0.58, 0.35, 0.8)
+corner_radius_top_left = 0
+corner_radius_top_right = 0
+corner_radius_bottom_right = 0
+corner_radius_bottom_left = 0
 content_margin_left = 24.0
 content_margin_top = 10.0
 content_margin_right = 24.0
 content_margin_bottom = 10.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_BtnRed"]
-bg_color = Color(0.85, 0.2, 0.2, 1)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_BtnBlue"]
-bg_color = Color(0.2, 0.4, 0.7, 1)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_BtnDark"]
-bg_color = Color(0.14, 0.17, 0.24, 0.9)
+bg_color = Color(0.48, 0.14, 0.14, 1)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.3, 0.5, 0.8, 0.7)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
+border_color = Color(0.70, 0.22, 0.22, 0.8)
+corner_radius_top_left = 0
+corner_radius_top_right = 0
+corner_radius_bottom_right = 0
+corner_radius_bottom_left = 0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_BtnBlue"]
+bg_color = Color(0.16, 0.15, 0.12, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.76, 0.64, 0.38, 0.85)
+corner_radius_top_left = 0
+corner_radius_top_right = 0
+corner_radius_bottom_right = 0
+corner_radius_bottom_left = 0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_BtnDark"]
+bg_color = Color(0.11, 0.12, 0.14, 0.95)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.28, 0.30, 0.34, 0.8)
+corner_radius_top_left = 0
+corner_radius_top_right = 0
+corner_radius_bottom_right = 0
+corner_radius_bottom_left = 0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_HB_Left"]
-bg_color = Color(0.06, 0.08, 0.12, 0.95)
-border_width_right = 2
-border_color = Color(0.2, 0.35, 0.55, 0.6)
-corner_radius_top_left = 12
-corner_radius_bottom_left = 12
+bg_color = Color(0.07, 0.08, 0.09, 0.96)
+border_width_right = 1
+border_color = Color(0.24, 0.26, 0.30, 0.8)
+corner_radius_top_left = 0
+corner_radius_bottom_left = 0
 content_margin_left = 12.0
 content_margin_top = 12.0
 content_margin_right = 12.0
 content_margin_bottom = 12.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_HB_Preview"]
-bg_color = Color(0.04, 0.05, 0.08, 0.95)
+bg_color = Color(0.05, 0.06, 0.07, 0.98)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.25, 0.45, 0.75, 0.6)
-corner_radius_top_right = 12
+border_color = Color(0.38, 0.34, 0.26, 0.75)
+corner_radius_top_right = 0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_HB_Stats"]
-bg_color = Color(0.07, 0.09, 0.14, 0.95)
+bg_color = Color(0.08, 0.09, 0.10, 0.96)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.25, 0.45, 0.75, 0.6)
-corner_radius_bottom_right = 12
+border_color = Color(0.24, 0.26, 0.30, 0.8)
+corner_radius_bottom_right = 0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_HB_Btn"]
-bg_color = Color(0.12, 0.15, 0.22, 0.9)
-border_width_left = 1
+bg_color = Color(0.10, 0.11, 0.13, 0.95)
+border_width_left = 2
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.25, 0.4, 0.65, 0.5)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
+border_color = Color(0.28, 0.30, 0.34, 0.65)
+corner_radius_top_left = 0
+corner_radius_top_right = 0
+corner_radius_bottom_right = 0
+corner_radius_bottom_left = 0
 content_margin_left = 8.0
 content_margin_top = 4.0
 content_margin_right = 8.0
@@ -905,17 +920,11 @@ initial_velocity_min = 1.5
 initial_velocity_max = 3.0
 
 [node name="AK_Sparks" type="CPUParticles3D" parent="Head/Camera3D/WeaponHolder"]
+visible = false
 emitting = false
-amount = 35
-lifetime = 0.09
+amount = 1
+lifetime = 0.1
 one_shot = true
-explosiveness = 1.0
-mesh = SubResource("Mesh_Spark")
-direction = Vector3(0, 0.25, -1)
-spread = 75.0
-gravity = Vector3(0, -9.8, 0)
-initial_velocity_min = 20.0
-initial_velocity_max = 30.0
 
 [node name="ShootSound" type="AudioStreamPlayer" parent="Head/Camera3D/WeaponHolder"]
 volume_db = -4.0
@@ -1147,7 +1156,7 @@ text = "[V] НОЖ"
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -660.0
+offset_left = -760.0
 offset_top = 20.0
 offset_right = -116.0
 offset_bottom = 120.0
@@ -1346,8 +1355,8 @@ theme_override_constants/separation = 10
 
 [node name="Title" type="Label" parent="HUD/ShopPanel/HBox/LeftCol/VBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
-theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.77, 0.65, 0.4, 1)
+theme_override_font_sizes/font_size = 16
 text = "🛒 ПОЛЕВОЙ МАГАЗИН"
 horizontal_alignment = 1
 
@@ -1363,62 +1372,83 @@ theme_override_constants/separation = 8
 [node name="BtnShopAK" type="Button" parent="HUD/ShopPanel/HBox/LeftCol/VBox/Scroll/List"]
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 13
 theme_override_styles/normal = SubResource("StyleBoxFlat_HB_Btn")
 text = "Патроны АК-47 ($20)"
 
 [node name="BtnShopShotgun" type="Button" parent="HUD/ShopPanel/HBox/LeftCol/VBox/Scroll/List"]
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 13
 theme_override_styles/normal = SubResource("StyleBoxFlat_HB_Btn")
 text = "Картечь дробовика ($3)"
 
 [node name="BtnShopPistol" type="Button" parent="HUD/ShopPanel/HBox/LeftCol/VBox/Scroll/List"]
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 13
 theme_override_styles/normal = SubResource("StyleBoxFlat_HB_Btn")
 text = "Патроны пистолета ($12)"
+
+[node name="BtnShopRPGLauncher" type="Button" parent="HUD/ShopPanel/HBox/LeftCol/VBox/Scroll/List"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxFlat_HB_Btn")
+text = "РПГ-7 ($350)"
+
+[node name="BtnShopRPG" type="Button" parent="HUD/ShopPanel/HBox/LeftCol/VBox/Scroll/List"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxFlat_HB_Btn")
+text = "Граната ПГ-7В ($100)"
+
+[node name="BtnShopWorkbench" type="Button" parent="HUD/ShopPanel/HBox/LeftCol/VBox/Scroll/List"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxFlat_HB_Btn")
+text = "Верстак модификации ($250)"
 
 [node name="BtnShopMedkit" type="Button" parent="HUD/ShopPanel/HBox/LeftCol/VBox/Scroll/List"]
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 13
 theme_override_styles/normal = SubResource("StyleBoxFlat_HB_Btn")
 text = "Большая аптечка ($40)"
 
 [node name="BtnShopVodka" type="Button" parent="HUD/ShopPanel/HBox/LeftCol/VBox/Scroll/List"]
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 13
 theme_override_styles/normal = SubResource("StyleBoxFlat_HB_Btn")
 text = "Чекунец 67 ($67)"
 
 [node name="BtnShopHeavyArmor" type="Button" parent="HUD/ShopPanel/HBox/LeftCol/VBox/Scroll/List"]
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 13
 theme_override_styles/normal = SubResource("StyleBoxFlat_HB_Btn")
 text = "Сверхтяжелый бронежилет ($80)"
 
 [node name="BtnShopPlate" type="Button" parent="HUD/ShopPanel/HBox/LeftCol/VBox/Scroll/List"]
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 13
 theme_override_styles/normal = SubResource("StyleBoxFlat_HB_Btn")
 text = "Бронеплита (+30) ($30)"
 
 [node name="CloseShopBtn" type="Button" parent="HUD/ShopPanel/HBox/LeftCol/VBox"]
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
-theme_override_font_sizes/font_size = 15
-theme_override_styles/normal = SubResource("StyleBoxFlat_BtnBlue")
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("StyleBoxFlat_BtnDark")
 text = "✕ ЗАКРЫТЬ (B / ESC)"
 
 [node name="PauseHint" type="Label" parent="HUD/ShopPanel/HBox/LeftCol/VBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.65, 0.7, 0.75, 1)
+theme_override_colors/font_color = Color(0.55, 0.58, 0.62, 1)
 theme_override_font_sizes/font_size = 12
 text = "(Таймер волны остановлен)"
 horizontal_alignment = 1
@@ -1441,7 +1471,10 @@ stretch_mode = 6
 mouse_filter = 2
 
 [node name="PreviewContainer" type="SubViewportContainer" parent="HUD/ShopPanel/HBox/RightCol/TopPreview"]
+custom_minimum_size = Vector2(400, 210)
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 stretch = true
 script = ExtResource("4_hbpreview")
 
@@ -1449,8 +1482,8 @@ script = ExtResource("4_hbpreview")
 own_world_3d = true
 transparent_bg = true
 handle_input_locally = false
-gui_disable_input = true
 size = Vector2i(630, 210)
+render_target_update_mode = 4
 
 [node name="Camera3D" type="Camera3D" parent="HUD/ShopPanel/HBox/RightCol/TopPreview/PreviewContainer/SubViewport"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1)
@@ -1471,7 +1504,7 @@ omni_range = 10.0
 [node name="HintLabel" type="Label" parent="HUD/ShopPanel/HBox/RightCol/TopPreview"]
 layout_mode = 2
 size_flags_vertical = 8
-theme_override_colors/font_color = Color(0.7, 0.8, 0.9, 0.7)
+theme_override_colors/font_color = Color(0.65, 0.68, 0.7, 0.8)
 theme_override_font_sizes/font_size = 12
 text = "  🖱 ЛКМ: Вращение 360°  |  ПКМ: Перемещение  |  Колесико: Приближение"
 mouse_filter = 2
@@ -1498,19 +1531,19 @@ layout_mode = 2
 [node name="ItemTitle" type="Label" parent="HUD/ShopPanel/HBox/RightCol/BottomDetails/Margin/VBox/TopHBox"]
 layout_mode = 3
 size_flags_horizontal = 3
-theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
-theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.77, 0.65, 0.4, 1)
+theme_override_font_sizes/font_size = 17
 text = "ПАТРОНЫ АК-47 (7.62x39)"
 
 [node name="BalanceLabel" type="Label" parent="HUD/ShopPanel/HBox/RightCol/BottomDetails/Margin/VBox/TopHBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.35, 0.95, 0.55, 1)
-theme_override_font_sizes/font_size = 17
+theme_override_colors/font_color = Color(0.77, 0.65, 0.4, 1)
+theme_override_font_sizes/font_size = 16
 text = "БАЛАНС: $ 0"
 
 [node name="PriceBadge" type="Label" parent="HUD/ShopPanel/HBox/RightCol/BottomDetails/Margin/VBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.75, 0.25, 1)
+theme_override_colors/font_color = Color(0.85, 0.75, 0.45, 1)
 theme_override_font_sizes/font_size = 15
 text = "Стоимость: $20"
 
@@ -1523,7 +1556,7 @@ autowrap_mode = 2
 
 [node name="StatsTitle" type="Label" parent="HUD/ShopPanel/HBox/RightCol/BottomDetails/Margin/VBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.4, 0.85, 1, 1)
+theme_override_colors/font_color = Color(0.65, 0.68, 0.72, 1)
 theme_override_font_sizes/font_size = 13
 text = "── ХАРАКТЕРИСТИКИ ТОВАРА ──"
 
@@ -1590,7 +1623,7 @@ size_flags_vertical = 3
 custom_minimum_size = Vector2(260, 42)
 layout_mode = 2
 size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 15
 theme_override_styles/normal = SubResource("StyleBoxFlat_BtnBlue")
 text = "КУПИТЬ ЗА $20"
 
@@ -1626,30 +1659,30 @@ alignment = 1
 
 [node name="Title" type="Label" parent="HUD/PausePanel/VBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.4, 0.85, 1, 1)
-theme_override_font_sizes/font_size = 32
+theme_override_colors/font_color = Color(0.77, 0.65, 0.4, 1)
+theme_override_font_sizes/font_size = 24
 text = "ПАУЗА"
 horizontal_alignment = 1
 
 [node name="ResumeBtn" type="Button" parent="HUD/PausePanel/VBox"]
 custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 16
 theme_override_styles/normal = SubResource("StyleBoxFlat_BtnBlue")
 text = "▶ ПРОДОЛЖИТЬ"
 
 [node name="HandbookBtn" type="Button" parent="HUD/PausePanel/VBox"]
 custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
-theme_override_font_sizes/font_size = 17
+theme_override_font_sizes/font_size = 16
 theme_override_styles/normal = SubResource("StyleBoxFlat_BtnDark")
 text = "📖 СПРАВОЧНИК ТАКТИКИ"
 
 [node name="MenuBtn" type="Button" parent="HUD/PausePanel/VBox"]
 custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.9, 0.4, 0.4, 1)
-theme_override_font_sizes/font_size = 17
+theme_override_colors/font_color = Color(0.85, 0.35, 0.35, 1)
+theme_override_font_sizes/font_size = 16
 theme_override_styles/normal = SubResource("StyleBoxFlat_BtnDark")
 text = "⌂ ГЛАВНОЕ МЕНЮ"
 
@@ -1693,8 +1726,8 @@ theme_override_constants/separation = 10
 
 [node name="Title" type="Label" parent="HUD/HandbookPanel/HBox/LeftCol/VBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.35, 0.85, 1, 1)
-theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.77, 0.65, 0.4, 1)
+theme_override_font_sizes/font_size = 16
 text = "📖 СПРАВОЧНИК"
 horizontal_alignment = 1
 
@@ -1709,35 +1742,42 @@ theme_override_constants/separation = 6
 
 [node name="WeaponsHeader" type="Label" parent="HUD/HandbookPanel/HBox/LeftCol/VBox/Scroll/List"]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.85, 0.35, 1)
-theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.77, 0.65, 0.4, 1)
+theme_override_font_sizes/font_size = 13
 text = "── 🔫 ОРУЖИЕ ──"
 
 [node name="BtnAK47" type="Button" parent="HUD/HandbookPanel/HBox/LeftCol/VBox/Scroll/List"]
 custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 13
 theme_override_styles/normal = SubResource("StyleBoxFlat_HB_Btn")
 text = "АК-47"
 
 [node name="BtnShotgun" type="Button" parent="HUD/HandbookPanel/HBox/LeftCol/VBox/Scroll/List"]
 custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 13
 theme_override_styles/normal = SubResource("StyleBoxFlat_HB_Btn")
 text = "Помповый дробовик"
 
 [node name="BtnPistol" type="Button" parent="HUD/HandbookPanel/HBox/LeftCol/VBox/Scroll/List"]
 custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 13
 theme_override_styles/normal = SubResource("StyleBoxFlat_HB_Btn")
 text = "Тактический пистолет"
+
+[node name="BtnRPG" type="Button" parent="HUD/HandbookPanel/HBox/LeftCol/VBox/Scroll/List"]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxFlat_HB_Btn")
+text = "РПГ-7"
 
 [node name="BtnKnife" type="Button" parent="HUD/HandbookPanel/HBox/LeftCol/VBox/Scroll/List"]
 custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 13
 theme_override_styles/normal = SubResource("StyleBoxFlat_HB_Btn")
 text = "Штыковой нож"
 
@@ -1747,42 +1787,42 @@ layout_mode = 2
 
 [node name="EnemiesHeader" type="Label" parent="HUD/HandbookPanel/HBox/LeftCol/VBox/Scroll/List"]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.45, 0.45, 1)
-theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.8, 0.35, 0.35, 1)
+theme_override_font_sizes/font_size = 13
 text = "── 👾 ВРАГИ (КРЮМЕЙТЫ) ──"
 
 [node name="BtnRed" type="Button" parent="HUD/HandbookPanel/HBox/LeftCol/VBox/Scroll/List"]
 custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 13
 theme_override_styles/normal = SubResource("StyleBoxFlat_HB_Btn")
 text = "Красный (Импостор)"
 
 [node name="BtnBlue" type="Button" parent="HUD/HandbookPanel/HBox/LeftCol/VBox/Scroll/List"]
 custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 13
 theme_override_styles/normal = SubResource("StyleBoxFlat_HB_Btn")
 text = "Синий (Скаут)"
 
 [node name="BtnYellow" type="Button" parent="HUD/HandbookPanel/HBox/LeftCol/VBox/Scroll/List"]
 custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 13
 theme_override_styles/normal = SubResource("StyleBoxFlat_HB_Btn")
 text = "Желтый (Тяжеловес)"
 
 [node name="BtnGreen" type="Button" parent="HUD/HandbookPanel/HBox/LeftCol/VBox/Scroll/List"]
 custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 13
 theme_override_styles/normal = SubResource("StyleBoxFlat_HB_Btn")
 text = "Зеленый (Снайпер)"
 
 [node name="BtnShahed" type="Button" parent="HUD/HandbookPanel/HBox/LeftCol/VBox/Scroll/List"]
 custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 13
 theme_override_styles/normal = SubResource("StyleBoxFlat_HB_Btn")
 text = "БПЛА Shahed (Камикадзе)"
 
@@ -1792,57 +1832,57 @@ layout_mode = 2
 
 [node name="EquipmentHeader" type="Label" parent="HUD/HandbookPanel/HBox/LeftCol/VBox/Scroll/List"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.4, 0.85, 1, 1)
-theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.65, 0.68, 0.72, 1)
+theme_override_font_sizes/font_size = 13
 text = "── 🛡️ СНАРЯЖЕНИЕ ──"
 
 [node name="BtnArmor" type="Button" parent="HUD/HandbookPanel/HBox/LeftCol/VBox/Scroll/List"]
 custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 13
 theme_override_styles/normal = SubResource("StyleBoxFlat_HB_Btn")
 text = "Бронежилет"
 
 [node name="BtnBandage" type="Button" parent="HUD/HandbookPanel/HBox/LeftCol/VBox/Scroll/List"]
 custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 13
 theme_override_styles/normal = SubResource("StyleBoxFlat_HB_Btn")
 text = "Бинты"
 
 [node name="BtnMedkit" type="Button" parent="HUD/HandbookPanel/HBox/LeftCol/VBox/Scroll/List"]
 custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 13
 theme_override_styles/normal = SubResource("StyleBoxFlat_HB_Btn")
 text = "Большая аптечка"
 
 [node name="BtnHB_Vodka" type="Button" parent="HUD/HandbookPanel/HBox/LeftCol/VBox/Scroll/List"]
 custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 13
 theme_override_styles/normal = SubResource("StyleBoxFlat_HB_Btn")
 text = "Чекунец 67"
 
 [node name="BtnHB_HeavyArmor" type="Button" parent="HUD/HandbookPanel/HBox/LeftCol/VBox/Scroll/List"]
 custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 13
 theme_override_styles/normal = SubResource("StyleBoxFlat_HB_Btn")
 text = "Сверхтяжелый бронежилет"
 
 [node name="BtnHB_Plate" type="Button" parent="HUD/HandbookPanel/HBox/LeftCol/VBox/Scroll/List"]
 custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 13
 theme_override_styles/normal = SubResource("StyleBoxFlat_HB_Btn")
 text = "Бронеплита (+30)"
 
 [node name="CloseHandbookBtn" type="Button" parent="HUD/HandbookPanel/HBox/LeftCol/VBox"]
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
-theme_override_font_sizes/font_size = 15
-theme_override_styles/normal = SubResource("StyleBoxFlat_BtnBlue")
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("StyleBoxFlat_BtnDark")
 text = "← НАЗАД В ПАУЗУ"
 
 [node name="RightCol" type="VBoxContainer" parent="HUD/HandbookPanel/HBox"]
@@ -1863,7 +1903,10 @@ stretch_mode = 6
 mouse_filter = 2
 
 [node name="PreviewContainer" type="SubViewportContainer" parent="HUD/HandbookPanel/HBox/RightCol/TopPreview"]
+custom_minimum_size = Vector2(400, 290)
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 stretch = true
 script = ExtResource("4_hbpreview")
 
@@ -1871,8 +1914,8 @@ script = ExtResource("4_hbpreview")
 own_world_3d = true
 transparent_bg = true
 handle_input_locally = false
-gui_disable_input = true
 size = Vector2i(630, 290)
+render_target_update_mode = 4
 
 [node name="Camera3D" type="Camera3D" parent="HUD/HandbookPanel/HBox/RightCol/TopPreview/PreviewContainer/SubViewport"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1)
@@ -1893,7 +1936,7 @@ omni_range = 10.0
 [node name="HintLabel" type="Label" parent="HUD/HandbookPanel/HBox/RightCol/TopPreview"]
 layout_mode = 2
 size_flags_vertical = 8
-theme_override_colors/font_color = Color(0.7, 0.8, 0.9, 0.7)
+theme_override_colors/font_color = Color(0.65, 0.68, 0.7, 0.8)
 theme_override_font_sizes/font_size = 12
 text = "  🖱 ЛКМ: Вращение 360°  |  ПКМ: Перемещение  |  Колесико: Приближение"
 mouse_filter = 2
@@ -1916,7 +1959,7 @@ theme_override_constants/separation = 6
 
 [node name="ItemTitle" type="Label" parent="HUD/HandbookPanel/HBox/RightCol/BottomStats/Margin/VBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.35, 0.85, 1, 1)
+theme_override_colors/font_color = Color(0.77, 0.65, 0.4, 1)
 theme_override_font_sizes/font_size = 18
 text = "АК-47 (АВТОМАТ КАЛАШНИКОВА)"
 
@@ -2049,22 +2092,22 @@ alignment = 1
 
 [node name="Title" type="Label" parent="HUD/GameOverPanel/VBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.25, 0.25, 1)
-theme_override_font_sizes/font_size = 32
+theme_override_colors/font_color = Color(0.85, 0.2, 0.2, 1)
+theme_override_font_sizes/font_size = 28
 text = "ВЫ ПОГИБЛИ"
 horizontal_alignment = 1
 
 [node name="Subtitle" type="Label" parent="HUD/GameOverPanel/VBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.75, 0.75, 0.75, 1)
-theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.65, 0.65, 0.65, 1)
+theme_override_font_sizes/font_size = 14
 text = "Вас устранили импосторы!"
 horizontal_alignment = 1
 
 [node name="StatsLabel" type="Label" parent="HUD/GameOverPanel/VBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.35, 0.8, 1, 1)
-theme_override_font_sizes/font_size = 15
+theme_override_colors/font_color = Color(0.77, 0.65, 0.4, 1)
+theme_override_font_sizes/font_size = 14
 text = "Волна: 1  |  Очки: 0  |  Сложность: Нормальная"
 horizontal_alignment = 1
 
@@ -2076,7 +2119,7 @@ layout_mode = 2
 custom_minimum_size = Vector2(240, 46)
 layout_mode = 2
 size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 17
+theme_override_font_sizes/font_size = 15
 theme_override_styles/normal = SubResource("StyleBoxFlat_BtnRed")
 text = "↺ ПОВТОРИТЬ ВОЛНУ (R)"
 
@@ -2088,13 +2131,16 @@ layout_mode = 2
 custom_minimum_size = Vector2(240, 46)
 layout_mode = 2
 size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 17
-theme_override_styles/normal = SubResource("StyleBoxFlat_BtnBlue")
+theme_override_font_sizes/font_size = 15
+theme_override_styles/normal = SubResource("StyleBoxFlat_BtnDark")
 text = "⌂ ГЛАВНОЕ МЕНЮ"
 
 [connection signal="pressed" from="HUD/ShopPanel/HBox/LeftCol/VBox/Scroll/List/BtnShopAK" to="HUD" method="_on_shop_select_ak"]
 [connection signal="pressed" from="HUD/ShopPanel/HBox/LeftCol/VBox/Scroll/List/BtnShopShotgun" to="HUD" method="_on_shop_select_shotgun"]
 [connection signal="pressed" from="HUD/ShopPanel/HBox/LeftCol/VBox/Scroll/List/BtnShopPistol" to="HUD" method="_on_shop_select_pistol"]
+[connection signal="pressed" from="HUD/ShopPanel/HBox/LeftCol/VBox/Scroll/List/BtnShopRPGLauncher" to="HUD" method="_on_shop_select_rpg_launcher"]
+[connection signal="pressed" from="HUD/ShopPanel/HBox/LeftCol/VBox/Scroll/List/BtnShopRPG" to="HUD" method="_on_shop_select_rpg"]
+[connection signal="pressed" from="HUD/ShopPanel/HBox/LeftCol/VBox/Scroll/List/BtnShopWorkbench" to="HUD" method="_on_shop_select_workbench"]
 [connection signal="pressed" from="HUD/ShopPanel/HBox/LeftCol/VBox/Scroll/List/BtnShopMedkit" to="HUD" method="_on_shop_select_medkit"]
 [connection signal="pressed" from="HUD/ShopPanel/HBox/LeftCol/VBox/Scroll/List/BtnShopVodka" to="HUD" method="_on_shop_select_vodka"]
 [connection signal="pressed" from="HUD/ShopPanel/HBox/LeftCol/VBox/Scroll/List/BtnShopHeavyArmor" to="HUD" method="_on_shop_select_heavy_armor"]
@@ -2107,6 +2153,7 @@ text = "⌂ ГЛАВНОЕ МЕНЮ"
 [connection signal="pressed" from="HUD/HandbookPanel/HBox/LeftCol/VBox/Scroll/List/BtnAK47" to="HUD" method="_on_hb_ak47_pressed"]
 [connection signal="pressed" from="HUD/HandbookPanel/HBox/LeftCol/VBox/Scroll/List/BtnShotgun" to="HUD" method="_on_hb_shotgun_pressed"]
 [connection signal="pressed" from="HUD/HandbookPanel/HBox/LeftCol/VBox/Scroll/List/BtnPistol" to="HUD" method="_on_hb_pistol_pressed"]
+[connection signal="pressed" from="HUD/HandbookPanel/HBox/LeftCol/VBox/Scroll/List/BtnRPG" to="HUD" method="_on_hb_rpg_pressed"]
 [connection signal="pressed" from="HUD/HandbookPanel/HBox/LeftCol/VBox/Scroll/List/BtnKnife" to="HUD" method="_on_hb_knife_pressed"]
 [connection signal="pressed" from="HUD/HandbookPanel/HBox/LeftCol/VBox/Scroll/List/BtnRed" to="HUD" method="_on_hb_enemy_red_pressed"]
 [connection signal="pressed" from="HUD/HandbookPanel/HBox/LeftCol/VBox/Scroll/List/BtnBlue" to="HUD" method="_on_hb_enemy_blue_pressed"]

@@ -19,6 +19,7 @@ amount = 10
 lifetime = 0.35
 one_shot = true
 explosiveness = 1.0
+local_coords = true
 mesh = SubResource("BoxMesh_spark")
 direction = Vector3(0, 1, 0)
 spread = 60.0
