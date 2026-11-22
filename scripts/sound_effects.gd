@@ -1,3 +1,6 @@
+<<<<<<< HEAD
+extends "res://scripts/effects/sound_effects.gd"
+=======
 class_name SoundEffects
 extends Node
 
@@ -825,3 +828,4 @@ static func create_van_reverse_beep() -> AudioStreamWAV:
 	wav.mix_rate = mix_rate
 	wav.data = byte_array
 	return wav
+>>>>>>> 872be28a1e633cfe230fa5423e5472944d343633

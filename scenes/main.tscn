@@ -1,12 +1,10 @@
-[gd_scene load_steps=23 format=3 uid="uid://main000000001"]
+[gd_scene load_steps=8 format=3 uid="uid://main000000001"]
 
 [ext_resource type="PackedScene" path="res://scenes/player.tscn" id="1_player"]
-[ext_resource type="Script" path="res://scripts/enemy_spawner.gd" id="2_spawner"]
+[ext_resource type="Script" path="res://scripts/enemies/enemy_spawner.gd" id="2_spawner"]
 [ext_resource type="PackedScene" path="res://scenes/minivan_shop.tscn" id="3_minivan"]
-[ext_resource type="Script" path="res://scripts/shop_building.gd" id="4_shop"]
-[ext_resource type="Script" path="res://scripts/map_obstacles.gd" id="5_obstacles"]
-[ext_resource type="Script" path="res://scripts/nav_manager.gd" id="6_nav"]
-[ext_resource type="Script" path="res://scripts/forest_backdrop.gd" id="7_forest"]
+[ext_resource type="Script" path="res://scripts/map/procedural_map.gd" id="4_proc_map"]
+[ext_resource type="Script" path="res://scripts/map/nav_manager.gd" id="5_nav"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_main"]
 sky_top_color = Color(0.02, 0.03, 0.07, 1)
@@ -28,69 +26,6 @@ glow_enabled = true
 glow_intensity = 0.6
 glow_bloom = 0.25
 
-[sub_resource type="StandardMaterial3D" id="Mat_Floor"]
-albedo_color = Color(0.24, 0.28, 0.16, 1)
-roughness = 0.95
-metallic = 0.0
-uv1_scale = Vector3(80, 140, 80)
-
-[sub_resource type="BoxMesh" id="BoxMesh_Floor"]
-material = SubResource("Mat_Floor")
-size = Vector3(120, 1, 220)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_Floor"]
-size = Vector3(120, 1, 220)
-
-[sub_resource type="StandardMaterial3D" id="Mat_Wall"]
-albedo_color = Color(0.28, 0.20, 0.14, 1)
-roughness = 0.95
-metallic = 0.0
-
-[sub_resource type="StandardMaterial3D" id="Mat_DividingWall"]
-albedo_color = Color(0.26, 0.22, 0.15, 1)
-roughness = 0.95
-metallic = 0.0
-
-[sub_resource type="StandardMaterial3D" id="Mat_NeonCyan"]
-emission_enabled = true
-emission = Color(0.2, 0.8, 1, 1)
-emission_energy_multiplier = 2.5
-
-[sub_resource type="BoxMesh" id="BoxMesh_BaseWall"]
-material = SubResource("Mat_Wall")
-size = Vector3(98, 7.5, 3.5)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_BaseWall"]
-size = Vector3(98, 7.5, 3.5)
-
-[sub_resource type="BoxMesh" id="BoxMesh_ConeWall"]
-material = SubResource("Mat_Wall")
-size = Vector3(3.2, 7.5, 149)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_ConeWall"]
-size = Vector3(3.2, 7.5, 149)
-
-[sub_resource type="BoxMesh" id="BoxMesh_DividingWall"]
-material = SubResource("Mat_DividingWall")
-size = Vector3(2.4, 6.5, 65)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_DividingWall"]
-size = Vector3(2.4, 6.5, 65)
-
-[sub_resource type="BoxMesh" id="BoxMesh_RearWall"]
-material = SubResource("Mat_Wall")
-size = Vector3(47, 7.5, 3.5)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_RearWall"]
-size = Vector3(47, 7.5, 3.5)
-
-[sub_resource type="BoxMesh" id="BoxMesh_RearSideWall"]
-material = SubResource("Mat_Wall")
-size = Vector3(3.5, 7.5, 36)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_RearSideWall"]
-size = Vector3(3.5, 7.5, 36)
-
 [node name="Main" type="Node3D"]
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
@@ -102,152 +37,17 @@ light_color = Color(0.9, 0.93, 1, 1)
 light_energy = 0.85
 shadow_enabled = true
 
-[node name="Map" type="Node3D" parent="."]
-
-[node name="Floor" type="StaticBody3D" parent="Map"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, -70)
-collision_layer = 1
-collision_mask = 7
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Map/Floor"]
-mesh = SubResource("BoxMesh_Floor")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Map/Floor"]
-shape = SubResource("BoxShape3D_Floor")
-
-[node name="BaseWall" type="StaticBody3D" parent="Map"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, -160)
-collision_layer = 1
-collision_mask = 7
-
-[node name="Mesh" type="MeshInstance3D" parent="Map/BaseWall"]
-mesh = SubResource("BoxMesh_BaseWall")
-
-[node name="Collision" type="CollisionShape3D" parent="Map/BaseWall"]
-shape = SubResource("BoxShape3D_BaseWall")
-
-[node name="LeftConeWall" type="StaticBody3D" parent="Map"]
-transform = Transform3D(0.9845, 0, 0.1755, 0, 1, 0, -0.1755, 0, 0.9845, -35, 3.5, -87)
-collision_layer = 1
-collision_mask = 7
-
-[node name="Mesh" type="MeshInstance3D" parent="Map/LeftConeWall"]
-mesh = SubResource("BoxMesh_ConeWall")
-
-[node name="Collision" type="CollisionShape3D" parent="Map/LeftConeWall"]
-shape = SubResource("BoxShape3D_ConeWall")
-
-[node name="RightConeWall" type="StaticBody3D" parent="Map"]
-transform = Transform3D(0.9845, 0, -0.1755, 0, 1, 0, 0.1755, 0, 0.9845, 35, 3.5, -87)
-collision_layer = 1
-collision_mask = 7
-
-[node name="Mesh" type="MeshInstance3D" parent="Map/RightConeWall"]
-mesh = SubResource("BoxMesh_ConeWall")
-
-[node name="Collision" type="CollisionShape3D" parent="Map/RightConeWall"]
-shape = SubResource("BoxShape3D_ConeWall")
-
-[node name="RearWall" type="StaticBody3D" parent="Map"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, 21)
-collision_layer = 1
-collision_mask = 7
-
-[node name="Mesh" type="MeshInstance3D" parent="Map/RearWall"]
-mesh = SubResource("BoxMesh_RearWall")
-
-[node name="Collision" type="CollisionShape3D" parent="Map/RearWall"]
-shape = SubResource("BoxShape3D_RearWall")
-
-[node name="RearLeftWall" type="StaticBody3D" parent="Map"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22, 3.5, 3.5)
-collision_layer = 1
-collision_mask = 7
-
-[node name="Mesh" type="MeshInstance3D" parent="Map/RearLeftWall"]
-mesh = SubResource("BoxMesh_RearSideWall")
-
-[node name="Collision" type="CollisionShape3D" parent="Map/RearLeftWall"]
-shape = SubResource("BoxShape3D_RearSideWall")
-
-[node name="RearRightWall" type="StaticBody3D" parent="Map"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, 3.5, 3.5)
-collision_layer = 1
-collision_mask = 7
-
-[node name="Mesh" type="MeshInstance3D" parent="Map/RearRightWall"]
-mesh = SubResource("BoxMesh_RearSideWall")
-
-[node name="Collision" type="CollisionShape3D" parent="Map/RearRightWall"]
-shape = SubResource("BoxShape3D_RearSideWall")
-
-[node name="DividingWallLeft" type="StaticBody3D" parent="Map"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 3, -127.5)
-collision_layer = 1
-collision_mask = 7
-
-[node name="Mesh" type="MeshInstance3D" parent="Map/DividingWallLeft"]
-mesh = SubResource("BoxMesh_DividingWall")
-
-[node name="Collision" type="CollisionShape3D" parent="Map/DividingWallLeft"]
-shape = SubResource("BoxShape3D_DividingWall")
-
-[node name="DividingWallRight" type="StaticBody3D" parent="Map"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 3, -127.5)
-collision_layer = 1
-collision_mask = 7
-
-[node name="Mesh" type="MeshInstance3D" parent="Map/DividingWallRight"]
-mesh = SubResource("BoxMesh_DividingWall")
-
-[node name="Collision" type="CollisionShape3D" parent="Map/DividingWallRight"]
-shape = SubResource("BoxShape3D_DividingWall")
-
-[node name="ShopBuilding" type="StaticBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 11)
-script = ExtResource("4_shop")
-
-[node name="Obstacles" type="Node3D" parent="."]
-script = ExtResource("5_obstacles")
+[node name="ProceduralMap" type="Node3D" parent="."]
+script = ExtResource("4_proc_map")
 
 [node name="NavManager" type="Node3D" parent="."]
-script = ExtResource("6_nav")
-
-[node name="Forest" type="Node3D" parent="."]
-script = ExtResource("7_forest")
+script = ExtResource("5_nav")
 
 [node name="Player" parent="." instance=ExtResource("1_player")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, -0.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
 
 [node name="EnemySpawner" type="Node3D" parent="."]
 script = ExtResource("2_spawner")
 
-[node name="Spawn1" type="Marker3D" parent="EnemySpawner"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36, 0.1, -152)
-
-[node name="Spawn2" type="Marker3D" parent="EnemySpawner"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -26, 0.1, -150)
-
-[node name="Spawn3" type="Marker3D" parent="EnemySpawner"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -32, 0.1, -145)
-
-[node name="Spawn4" type="Marker3D" parent="EnemySpawner"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0.1, -152)
-
-[node name="Spawn5" type="Marker3D" parent="EnemySpawner"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, -150)
-
-[node name="Spawn6" type="Marker3D" parent="EnemySpawner"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0.1, -152)
-
-[node name="Spawn7" type="Marker3D" parent="EnemySpawner"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26, 0.1, -150)
-
-[node name="Spawn8" type="Marker3D" parent="EnemySpawner"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, 0.1, -152)
-
-[node name="Spawn9" type="Marker3D" parent="EnemySpawner"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32, 0.1, -145)
-
 [node name="MinivanShop" parent="." instance=ExtResource("3_minivan")]
-transform = Transform3D(0.3746, 0, 0.9272, 0, 1, 0, -0.9272, 0, 0.3746, -15.5, 0, -5.5)
+transform = Transform3D(0.965926, 0, 0.258819, 0, 1, 0, -0.258819, 0, 0.965926, -14, 0, 4)
