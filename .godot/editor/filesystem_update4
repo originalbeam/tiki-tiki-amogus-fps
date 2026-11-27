@@ -1,6 +1,0 @@
-res://scripts/handbook_preview.gd
-res://scripts/map/procedural_map.gd
-res://scripts/ui/hud.gd
-res://scripts/ui/previews/preview_drone.gd
-res://scripts/ui/previews/preview_shop.gd
-res://scripts/global_settings.gd
