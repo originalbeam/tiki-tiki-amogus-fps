@@ -49,6 +49,7 @@ var has_workbench: bool = false
 var is_near_workbench: bool = false
 var is_in_workbench: bool = false
 var workbench_node: Node3D = null
+var mounted_turret: Node3D = null
 
 # 3D Camera Controls
 var base_fov: float = 85.0
@@ -60,6 +61,15 @@ var base_cam_y: float = 0.0
 var bob_time: float = 0.0
 var bob_freq: float = 10.0
 var bob_amplitude: float = 0.035
+
+# Smooth Physical Camera Recoil (vertical climb + horizontal kick + partial settle)
+var cam_recoil_rem_pitch: float = 0.0
+var cam_recoil_rem_yaw: float = 0.0
+var cam_recoil_recover_pitch: float = 0.0
+
+# Cloaker Payday-2 Style Short Knockdown Stun (1.2s tilt + recovery)
+var cloaker_stun_timer: float = 0.0
+var cloaker_stun_roll_sign: float = 1.0
 
 @onready var head: Node3D = $Head
 @onready var camera: Camera3D = $Head/Camera3D
@@ -74,6 +84,9 @@ func _ready() -> void:
 	
 	base_cam_y = camera.position.y
 	base_fov = camera.fov
+	camera.cull_mask = 1 | 2 # Layers 1 (world) & 2 (viewmodel); Layer 3 (4) is reserved exclusively for FLIR thermal vision!
+	if hurt_sound_player:
+		hurt_sound_player.bus = "SFX"
 	
 	var gs = get_node_or_null("/root/GlobalSettings")
 	if gs:
@@ -102,11 +115,15 @@ func _ready() -> void:
 			weapon_manager.slots_updated.connect(hud._on_slots_updated)
 		if weapon_manager.has_signal("ads_state_changed") and hud.has_method("_on_ads_state_changed"):
 			weapon_manager.ads_state_changed.connect(hud._on_ads_state_changed)
+		if weapon_manager.has_signal("tactical_state_changed") and hud.has_method("_on_tactical_state_changed"):
+			weapon_manager.tactical_state_changed.connect(hud._on_tactical_state_changed)
 		
 		# Immediately push current weapon and ammo to HUD on startup
 		if weapon_manager.current_weapon:
 			weapon_manager.weapon_changed.emit(weapon_manager.current_weapon)
 		weapon_manager.emit_ammo_state()
+		if weapon_manager.has_method("emit_tactical_state"):
+			weapon_manager.emit_tactical_state()
 		if hud.has_method("_on_slots_updated"):
 			hud._on_slots_updated()
 
@@ -138,6 +155,29 @@ func set_in_workbench(state: bool) -> void:
 		velocity.z = 0.0
 		if weapon_manager and weapon_manager.has_method("set_aiming"):
 			weapon_manager.set_aiming(false)
+
+func mount_turret(dshk: Node3D) -> void:
+	if not is_instance_valid(dshk) or is_dead:
+		return
+	mounted_turret = dshk
+	dshk.set_meta("mounted_player", self)
+	velocity = Vector3.ZERO
+	if weapon_manager:
+		if weapon_manager.has_method("set_aiming"):
+			weapon_manager.set_aiming(false)
+		weapon_manager.visible = false
+	var sm: Marker3D = dshk.get_meta("stand_marker", null) as Marker3D
+	if sm:
+		global_position = Vector3(sm.global_position.x, global_position.y, sm.global_position.z)
+	rotation.y = dshk.rotation.y
+	head.rotation.x = 0.0
+
+func dismount_turret() -> void:
+	if is_instance_valid(mounted_turret):
+		mounted_turret.set_meta("mounted_player", null)
+	mounted_turret = null
+	if weapon_manager:
+		weapon_manager.visible = true
 
 func buy_workbench() -> bool:
 	if has_workbench:
@@ -211,11 +251,15 @@ func _input(event: InputEvent) -> void:
 					get_viewport().set_input_as_handled()
 					return
 		
-	# ESC layered close: CheatMenu -> Workbench (Screen 2->1->Close) -> Inventory -> Shop -> Handbook -> Pause Menu
+	# ESC layered close: CheatMenu -> MapTravel -> Workbench (Screen 2->1->Close) -> Inventory -> Shop -> Handbook -> Pause Menu
 	if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
 		if hud:
 			if hud.has_method("is_cheat_menu_open") and hud.is_cheat_menu_open():
 				hud.close_cheat_menu()
+				get_viewport().set_input_as_handled()
+				return
+			elif hud.has_method("is_map_travel_open") and hud.is_map_travel_open():
+				hud.close_map_travel()
 				get_viewport().set_input_as_handled()
 				return
 			elif hud.has_method("is_workbench_open") and hud.is_workbench_open():
@@ -253,14 +297,54 @@ func _input(event: InputEvent) -> void:
 				get_viewport().set_input_as_handled()
 				return
 
-	# Drink Vodka "Чекунец 67" [5]
-	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_5:
-		if not (hud and hud.has_method("is_any_menu_open") and hud.is_any_menu_open()):
-			use_vodka()
-			get_viewport().set_input_as_handled()
-			return
+	# Tactical Weapon Controls: [X] Fire Mode, [T] Laser, [L] Flashlight, [G] Underbarrel Grenade Launcher
+	if event is InputEventKey and event.pressed and not event.echo:
+		if not is_dead and not get_tree().paused and not is_in_shop and not is_in_workbench:
+			if not (hud and hud.has_method("is_any_menu_open") and hud.is_any_menu_open()):
+				if event.keycode == KEY_X or event.physical_keycode == KEY_X:
+					if weapon_manager and weapon_manager.has_method("toggle_fire_mode"):
+						weapon_manager.toggle_fire_mode()
+						get_viewport().set_input_as_handled()
+						return
+				elif event.keycode == KEY_T or event.physical_keycode == KEY_T:
+					if weapon_manager and weapon_manager.has_method("toggle_laser"):
+						weapon_manager.toggle_laser()
+						get_viewport().set_input_as_handled()
+						return
+				elif event.keycode == KEY_L or event.physical_keycode == KEY_L:
+					if weapon_manager and weapon_manager.has_method("toggle_flashlight"):
+						weapon_manager.toggle_flashlight()
+						get_viewport().set_input_as_handled()
+						return
+				elif event.keycode == KEY_G or event.physical_keycode == KEY_G:
+					if weapon_manager and weapon_manager.has_method("toggle_ugl_mode"):
+						weapon_manager.toggle_ugl_mode()
+						get_viewport().set_input_as_handled()
+						return
 
-	# Wave Warmup & Shop Controls: [B] Minivan Shop (Only when in shop zone!), [F] Start Wave
+	# Drink Vodka "Чекунец 67" — Usable Item Slot [6] (Slots [4] & [5] are unlockable firearm slots!)
+	if event is InputEventKey and event.pressed and not event.echo:
+		if event.keycode == KEY_6 or event.physical_keycode == KEY_6:
+			if not (hud and hud.has_method("is_any_menu_open") and hud.is_any_menu_open()):
+				use_vodka()
+				get_viewport().set_input_as_handled()
+				return
+		elif event.keycode == KEY_4 or event.physical_keycode == KEY_4:
+			if not is_dead and not get_tree().paused and not is_in_shop and not is_in_workbench:
+				if not (hud and hud.has_method("is_any_menu_open") and hud.is_any_menu_open()):
+					if weapon_manager:
+						weapon_manager.switch_slot(4)
+						get_viewport().set_input_as_handled()
+						return
+		elif event.keycode == KEY_5 or event.physical_keycode == KEY_5:
+			if not is_dead and not get_tree().paused and not is_in_shop and not is_in_workbench:
+				if not (hud and hud.has_method("is_any_menu_open") and hud.is_any_menu_open()):
+					if weapon_manager:
+						weapon_manager.switch_slot(5)
+						get_viewport().set_input_as_handled()
+						return
+
+	# Wave Warmup, Shop, Paid Map Travel [M] & Arena Interact [E] (Airdrop Crates / Mounted DShK)
 	if event is InputEventKey and event.pressed and not event.echo:
 		if event.keycode == KEY_B or event.physical_keycode == KEY_B:
 			if is_near_shop or (hud and hud.has_node("ShopPanel") and hud.get_node("ShopPanel").visible):
@@ -268,6 +352,21 @@ func _input(event: InputEvent) -> void:
 					hud.toggle_shop()
 					get_viewport().set_input_as_handled()
 					return
+		elif event.keycode == KEY_M or event.physical_keycode == KEY_M:
+			if not is_dead and not get_tree().paused and not is_in_workbench:
+				if is_near_shop or (hud and hud.has_method("is_map_travel_open") and hud.is_map_travel_open()):
+					if hud and hud.has_method("toggle_map_travel"):
+						hud.toggle_map_travel()
+						get_viewport().set_input_as_handled()
+						return
+		elif event.keycode == KEY_E or event.physical_keycode == KEY_E:
+			if not is_dead and not get_tree().paused and not is_in_shop and not is_in_workbench:
+				if not (hud and hud.has_method("is_any_menu_open") and hud.is_any_menu_open()):
+					var mgrs := get_tree().get_nodes_in_group("arena_interactables")
+					if mgrs.size() > 0 and mgrs[0].has_method("try_interact"):
+						if mgrs[0].try_interact(self):
+							get_viewport().set_input_as_handled()
+							return
 		elif event.keycode == KEY_F or event.physical_keycode == KEY_F:
 			var spawner = get_parent().get_node_or_null("EnemySpawner")
 			if spawner and spawner.is_warming_up:
@@ -277,7 +376,7 @@ func _input(event: InputEvent) -> void:
 
 	# Standard 3D FPS Mouse Look (Horizontal = Yaw, Vertical = Pitch, scaled down when zoomed in ADS)
 	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
-		var sens_mult: float = 1.0 / sqrt(maxf(1.0, weapon_manager.current_ads_zoom)) if (weapon_manager and weapon_manager.is_aiming) else 1.0
+		var sens_mult: float = 1.0 / pow(maxf(1.0, weapon_manager.current_ads_zoom), 0.72) if (weapon_manager and weapon_manager.is_aiming) else 1.0
 		var mouse_x: float = -event.relative.x * mouse_sensitivity * sens_mult
 		var mouse_y: float = -event.relative.y * mouse_sensitivity * sens_mult
 		
@@ -287,6 +386,9 @@ func _input(event: InputEvent) -> void:
 		# Look up / down (Pitch) with clamp
 		head.rotate_x(mouse_y)
 		head.rotation.x = clampf(head.rotation.x, deg_to_rad(-88.0), deg_to_rad(88.0))
+		# Manual downward pull consumes pending auto-recovery so player control never double-drops
+		if mouse_y < 0.0 and cam_recoil_recover_pitch > 0.0:
+			cam_recoil_recover_pitch = maxf(0.0, cam_recoil_recover_pitch + mouse_y)
 		
 		# Weapon inertia / sway
 		if weapon_manager and weapon_manager.has_method("apply_mouse_sway"):
@@ -301,6 +403,19 @@ func _physics_process(delta: float) -> void:
 		velocity.z = 0.0
 		if not is_on_floor():
 			velocity.y -= gravity * delta
+		move_and_slide()
+		return
+
+	# Cloaker short knockdown recovery (1.2s camera tilt + dip + gradual upright recovery)
+	if cloaker_stun_timer > 0.0:
+		cloaker_stun_timer = maxf(0.0, cloaker_stun_timer - delta)
+		var stun_u: float = clampf(cloaker_stun_timer / 1.2, 0.0, 1.0)
+		if not is_on_floor():
+			velocity.y -= gravity * delta
+		velocity.x = move_toward(velocity.x, 0.0, 9.0 * delta)
+		velocity.z = move_toward(velocity.z, 0.0, 9.0 * delta)
+		camera.position.y = lerpf(camera.position.y, base_cam_y - 0.55 * stun_u, delta * 12.0)
+		camera.rotation.z = lerpf(camera.rotation.z, deg_to_rad(32.0 * cloaker_stun_roll_sign * stun_u), delta * 12.0)
 		move_and_slide()
 		return
 		
@@ -366,23 +481,25 @@ func _physics_process(delta: float) -> void:
 	var direction: Vector3 = (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
 	
 	var aiming_now: bool = weapon_manager != null and weapon_manager.is_aiming
+	var ugl_mode_now: bool = weapon_manager != null and ("is_ugl_mode" in weapon_manager) and weapon_manager.is_ugl_mode
+	var ugl_cam_y_boost: float = (0.065 if aiming_now else 0.025) if ugl_mode_now else 0.0
 	if direction.length_squared() > 0.001:
 		velocity.x = direction.x * current_speed
 		velocity.z = direction.z * current_speed
 		
-		# Head Bobbing (disabled in ADS so the optic stays rock-solid while moving!)
+		# Head Bobbing (disabled in ADS so the optic / UGL sight stays rock-solid while moving!)
 		if aiming_now:
-			camera.position.y = lerpf(camera.position.y, base_cam_y, delta * 14.0)
+			camera.position.y = lerpf(camera.position.y, base_cam_y + ugl_cam_y_boost, delta * 14.0)
 			camera.position.x = lerpf(camera.position.x, 0.0, delta * 14.0)
 			bob_time = 0.0
 		else:
 			bob_time += delta * (bob_freq * (1.35 if is_sprinting else 1.0))
-			camera.position.y = base_cam_y + sin(bob_time) * bob_amplitude
+			camera.position.y = base_cam_y + ugl_cam_y_boost + sin(bob_time) * bob_amplitude
 			camera.position.x = cos(bob_time * 0.5) * (bob_amplitude * 0.5)
 	else:
 		velocity.x = move_toward(velocity.x, 0, current_speed * 4.5 * delta)
 		velocity.z = move_toward(velocity.z, 0, current_speed * 4.5 * delta)
-		camera.position.y = lerpf(camera.position.y, base_cam_y, delta * 8.0)
+		camera.position.y = lerpf(camera.position.y, base_cam_y + ugl_cam_y_boost, delta * 8.0)
 		camera.position.x = lerpf(camera.position.x, 0.0, delta * 8.0)
 		bob_time = 0.0
 		
@@ -390,8 +507,13 @@ func _physics_process(delta: float) -> void:
 	var target_roll: float = 0.0 if aiming_now else (-input_dir.x * deg_to_rad(2.2))
 	camera.rotation.z = lerpf(camera.rotation.z, target_roll, delta * 10.0)
 	
-	# 3D Camera Dynamic FOV: during ADS main camera stays unzoomed (Picture-in-Picture zooms ONLY inside the optic!)
-	if aiming_now:
+	# 3D Camera Dynamic FOV: during UGL mode, narrow FOV slightly for crisp ballistic grenade lobbing;
+	# during normal ADS, main camera stays unzoomed (PiP zooms ONLY inside the optic!)
+	if ugl_mode_now and aiming_now:
+		target_fov = 70.0
+	elif ugl_mode_now:
+		target_fov = 80.0
+	elif aiming_now:
 		target_fov = base_fov
 	else:
 		target_fov = sprint_fov if is_sprinting else base_fov
@@ -404,12 +526,74 @@ func _physics_process(delta: float) -> void:
 		var horiz_vel: float = Vector2(velocity.x, velocity.z).length()
 		weapon_manager.apply_movement_bob(horiz_vel, is_sprinting, delta)
 		
+	# Smooth camera recoil kick & partial recovery (vertical climb + horizontal drift)
+	var rec_blend: float = 1.0 - exp(-24.0 * delta)
+	if absf(cam_recoil_rem_pitch) > 0.00005 or absf(cam_recoil_rem_yaw) > 0.00005:
+		var dp: float = cam_recoil_rem_pitch * rec_blend
+		var dy: float = cam_recoil_rem_yaw * rec_blend
+		cam_recoil_rem_pitch -= dp
+		cam_recoil_rem_yaw -= dy
+		head.rotation.x = clampf(head.rotation.x + dp, deg_to_rad(-88.0), deg_to_rad(88.0))
+		rotate_y(dy)
+	elif cam_recoil_recover_pitch > 0.0001:
+		var rec_down: float = cam_recoil_recover_pitch * minf(1.0, delta * 6.5)
+		cam_recoil_recover_pitch = maxf(0.0, cam_recoil_recover_pitch - rec_down)
+		head.rotation.x = clampf(head.rotation.x - rec_down, deg_to_rad(-88.0), deg_to_rad(88.0))
+
+	# Update HUD prompt for nearby Airdrop Crate or Mounted DShK 12.7mm
+	if hud and hud.has_method("show_arena_interact_prompt"):
+		var mgrs := get_tree().get_nodes_in_group("arena_interactables")
+		var prompt_txt: String = ""
+		if mgrs.size() > 0 and mgrs[0].has_method("get_nearby_interact_prompt"):
+			prompt_txt = mgrs[0].get_nearby_interact_prompt(global_position, mounted_turret)
+		hud.show_arena_interact_prompt(prompt_txt)
+
+	# If player is manning a Mounted DShK 12.7mm, lock movement smoothly to GunnerStand
+	if is_instance_valid(mounted_turret):
+		var sm: Marker3D = mounted_turret.get_meta("stand_marker", null) as Marker3D
+		if sm:
+			global_position.x = lerpf(global_position.x, sm.global_position.x, delta * 14.0)
+			global_position.z = lerpf(global_position.z, sm.global_position.z, delta * 14.0)
+		velocity.x = 0.0
+		velocity.z = 0.0
+		move_and_slide()
+		return
+
 	# Weapon inputs
 	handle_weapon_inputs()
 
 func add_camera_recoil(pitch: float, yaw: float) -> void:
-	head.rotation.x = clampf(head.rotation.x - pitch * 0.15, deg_to_rad(-88.0), deg_to_rad(88.0))
-	rotate_y(yaw * 0.15)
+	# Positive pitch rotates head.rotation.x UPWARD; yaw rotates body left/right horizontally
+	var inst_p: float = pitch * 0.45
+	var inst_y: float = yaw * 0.45
+	head.rotation.x = clampf(head.rotation.x + inst_p, deg_to_rad(-88.0), deg_to_rad(88.0))
+	rotate_y(inst_y)
+	cam_recoil_rem_pitch += pitch * 0.55
+	cam_recoil_rem_yaw += yaw * 0.55
+	# Partial (~35%) muzzle snap settles back automatically; remaining ~65% stays as true climb to control!
+	if pitch > 0.0:
+		cam_recoil_recover_pitch = minf(cam_recoil_recover_pitch + pitch * 0.35, deg_to_rad(12.0))
+
+func apply_cloaker_knockdown(attacker_pos: Vector3, dmg: float) -> void:
+	if is_dead:
+		return
+	dismount_turret()
+	take_damage(dmg)
+	if is_dead:
+		return
+	cloaker_stun_timer = 1.2
+	cloaker_stun_roll_sign = 1.0 if randf() < 0.5 else -1.0
+	play_sfx(SoundEffects.create_cloaker_knockdown_sound())
+	add_camera_shake(0.24)
+	# Knock player slightly away from the Cloaker's dropkick!
+	var push: Vector3 = global_position - attacker_pos
+	push.y = 0.0
+	if push.length_squared() > 0.01:
+		push = push.normalized()
+		velocity.x = push.x * 6.5
+		velocity.z = push.z * 6.5
+	if hud and hud.has_method("show_arena_toast"):
+		hud.show_arena_toast("⚡ КЛОКЕР СБИЛ С НОГ! ПОДЪЁМ...")
 
 func add_camera_shake(intensity: float) -> void:
 	if is_dead or not camera:
@@ -549,6 +733,7 @@ func play_sfx(stream: AudioStream) -> void:
 	if not stream:
 		return
 	var sfx := AudioStreamPlayer.new()
+	sfx.bus = "SFX"
 	sfx.stream = stream
 	add_child(sfx)
 	sfx.play()
@@ -587,10 +772,13 @@ func add_score(amount: int) -> void:
 func die() -> void:
 	if is_dead:
 		return
+	dismount_turret()
 	is_dead = true
 	
-	# Requirement 7: Halve reserve ammo for each weapon, keeping exact same magazine ammo
-	if weapon_manager and weapon_manager.weapons:
+	# Requirement 7: Halve reserve ammo for each shared caliber pool, keeping exact same magazine ammo
+	if weapon_manager and weapon_manager.has_method("halve_all_reserves"):
+		weapon_manager.halve_all_reserves()
+	elif weapon_manager and weapon_manager.weapons:
 		for w in weapon_manager.weapons:
 			w.reserve_ammo = int(ceil(float(w.reserve_ammo) / 2.0))
 		if weapon_manager.has_method("emit_ammo_state"):

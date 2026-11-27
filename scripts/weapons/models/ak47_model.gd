@@ -111,9 +111,14 @@ static func create(mat_metal_override: Material = null, mat_wood_override: Mater
 	# Recessed ejection port channel (right side)
 	_add_box(root, "EjectRecess", Vector3(0.010, 0.022, 0.105), Vector3(0.022, 0.020, -0.032), mat_bore)
 	
-	# Iconic AK right-side stamped steel fire selector lever & pivot
-	var selector := _add_box(root, "FireSelector", Vector3(0.004, 0.014, 0.115), Vector3(0.026, 0.005, 0.020), mat_steel_dark, Vector3(4.0, 0.0, 0.0))
-	_add_box(selector, "SelectorTab", Vector3(0.010, 0.008, 0.016), Vector3(0.004, -0.002, -0.052), mat_steel_dark)
+	# Iconic AK right-side stamped steel fire selector lever pivoted at rear pin (animates on [X]!)
+	var selector_pivot := Node3D.new()
+	selector_pivot.name = "FireSelector"
+	selector_pivot.position = Vector3(0.026, 0.004, 0.074)
+	selector_pivot.rotation_degrees = Vector3(6.0, 0.0, 0.0) # Default АВ (auto) position
+	root.add_child(selector_pivot)
+	_add_box(selector_pivot, "SelectorArm", Vector3(0.004, 0.014, 0.115), Vector3(0.0, 0.001, -0.054), mat_steel_dark)
+	_add_box(selector_pivot, "SelectorTab", Vector3(0.010, 0.008, 0.016), Vector3(0.004, -0.001, -0.106), mat_steel_dark)
 	_add_cyl(root, "SelectorPivot", 0.007, 0.007, 0.008, Vector3(0.025, 0.004, 0.074), mat_steel_dark, 8, Vector3(0, 0, 90))
 	
 	# Trigger guard loop, magazine catch paddle & curved trigger

@@ -13,7 +13,7 @@ enum State {
 
 @export var max_health: float = 30.0
 var health: float = 30.0
-var score_value: int = 8
+var score_value: int = 12
 
 var current_state: State = State.CRUISE
 var player: Node3D = null
@@ -62,7 +62,10 @@ func _ready() -> void:
 	
 	# Start engine moped buzzing loop
 	if audio_engine:
+		audio_engine.bus = "SFX"
 		audio_engine.stream = SoundEffects.create_shahed_engine_sound()
+	if audio_dive:
+		audio_dive.bus = "SFX"
 		audio_engine.play()
 
 func _rebuild_high_detail_drone() -> void:
@@ -288,6 +291,7 @@ func detonate(killed_by_player: bool) -> void:
 					
 	# 3. Global explosion audio
 	var exp_sfx := AudioStreamPlayer.new()
+	exp_sfx.bus = "SFX"
 	exp_sfx.stream = SoundEffects.create_shahed_explosion_sound()
 	exp_sfx.pitch_scale = randf_range(0.95, 1.05)
 	get_tree().root.add_child(exp_sfx)
