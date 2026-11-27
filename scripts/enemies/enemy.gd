@@ -6,6 +6,7 @@ const AxeModel = preload("res://scripts/weapons/models/axe_model.gd")
 const SniperModel = preload("res://scripts/weapons/models/sniper_model.gd")
 const PreviewCrewmateScript = preload("res://scripts/ui/previews/preview_crewmate.gd")
 const VFXFactoryScript = preload("res://scripts/effects/vfx_factory.gd")
+const EngineerTurretScript = preload("res://scripts/enemies/engineer_turret.gd")
 
 signal died(points)
 
@@ -13,7 +14,11 @@ enum EnemyType {
 	RED_STANDARD,
 	BLUE_SCOUT,
 	YELLOW_HEAVY,
-	GREEN_SNIPER
+	GREEN_SNIPER,
+	ORANGE_ENGINEER,
+	BLACK_SHIELD,
+	GRAY_SABOTEUR,
+	GRAY_CLOAKER
 }
 
 @export var enemy_type: EnemyType = EnemyType.RED_STANDARD
@@ -42,6 +47,16 @@ var scope_glint_node: Node3D = null
 var is_bursting: bool = false
 var burst_shots_left: int = 0
 var burst_shot_timer: float = 0.0
+
+# Stage 2 Special Class States (Engineer, Shield, Saboteur, Cloaker)
+var engineer_deployed: bool = false
+var engineer_deploy_timer: float = 3.2
+var shield_body: StaticBody3D = null
+var flank_dir_sign: float = 1.0
+var is_cloaker_charging: bool = false
+var cloaker_charge_cd: float = 1.8
+var cloaker_retreat_timer: float = 0.0
+var cloaker_siren_player: AudioStreamPlayer3D = null
 
 enum TargetType {
 	PLAYER
@@ -79,6 +94,8 @@ var flash_timer: float = 0.0
 
 func _ready() -> void:
 	add_to_group("enemy")
+	if audio_player:
+		audio_player.bus = "Weapons"
 	setup_type_attributes()
 	health = max_health
 	apply_materials()
@@ -109,7 +126,7 @@ func setup_type_attributes() -> void:
 			move_speed = 4.2
 			shoot_interval = 1.4
 			bullet_damage = 10.0
-			score_value = 4
+			score_value = 6
 			preferred_distance = 7.0
 			is_melee = false
 			is_sniper = false
@@ -120,7 +137,7 @@ func setup_type_attributes() -> void:
 			move_speed = 6.2
 			shoot_interval = 0.75
 			bullet_damage = 8.0
-			score_value = 6
+			score_value = 10
 			preferred_distance = 5.5
 			is_melee = false
 			is_sniper = false
@@ -133,7 +150,7 @@ func setup_type_attributes() -> void:
 			health = 280.0
 			shoot_interval = 1.5
 			melee_damage = 38.0
-			score_value = 12
+			score_value = 20
 			preferred_distance = 1.1
 			is_melee = true
 			is_sniper = false
@@ -146,10 +163,66 @@ func setup_type_attributes() -> void:
 			health = 60.0
 			shoot_interval = 3.8
 			bullet_damage = 48.0
-			score_value = 10
+			score_value = 16
 			preferred_distance = 15.0
 			is_melee = false
 			is_sniper = true
+
+		EnemyType.ORANGE_ENGINEER:
+			crewmate_color = Color(0.95, 0.46, 0.08)
+			laser_color = Color(1.0, 0.62, 0.18)
+			move_speed = 4.0
+			max_health = 135.0
+			health = 135.0
+			shoot_interval = 1.15
+			bullet_damage = 9.0
+			score_value = 22
+			preferred_distance = 14.0
+			is_melee = false
+			is_sniper = false
+			engineer_deploy_timer = randf_range(2.4, 4.0)
+
+		EnemyType.BLACK_SHIELD:
+			crewmate_color = Color(0.13, 0.14, 0.16)
+			laser_color = Color(0.95, 0.72, 0.25)
+			move_speed = 2.95
+			max_health = 220.0
+			health = 220.0
+			shoot_interval = 1.25
+			bullet_damage = 11.0
+			score_value = 26
+			preferred_distance = 5.0
+			is_melee = false
+			is_sniper = false
+
+		EnemyType.GRAY_SABOTEUR:
+			crewmate_color = Color(0.22, 0.24, 0.27)
+			laser_color = Color(0.24, 0.92, 0.42)
+			move_speed = 5.6
+			max_health = 95.0
+			health = 95.0
+			shoot_interval = 1.35
+			bullet_damage = 11.0
+			score_value = 20
+			preferred_distance = 10.5
+			is_melee = false
+			is_sniper = false
+			flank_dir_sign = 1.0 if randf() < 0.5 else -1.0
+
+		EnemyType.GRAY_CLOAKER:
+			crewmate_color = Color(0.17, 0.19, 0.21)
+			laser_color = Color(0.14, 1.0, 0.30)
+			move_speed = 5.9
+			max_health = 145.0
+			health = 145.0
+			shoot_interval = 1.2
+			melee_damage = 32.0
+			score_value = 35
+			preferred_distance = 1.4
+			is_melee = true
+			is_sniper = false
+			flank_dir_sign = 1.0 if randf() < 0.5 else -1.0
+			cloaker_charge_cd = randf_range(1.2, 2.4)
 
 	# Apply difficulty modifiers from GlobalSettings
 	if GlobalSettings:
@@ -217,6 +290,103 @@ func setup_weapon_visuals() -> void:
 			build_axe_visuals(weapon_model_root)
 		EnemyType.GREEN_SNIPER:
 			build_awp_visuals(weapon_model_root)
+		EnemyType.ORANGE_ENGINEER:
+			build_pistol_visuals(weapon_model_root)
+		EnemyType.BLACK_SHIELD:
+			build_pistol_visuals(weapon_model_root)
+			_setup_ballistic_shield()
+		EnemyType.GRAY_SABOTEUR:
+			build_ak_visuals(weapon_model_root)
+			_attach_suppressed_can(weapon_model_root)
+		EnemyType.GRAY_CLOAKER:
+			_build_cloaker_baton(weapon_model_root)
+			cloaker_siren_player = AudioStreamPlayer3D.new()
+			cloaker_siren_player.bus = "SFX"
+			cloaker_siren_player.stream = SoundEffects.create_cloaker_charge_sound()
+			cloaker_siren_player.max_distance = 65.0
+			cloaker_siren_player.unit_size = 14.0
+			cloaker_siren_player.volume_db = 3.5
+			add_child(cloaker_siren_player)
+
+func _setup_ballistic_shield() -> void:
+	# Physical steel ballistic shield with narrow upper viewport slit!
+	# Lower & upper steel plates deflect non-AP bullets; narrow viewport slit lets precision headshots through!
+	shield_body = StaticBody3D.new()
+	shield_body.name = "BallisticShield"
+	shield_body.collision_layer = 1
+	shield_body.collision_mask = 0
+	shield_body.position = Vector3(0.06, 0.0, 0.72)
+	shield_body.add_to_group("enemy_shield")
+	shield_body.set_meta("shield_owner", self)
+	add_child(shield_body)
+
+	var m_steel := StandardMaterial3D.new()
+	m_steel.albedo_color = Color(0.11, 0.12, 0.14)
+	m_steel.metallic = 0.84
+	m_steel.roughness = 0.36
+	var m_stripe := StandardMaterial3D.new()
+	m_stripe.albedo_color = Color(0.86, 0.72, 0.24)
+	m_stripe.roughness = 0.55
+	var m_glass := StandardMaterial3D.new()
+	m_glass.albedo_color = Color(0.30, 0.62, 0.76, 0.42)
+	m_glass.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+
+	# Lower steel armor plate (y = 0.14 .. 1.12)
+	var low_col := CollisionShape3D.new()
+	var low_bs := BoxShape3D.new(); low_bs.size = Vector3(0.94, 0.98, 0.08)
+	low_col.shape = low_bs; low_col.position = Vector3(0, 0.63, 0)
+	shield_body.add_child(low_col)
+	var low_mi := MeshInstance3D.new(); low_mi.name = "ShieldPlate"; var lbm := BoxMesh.new(); lbm.size = Vector3(0.94, 0.98, 0.06)
+	low_mi.mesh = lbm; low_mi.material_override = m_steel; low_mi.position = Vector3(0, 0.63, 0)
+	shield_body.add_child(low_mi)
+
+	# Upper steel forehead brow above viewport slit (y = 1.32 .. 1.66)
+	var top_col := CollisionShape3D.new()
+	var top_bs := BoxShape3D.new(); top_bs.size = Vector3(0.94, 0.34, 0.08)
+	top_col.shape = top_bs; top_col.position = Vector3(0, 1.49, 0)
+	shield_body.add_child(top_col)
+	var top_mi := MeshInstance3D.new(); var tbm := BoxMesh.new(); tbm.size = Vector3(0.94, 0.34, 0.06)
+	top_mi.mesh = tbm; top_mi.material_override = m_steel; top_mi.position = Vector3(0, 1.49, 0)
+	shield_body.add_child(top_mi)
+
+	# Side steel pillars flanking the narrow glass slit (so center viewport y=1.12..1.32, x=-0.26..+0.26 is shootable!)
+	for sx in [-0.36, 0.36]:
+		var pc := CollisionShape3D.new()
+		var pbs := BoxShape3D.new(); pbs.size = Vector3(0.22, 0.22, 0.08)
+		pc.shape = pbs; pc.position = Vector3(sx, 1.22, 0)
+		shield_body.add_child(pc)
+		var pm := MeshInstance3D.new(); var pbm := BoxMesh.new(); pbm.size = Vector3(0.22, 0.22, 0.06)
+		pm.mesh = pbm; pm.material_override = m_steel; pm.position = Vector3(sx, 1.22, 0)
+		shield_body.add_child(pm)
+
+	# Visual transparent slit window + yellow SWAT trim stripe
+	var gl_mi := MeshInstance3D.new(); var gbm := BoxMesh.new(); gbm.size = Vector3(0.50, 0.18, 0.025)
+	gl_mi.mesh = gbm; gl_mi.material_override = m_glass; gl_mi.position = Vector3(0, 1.22, 0)
+	shield_body.add_child(gl_mi)
+	var st_mi := MeshInstance3D.new(); var sbm := BoxMesh.new(); sbm.size = Vector3(0.86, 0.08, 0.07)
+	st_mi.mesh = sbm; st_mi.material_override = m_stripe; st_mi.position = Vector3(0, 0.96, 0.005)
+	shield_body.add_child(st_mi)
+
+func _attach_suppressed_can(parent: Node3D) -> void:
+	var sup := MeshInstance3D.new()
+	var cm := CylinderMesh.new(); cm.top_radius = 0.026; cm.bottom_radius = 0.026; cm.height = 0.24; cm.radial_segments = 10
+	var sm := StandardMaterial3D.new(); sm.albedo_color = Color(0.08, 0.09, 0.10); sm.metallic = 0.80; sm.roughness = 0.35
+	sup.mesh = cm; sup.material_override = sm
+	sup.position = Vector3(0, 0.02, 0.62)
+	sup.rotation_degrees = Vector3(90, 0, 0)
+	parent.add_child(sup)
+	if muzzle_marker:
+		muzzle_marker.position = Vector3(0, 0.02, 0.76)
+
+func _build_cloaker_baton(parent: Node3D) -> void:
+	var m_bat := StandardMaterial3D.new(); m_bat.albedo_color = Color(0.10, 0.11, 0.12); m_bat.metallic = 0.85; m_bat.roughness = 0.28
+	var m_tip := StandardMaterial3D.new(); m_tip.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED; m_tip.albedo_color = Color(0.14, 1.0, 0.36)
+	var b := MeshInstance3D.new(); var cm := CylinderMesh.new(); cm.top_radius = 0.024; cm.bottom_radius = 0.024; cm.height = 0.68
+	b.mesh = cm; b.material_override = m_bat; b.position = Vector3(0, 0.06, 0.28); b.rotation_degrees = Vector3(62, 0, 0)
+	parent.add_child(b)
+	var tip := MeshInstance3D.new(); var tcm := CylinderMesh.new(); tcm.top_radius = 0.028; tcm.bottom_radius = 0.028; tcm.height = 0.10
+	tip.mesh = tcm; tip.material_override = m_tip; tip.position = Vector3(0, 0.22, 0.56); tip.rotation_degrees = Vector3(62, 0, 0)
+	parent.add_child(tip)
 
 func build_ak_visuals(parent: Node3D) -> void:
 	var ak = AK47Model.create()
@@ -359,12 +529,15 @@ func _physics_process(delta: float) -> void:
 	var whisker_l = forward.rotated(Vector3.UP, deg_to_rad(32.0)) * 2.2
 	var whisker_r = forward.rotated(Vector3.UP, deg_to_rad(-32.0)) * 2.2
 	
+	var whisker_excl: Array[RID] = [get_rid()]
+	if is_instance_valid(shield_body):
+		whisker_excl.append(shield_body.get_rid())
 	var ray_l = PhysicsRayQueryParameters3D.create(global_position + Vector3(0, 0.6, 0), global_position + Vector3(0, 0.6, 0) + whisker_l)
 	ray_l.collision_mask = 1 # World / obstacles
-	ray_l.exclude = [get_rid()]
+	ray_l.exclude = whisker_excl
 	var ray_r = PhysicsRayQueryParameters3D.create(global_position + Vector3(0, 0.6, 0), global_position + Vector3(0, 0.6, 0) + whisker_r)
 	ray_r.collision_mask = 1
-	ray_r.exclude = [get_rid()]
+	ray_r.exclude = whisker_excl
 	
 	var hit_l = space_state.intersect_ray(ray_l)
 	var hit_r = space_state.intersect_ray(ray_r)
@@ -386,15 +559,70 @@ func _physics_process(delta: float) -> void:
 	# Movement logic
 	var desired_velocity = Vector3.ZERO
 	var active_dist = dist_to_player
-	
-	if is_melee:
+
+	if enemy_type == EnemyType.GRAY_CLOAKER:
+		cloaker_charge_cd = maxf(0.0, cloaker_charge_cd - delta)
+		if cloaker_retreat_timer > 0.0:
+			cloaker_retreat_timer -= delta
+			var away_dir: Vector3 = -dir_to_look.normalized() if dir_to_look.length_squared() > 0.01 else -move_dir
+			desired_velocity = (away_dir + away_dir.cross(Vector3.UP) * flank_dir_sign * 0.45).normalized() * 7.6
+		elif is_cloaker_charging:
+			desired_velocity = move_dir * 9.8
+			if active_dist <= 2.25 and is_instance_valid(player):
+				if player.has_method("apply_cloaker_knockdown"):
+					player.apply_cloaker_knockdown(global_position, melee_damage)
+				elif player.has_method("take_damage"):
+					player.take_damage(melee_damage)
+				is_cloaker_charging = false
+				cloaker_retreat_timer = 1.25
+				cloaker_charge_cd = 4.4
+				if cloaker_siren_player and cloaker_siren_player.playing:
+					cloaker_siren_player.stop()
+				var leap_dir: Vector3 = -dir_to_look.normalized() if dir_to_look.length_squared() > 0.01 else -move_dir
+				velocity.x = leap_dir.x * 8.4
+				velocity.z = leap_dir.z * 8.4
+				velocity.y = 4.2
+			elif active_dist > 34.0:
+				is_cloaker_charging = false
+				if cloaker_siren_player and cloaker_siren_player.playing:
+					cloaker_siren_player.stop()
+		else:
+			if active_dist <= 24.0 and cloaker_charge_cd <= 0.0 and has_line_of_sight():
+				is_cloaker_charging = true
+				if cloaker_siren_player:
+					cloaker_siren_player.pitch_scale = randf_range(0.96, 1.05)
+					cloaker_siren_player.play()
+				desired_velocity = move_dir * 9.8
+			else:
+				# Stalk sideways while closing distance
+				var stalk_side: Vector3 = dir_to_look.normalized().cross(Vector3.UP) * flank_dir_sign if dir_to_look.length_squared() > 0.01 else Vector3.ZERO
+				desired_velocity = (move_dir * 0.80 + stalk_side * 0.55).normalized() * move_speed
+	elif is_melee:
 		# Berserker Yellow rushes directly along path to player
 		if active_dist > 2.0:
 			desired_velocity = move_dir * move_speed
 		else:
 			desired_velocity = move_dir * (move_speed * 0.3)
+	elif enemy_type == EnemyType.BLACK_SHIELD:
+		# Heavy Ballistic Shield advances steadily head-on, keeping steel shield angled toward player
+		if dist_to_player > preferred_distance + 0.8:
+			desired_velocity = move_dir * move_speed
+		elif dist_to_player < 3.6:
+			desired_velocity = -move_dir * (move_speed * 0.45)
+		else:
+			var shield_strafe: Vector3 = dir_to_look.normalized().cross(Vector3.UP) * flank_dir_sign if dir_to_look.length_squared() > 0.01 else Vector3.ZERO
+			desired_velocity = shield_strafe * (move_speed * 0.35)
+	elif enemy_type == EnemyType.GRAY_SABOTEUR:
+		# Night Saboteur flanks wide around the player in silence
+		var flank_side: Vector3 = dir_to_look.normalized().cross(Vector3.UP) * flank_dir_sign if dir_to_look.length_squared() > 0.01 else Vector3.ZERO
+		if dist_to_player > preferred_distance + 2.0:
+			desired_velocity = (move_dir * 0.72 + flank_side * 0.68).normalized() * move_speed
+		elif dist_to_player < preferred_distance - 3.5:
+			desired_velocity = (-move_dir * 0.65 + flank_side * 0.75).normalized() * (move_speed * 0.88)
+		else:
+			desired_velocity = flank_side * (move_speed * 0.85)
 	else:
-		# Ranged enemies maintain preferred distance
+		# Ranged enemies (Red, Blue, Green, Orange Engineer) maintain preferred distance
 		if dist_to_player > preferred_distance + 1.2:
 			desired_velocity = move_dir * move_speed
 		elif dist_to_player < preferred_distance - 2.5:
@@ -402,6 +630,12 @@ func _physics_process(delta: float) -> void:
 		else:
 			var strafe_player = dir_to_look.normalized().cross(Vector3.UP)
 			desired_velocity = strafe_player * (move_speed * 0.5)
+
+	# Orange Engineer deploys a portable Sentry Turret + drops 1 fresh Fuel Barrel once in range!
+	if enemy_type == EnemyType.ORANGE_ENGINEER and not engineer_deployed and dist_to_player <= 26.0:
+		engineer_deploy_timer -= delta
+		if engineer_deploy_timer <= 0.0:
+			_deploy_engineer_gear()
 
 	# Sniper slows down while aiming with glint
 	if is_sniper and glint_active:
@@ -439,14 +673,43 @@ func _physics_process(delta: float) -> void:
 	# Attack Handling
 	handle_attacks(delta, active_dist)
 
+func _deploy_engineer_gear() -> void:
+	engineer_deployed = true
+	if not is_inside_tree() or not get_parent():
+		return
+	var side_vec: Vector3 = transform.basis.x
+	side_vec.y = 0.0
+	if side_vec.length_squared() < 0.01:
+		side_vec = Vector3.RIGHT
+	side_vec = side_vec.normalized()
+	var turret_pos: Vector3 = global_position + side_vec * 1.55
+	turret_pos.x = clampf(turret_pos.x, -42.0, 42.0)
+	turret_pos.z = clampf(turret_pos.z, -42.0, 42.0)
+	turret_pos.y = 0.0
+	var turret: Node3D = EngineerTurretScript.new()
+	get_parent().add_child(turret)
+	turret.global_position = turret_pos
+	play_sfx(SoundEffects.create_turret_deploy_sound(), 1.0)
+	# Also drop 1 fresh Fuel Barrel onto the arena for dynamic logistics!
+	var mgrs := get_tree().get_nodes_in_group("arena_interactables")
+	if mgrs.size() > 0 and mgrs[0].has_method("spawn_enemy_dropped_barrel"):
+		var barrel_pos: Vector3 = global_position - side_vec * 1.45
+		barrel_pos.x = clampf(barrel_pos.x, -42.0, 42.0)
+		barrel_pos.z = clampf(barrel_pos.z, -42.0, 42.0)
+		barrel_pos.y = 0.0
+		mgrs[0].spawn_enemy_dropped_barrel(barrel_pos)
+
 func handle_attacks(delta: float, active_dist: float) -> void:
-	if is_melee:
+	if enemy_type == EnemyType.GRAY_CLOAKER:
+		# Cloaker attacks purely via sprint-charge knockdown in _physics_process
+		return
+	elif is_melee:
 		handle_melee_axe(delta, active_dist)
 	elif is_sniper:
 		handle_sniper_attack(delta, active_dist)
-	elif enemy_type == EnemyType.RED_STANDARD:
+	elif enemy_type == EnemyType.RED_STANDARD or enemy_type == EnemyType.GRAY_SABOTEUR:
 		handle_burst_attack(delta, active_dist)
-	else: # Blue Scout semi-auto
+	else: # Blue Scout, Orange Engineer, Black Shield semi-auto
 		handle_pistol_attack(delta, active_dist)
 
 func handle_melee_axe(delta: float, active_dist: float) -> void:
@@ -552,10 +815,11 @@ func handle_burst_attack(delta: float, active_dist: float) -> void:
 
 	shoot_timer -= delta
 	if shoot_timer <= 0.0:
-		if active_dist <= MAX_ENGAGE_DIST_AK and has_line_of_sight():
+		var max_rng: float = 30.0 if enemy_type == EnemyType.GRAY_SABOTEUR else MAX_ENGAGE_DIST_AK
+		if active_dist <= max_rng and has_line_of_sight():
 			shoot_timer = shoot_interval + randf_range(-0.15, 0.2)
 			is_bursting = true
-			burst_shots_left = 3
+			burst_shots_left = 2 if enemy_type == EnemyType.GRAY_SABOTEUR else 3
 			burst_shot_timer = 0.0
 		else:
 			# Not in range or blocked: keep weapon primed with small reaction delay
@@ -586,30 +850,37 @@ func spawn_standard_bullet() -> void:
 	get_parent().add_child(bullet)
 	bullet.global_position = spawn_pos
 	
-	var spread: float = 0.08 if enemy_type == EnemyType.BLUE_SCOUT else 0.12
+	var spread: float = 0.06 if enemy_type == EnemyType.GRAY_SABOTEUR else (0.08 if enemy_type == EnemyType.BLUE_SCOUT else 0.12)
 	var target_pos: Vector3 = target_center + Vector3(
 		randf_range(-spread, spread),
 		randf_range(-spread, spread),
 		randf_range(-spread, spread)
 	)
 	var shoot_dir: Vector3 = (target_pos - spawn_pos).normalized()
-	# Standard bullet travels at 26.0 m/s until hitting an obstacle or target
-	bullet.init(shoot_dir, bullet_damage, laser_color, 26.0)
-	VFXFactoryScript.spawn_enemy_muzzle_flash(get_parent(), spawn_pos, shoot_dir, Color(1.0, 0.72, 0.25), 0.95 if enemy_type == EnemyType.RED_STANDARD else 0.72)
-	if enemy_type == EnemyType.RED_STANDARD:
-		# Мягкий и намного более тихий звук выстрела АК-47 со средней дистанции
+	var spd: float = 31.0 if enemy_type == EnemyType.GRAY_SABOTEUR else 26.0
+	bullet.init(shoot_dir, bullet_damage, laser_color, spd)
+	if enemy_type == EnemyType.GRAY_SABOTEUR:
+		# Quiet suppressed carbine: tiny subdued dark-green flash + hushed -13 dB thump!
+		VFXFactoryScript.spawn_enemy_muzzle_flash(get_parent(), spawn_pos, shoot_dir, Color(0.28, 0.72, 0.42), 0.32)
+		play_sfx(SoundEffects.create_pistol_sound(), -13.0)
+	elif enemy_type == EnemyType.RED_STANDARD:
+		VFXFactoryScript.spawn_enemy_muzzle_flash(get_parent(), spawn_pos, shoot_dir, Color(1.0, 0.72, 0.25), 0.95)
 		play_sfx(SoundEffects.get_enemy_ak47_sound(), -6.0)
 	else:
+		VFXFactoryScript.spawn_enemy_muzzle_flash(get_parent(), spawn_pos, shoot_dir, Color(1.0, 0.72, 0.25), 0.72)
 		play_sfx(SoundEffects.create_pistol_sound(), -2.0)
 
-# Robust raycast check ignoring other enemies and hitting layer 1 (world)
+# Robust raycast check ignoring other enemies & own ballistic shield and hitting layer 1 (world)
 func has_line_of_sight() -> bool:
 	var target_center := get_current_target_center()
 	var space_state = get_world_3d().direct_space_state
 	var from_pos: Vector3 = global_position + Vector3(0, 1.1, 0)
 	var query = PhysicsRayQueryParameters3D.create(from_pos, target_center)
 	query.collision_mask = 1 # World layer
-	query.exclude = [get_rid()]
+	var excl: Array[RID] = [get_rid()]
+	if is_instance_valid(shield_body):
+		excl.append(shield_body.get_rid())
+	query.exclude = excl
 	var result = space_state.intersect_ray(query)
 	if result.is_empty():
 		return true
@@ -663,6 +934,7 @@ func die() -> void:
 		
 	# Play explosion gib sound globally in tree
 	var sfx = AudioStreamPlayer.new()
+	sfx.bus = "SFX"
 	sfx.stream = SoundEffects.create_explosion_gib_sound()
 	sfx.pitch_scale = randf_range(0.95, 1.1)
 	get_tree().root.add_child(sfx)
@@ -675,17 +947,35 @@ func spawn_death_drops() -> void:
 	if not pickup_scene:
 		return
 		
-	# Yellow Heavy: 100% Guaranteed Armor Vest drop
-	if enemy_type == EnemyType.YELLOW_HEAVY:
+	# Yellow Heavy & Black Shield: 100% Guaranteed Armor Vest drop
+	if enemy_type == EnemyType.YELLOW_HEAVY or enemy_type == EnemyType.BLACK_SHIELD:
 		var vest = pickup_scene.instantiate()
 		vest.item_type = 0 # ARMOR_VEST
 		get_parent().add_child(vest)
 		vest.global_position = global_position + Vector3(0, 0.35, 0)
 		return
-		
-	# Blue Scout and Green Sniper: 12% drop chance for Bandages
-	if enemy_type == EnemyType.BLUE_SCOUT or enemy_type == EnemyType.GREEN_SNIPER:
-		if randf() <= 0.12:
+
+	# Orange Engineer: 55% chance for Armor Vest or Bandage
+	if enemy_type == EnemyType.ORANGE_ENGINEER:
+		if randf() <= 0.55:
+			var item = pickup_scene.instantiate()
+			item.item_type = 0 if randf() <= 0.45 else 1
+			get_parent().add_child(item)
+			item.global_position = global_position + Vector3(0, 0.35, 0)
+		return
+
+	# Gray Cloaker: 65% chance for Bandage
+	if enemy_type == EnemyType.GRAY_CLOAKER:
+		if randf() <= 0.65:
+			var bandage_c = pickup_scene.instantiate()
+			bandage_c.item_type = 1 # BANDAGE
+			get_parent().add_child(bandage_c)
+			bandage_c.global_position = global_position + Vector3(0, 0.35, 0)
+		return
+
+	# Blue Scout, Green Sniper & Gray Saboteur: 14% drop chance for Bandages
+	if enemy_type == EnemyType.BLUE_SCOUT or enemy_type == EnemyType.GREEN_SNIPER or enemy_type == EnemyType.GRAY_SABOTEUR:
+		if randf() <= 0.14:
 			var bandage = pickup_scene.instantiate()
 			bandage.item_type = 1 # BANDAGE
 			get_parent().add_child(bandage)

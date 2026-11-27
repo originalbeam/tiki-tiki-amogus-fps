@@ -597,3 +597,138 @@ static func spawn_explosion(parent: Node, pos: Vector3, normal: Vector3 = Vector
 			smat.set_shader_parameter("opacity", v)
 	, 0.82, 0.0, 2.0)
 	scorch_tw.tween_callback(vfx.queue_free)
+
+# Colossal 2-Stage TBG-7V Thermobaric Fuel-Air Vacuum Detonation!
+# Visually unmistakable: giant 3.2x billowing orange-crimson mushroom fireball + DOUBLE supersonic shockwave rings + fiery pillar!
+static func spawn_thermobaric_explosion(parent: Node, pos: Vector3, normal: Vector3 = Vector3.UP) -> void:
+	if not parent:
+		return
+	# Huge primary fuel-air fireball cluster (nearly 2x larger than standard PG-7V!)
+	spawn_explosion(parent, pos, normal, 3.25)
+
+	var vfx := Node3D.new()
+	vfx.name = "ThermobaricFuelAirVFX"
+	vfx.position = pos
+	parent.add_child(vfx)
+	vfx.global_position = pos
+
+	# Secondary gigantic crimson-orange fuel-air overpressure dome + rising mushroom stem
+	var dome := MeshInstance3D.new()
+	var dm := SphereMesh.new()
+	dm.radius = 2.6
+	dm.height = 5.2
+	dm.radial_segments = 24
+	dm.rings = 16
+	dome.mesh = dm
+	var dmat := ShaderMaterial.new()
+	dmat.shader = get_fireball_shader()
+	dmat.set_shader_parameter("dissolve", 0.0)
+	dmat.set_shader_parameter("heat", 2.35)
+	dome.material_override = dmat
+	dome.position = Vector3(0, 1.8, 0)
+	dome.scale = Vector3(0.4, 0.3, 0.4)
+	vfx.add_child(dome)
+
+	var cap := MeshInstance3D.new()
+	var cm := SphereMesh.new()
+	cm.radius = 3.2
+	cm.height = 4.0
+	cm.radial_segments = 24
+	cm.rings = 14
+	cap.mesh = cm
+	var cmat := ShaderMaterial.new()
+	cmat.shader = get_fireball_shader()
+	cmat.set_shader_parameter("dissolve", 0.0)
+	cmat.set_shader_parameter("heat", 2.15)
+	cap.material_override = cmat
+	cap.position = Vector3(0, 3.2, 0)
+	cap.scale = Vector3(0.3, 0.25, 0.3)
+	vfx.add_child(cap)
+
+	# Massive secondary overpressure vacuum shockwave ring expanding across 25m!
+	var wave := MeshInstance3D.new()
+	var wm := TorusMesh.new()
+	wm.inner_radius = 1.8
+	wm.outer_radius = 2.35
+	wm.rings = 32
+	wm.ring_segments = 12
+	wave.mesh = wm
+	var wmat := StandardMaterial3D.new()
+	wmat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	wmat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	wmat.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+	wmat.albedo_color = Color(1.0, 0.54, 0.14, 0.85)
+	wave.material_override = wmat
+	wave.position = Vector3(0, 0.35, 0)
+	vfx.add_child(wave)
+
+	var light := OmniLight3D.new()
+	light.light_color = Color(1.0, 0.42, 0.08)
+	light.light_energy = 32.0
+	light.omni_range = 52.0
+	light.position = Vector3(0, 2.5, 0)
+	vfx.add_child(light)
+
+	var tw := vfx.create_tween()
+	tw.set_parallel(true)
+	tw.tween_property(dome, "scale", Vector3(3.4, 3.8, 3.4), 0.72).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tw.tween_property(dome, "position:y", 5.8, 1.35)
+	tw.tween_property(cap, "scale", Vector3(4.2, 2.8, 4.2), 0.95).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tw.tween_property(cap, "position:y", 11.5, 1.55)
+	tw.tween_property(wave, "scale", Vector3(11.5, 1.2, 11.5), 0.58).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tw.tween_property(wmat, "albedo_color:a", 0.0, 0.62)
+	tw.tween_property(light, "light_energy", 0.0, 1.35)
+	tw.tween_method(func(v: float):
+		if is_instance_valid(dmat): dmat.set_shader_parameter("dissolve", v)
+		if is_instance_valid(cmat): cmat.set_shader_parameter("dissolve", v)
+	, 0.0, 1.0, 1.50).set_ease(Tween.EASE_IN)
+	tw.chain().tween_callback(vfx.queue_free)
+
+# Focused PG-7VR Tandem HEAT Armor-Piercing Shaped-Charge Plasma Jet VFX!
+static func spawn_tandem_explosion(parent: Node, pos: Vector3, normal: Vector3 = Vector3.UP) -> void:
+	if not parent:
+		return
+	# Tighter, sharper shaped-charge blast (1.25x vs 1.75x standard) + intense blue-white copper-jet flash & armor spall!
+	spawn_explosion(parent, pos, normal, 1.25)
+
+	var vfx := Node3D.new()
+	vfx.name = "TandemHEATJetVFX"
+	vfx.position = pos
+	parent.add_child(vfx)
+	vfx.global_position = pos
+
+	var jet_light := OmniLight3D.new()
+	jet_light.light_color = Color(0.82, 0.92, 1.0)
+	jet_light.light_energy = 24.0
+	jet_light.omni_range = 20.0
+	vfx.add_child(jet_light)
+
+	# Molten copper armor-penetration spark shower!
+	var spall := CPUParticles3D.new()
+	spall.one_shot = true
+	spall.explosiveness = 0.98
+	spall.amount = 64
+	spall.lifetime = 0.85
+	spall.direction = normal.normalized() if normal.length_squared() > 0.01 else Vector3.UP
+	spall.spread = 52.0
+	spall.gravity = Vector3(0, -18.0, 0)
+	spall.initial_velocity_min = 12.0
+	spall.initial_velocity_max = 28.0
+	spall.particle_flag_align_y = true
+	var sm := CylinderMesh.new()
+	sm.top_radius = 0.025
+	sm.bottom_radius = 0.004
+	sm.height = 0.55
+	var smat := StandardMaterial3D.new()
+	smat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	smat.albedo_color = Color(0.85, 0.95, 1.0)
+	smat.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+	sm.material = smat
+	spall.mesh = sm
+	vfx.add_child(spall)
+	spall.emitting = true
+
+	var tw := vfx.create_tween()
+	tw.tween_property(jet_light, "light_energy", 0.0, 0.25)
+	tw.tween_interval(0.8)
+	tw.tween_callback(vfx.queue_free)

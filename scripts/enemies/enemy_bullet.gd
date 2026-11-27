@@ -6,6 +6,7 @@ var speed: float = 24.0
 var damage: float = 12.0
 var direction: Vector3 = Vector3.FORWARD
 var bullet_color: Color = Color(1.0, 0.25, 0.2)
+var ignore_owner: Node = null
 
 const BulletImpactScene = preload("res://scenes/bullet_impact.tscn")
 
@@ -67,6 +68,8 @@ func _process(delta: float) -> void:
 		queue_free()
 
 func _on_body_entered(body: Node3D) -> void:
+	if ignore_owner != null and body.is_in_group("tiger_hitbox") and body.get_meta("tiger_owner", null) == ignore_owner:
+		return
 	if body.is_in_group("player"):
 		if body.has_method("take_damage"):
 			body.take_damage(damage)

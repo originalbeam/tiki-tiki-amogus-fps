@@ -13,13 +13,12 @@ const REAL_BASE := "res://sounds/real/"
 
 # Multi-variant pools for natural gunfire variation
 const AK47_SHOT_POOL: Array[String] = [
-	REAL_BASE + "weapons/ak47_shot_1.ogg",
-	REAL_BASE + "weapons/ak47_shot_2.ogg",
+	REAL_BASE + "weapons/ak47_shot_1.wav",
+	REAL_BASE + "weapons/ak47_shot_2.wav",
 ]
 
 const PISTOL_SHOT_POOL: Array[String] = [
 	REAL_BASE + "weapons/pistol_shot_1.ogg",
-	REAL_BASE + "weapons/pistol_shot_2.ogg",
 ]
 
 static func load_audio_file(res_path: String, looping: bool = false) -> AudioStream:
@@ -123,7 +122,7 @@ static func get_enemy_ak47_sound() -> AudioStream:
 	return load_audio_file(REAL_BASE + "weapons/ak47_enemy.ogg", false)
 
 static func create_shotgun_sound() -> AudioStream:
-	return load_audio_file(REAL_BASE + "weapons/shotgun_shot.ogg", false)
+	return load_audio_file(REAL_BASE + "weapons/shotgun_shot.wav", false)
 
 static func create_pistol_sound() -> AudioStream:
 	return _pick_pool(PISTOL_SHOT_POOL)
@@ -136,6 +135,36 @@ static func create_rpg_shot_sound() -> AudioStream:
 
 static func create_rpg_flight_sound() -> AudioStream:
 	return load_audio_file(REAL_BASE + "weapons/rpg_flight.ogg", true)
+
+static func create_kar98k_sound() -> AudioStream:
+	return load_audio_file(REAL_BASE + "weapons/kar98k_shot.wav", false)
+
+static func create_pkm_sound() -> AudioStream:
+	return load_audio_file(REAL_BASE + "weapons/pkm_shot.ogg", false)
+
+static func create_l96a1_sound() -> AudioStream:
+	return load_audio_file(REAL_BASE + "weapons/l96a1_shot.ogg", false)
+
+static func create_deagle_sound() -> AudioStream:
+	return load_audio_file(REAL_BASE + "weapons/deagle_shot.ogg", false)
+
+static func create_aa12_sound() -> AudioStream:
+	return load_audio_file(REAL_BASE + "weapons/aa12_shot.ogg", false)
+
+static func create_mg42_sound() -> AudioStream:
+	return load_audio_file(REAL_BASE + "weapons/mg42_shot.ogg", false)
+
+static func create_bolt_cycle_sound() -> AudioStream:
+	return load_audio_file(REAL_BASE + "weapons/bolt_cycle.ogg", false)
+
+static func create_kar98k_bolt_open_sound() -> AudioStream:
+	return load_audio_file(REAL_BASE + "handling/kar98k_bolt_open.ogg", false)
+
+static func create_kar98k_bolt_close_sound() -> AudioStream:
+	return load_audio_file(REAL_BASE + "handling/kar98k_bolt_close.ogg", false)
+
+static func create_kar98k_clip_in_sound() -> AudioStream:
+	return load_audio_file(REAL_BASE + "handling/kar98k_clip_in.ogg", false)
 
 static func create_laser_sound() -> AudioStream:
 	return load_audio_file(REAL_BASE + "weapons/laser_fallback.ogg", false)
@@ -255,3 +284,160 @@ static func create_van_horn_sound() -> AudioStream:
 
 static func create_van_reverse_beep() -> AudioStream:
 	return load_audio_file(REAL_BASE + "vehicles/van_reverse.ogg", false)
+
+static func create_black_van_idle_sound() -> AudioStream:
+	return load_audio_file(REAL_BASE + "vehicles/black_van_idle.ogg", true)
+
+static func create_black_van_move_sound() -> AudioStream:
+	return load_audio_file(REAL_BASE + "vehicles/black_van_move.ogg", true)
+
+static func create_black_van_accel_sound() -> AudioStream:
+	return load_audio_file(REAL_BASE + "vehicles/black_van_accel.ogg", true)
+
+static func create_black_van_deploy_sound() -> AudioStream:
+	return load_audio_file(REAL_BASE + "vehicles/black_van_deploy.ogg", false)
+
+static func create_black_van_explosion_sound() -> AudioStream:
+	return load_audio_file(REAL_BASE + "vehicles/black_van_explosion.ogg", false)
+
+# ==========================================
+# 7. TIGER I HEAVY TANK BOSS
+# ==========================================
+
+static func create_tiger_idle_sound() -> AudioStream:
+	return load_audio_file(REAL_BASE + "tiger/tiger_idle.ogg", true)
+
+static func create_tiger_move_sound() -> AudioStream:
+	return load_audio_file(REAL_BASE + "tiger/tiger_move.ogg", true)
+
+static func create_tiger_cannon_sound() -> AudioStream:
+	return load_audio_file(REAL_BASE + "tiger/tiger_cannon.wav", false)
+
+static func create_tiger_mg_sound() -> AudioStream:
+	return load_audio_file(REAL_BASE + "tiger/tiger_mg.wav", false)
+
+static func create_tiger_engine_broken_sound() -> AudioStream:
+	return load_audio_file(REAL_BASE + "tiger/tiger_engine_broken.ogg", true)
+
+static func create_tiger_fire_sound() -> AudioStream:
+	return load_audio_file(REAL_BASE + "tiger/tiger_fire.ogg", true)
+
+static func create_tiger_ammo_cookoff_sound() -> AudioStream:
+	return load_audio_file(REAL_BASE + "tiger/tiger_ammo_cookoff.ogg", true)
+
+static func create_tiger_explosion_sound() -> AudioStream:
+	return load_audio_file(REAL_BASE + "tiger/tiger_explosion.ogg", false)
+
+static func create_tiger_ammo_explosion_sound() -> AudioStream:
+	return load_audio_file(REAL_BASE + "tiger/tiger_ammo_explosion.ogg", false)
+
+static func create_tiger_crew_scream_sound() -> AudioStream:
+	return load_audio_file(REAL_BASE + "tiger/tiger_crew_scream.wav", false)
+
+static func create_tiger_ricochet_sound() -> AudioStream:
+	return load_audio_file(REAL_BASE + "tiger/tiger_ricochet.ogg", false)
+
+static func create_tiger_destroyed_beep_sound() -> AudioStream:
+	return load_audio_file(REAL_BASE + "tiger/tiger_destroyed_beep.wav", false)
+
+# ==========================================
+# 8. STAGE 2 & 3 PROCEDURAL TACTICAL AUDIO (CLOAKER, TURRET, MI-24 ROTOR)
+# ==========================================
+
+static func _make_wav_16bit(samples: PackedFloat32Array, mix_rate: int = 22050, loop: bool = false) -> AudioStreamWAV:
+	var data := PackedByteArray()
+	data.resize(samples.size() * 2)
+	for i in range(samples.size()):
+		var v: int = clampi(int(round(samples[i] * 32767.0)), -32767, 32767)
+		data[i * 2] = v & 0xFF
+		data[i * 2 + 1] = (v >> 8) & 0xFF
+	var wav := AudioStreamWAV.new()
+	wav.format = AudioStreamWAV.FORMAT_16_BITS
+	wav.mix_rate = mix_rate
+	wav.stereo = false
+	wav.data = data
+	if loop:
+		wav.loop_mode = AudioStreamWAV.LOOP_FORWARD
+		wav.loop_begin = 0
+		wav.loop_end = samples.size()
+	return wav
+
+static func create_cloaker_charge_sound() -> AudioStream:
+	# Iconic Payday-2 style rising electronic WULULULULU high-pitched warble siren!
+	if _sound_cache.has("proc_cloaker_charge"):
+		return _sound_cache["proc_cloaker_charge"]
+	var sr: int = 22050
+	var dur: float = 1.65
+	var n: int = int(sr * dur)
+	var buf := PackedFloat32Array()
+	buf.resize(n)
+	var phase: float = 0.0
+	for i in range(n):
+		var t: float = float(i) / float(sr)
+		var u: float = t / dur
+		var base_f: float = lerpf(880.0, 2650.0, pow(u, 1.35))
+		var warble: float = sin(t * TAU * lerpf(11.0, 24.0, u)) * lerpf(160.0, 340.0, u)
+		phase += TAU * (base_f + warble) / float(sr)
+		var env: float = minf(1.0, t * 8.0) * (1.0 - maxf(0.0, (u - 0.90) / 0.10))
+		var sig: float = (sin(phase) * 0.65 + sin(phase * 2.0) * 0.25 + (1.0 if sin(phase) > 0.0 else -1.0) * 0.10)
+		buf[i] = clampf(sig * env * 0.62, -1.0, 1.0)
+	var wav := _make_wav_16bit(buf, sr, false)
+	_sound_cache["proc_cloaker_charge"] = wav
+	return wav
+
+static func create_cloaker_knockdown_sound() -> AudioStream:
+	# Heavy dropkick impact thud + sharp brief ear-ringing tinnitus!
+	if _sound_cache.has("proc_cloaker_hit"):
+		return _sound_cache["proc_cloaker_hit"]
+	var sr: int = 22050
+	var dur: float = 1.15
+	var n: int = int(sr * dur)
+	var buf := PackedFloat32Array()
+	buf.resize(n)
+	for i in range(n):
+		var t: float = float(i) / float(sr)
+		var thud: float = sin(TAU * lerpf(125.0, 38.0, minf(1.0, t * 6.0)) * t) * exp(-t * 11.0) * 0.85
+		var ring: float = sin(TAU * 3650.0 * t) * exp(-t * 2.2) * 0.24
+		buf[i] = clampf(thud + ring, -1.0, 1.0)
+	var wav := _make_wav_16bit(buf, sr, false)
+	_sound_cache["proc_cloaker_hit"] = wav
+	return wav
+
+static func create_turret_deploy_sound() -> AudioStream:
+	if _sound_cache.has("proc_turret_deploy"):
+		return _sound_cache["proc_turret_deploy"]
+	var sr: int = 22050
+	var dur: float = 0.42
+	var n: int = int(sr * dur)
+	var buf := PackedFloat32Array()
+	buf.resize(n)
+	for i in range(n):
+		var t: float = float(i) / float(sr)
+		var b1: float = sin(TAU * 980.0 * t) * (1.0 if (t >= 0.05 and t < 0.14) else 0.0) * 0.45
+		var b2: float = sin(TAU * 1480.0 * t) * (1.0 if (t >= 0.18 and t < 0.34) else 0.0) * 0.50
+		buf[i] = clampf(b1 + b2, -1.0, 1.0)
+	var wav := _make_wav_16bit(buf, sr, false)
+	_sound_cache["proc_turret_deploy"] = wav
+	return wav
+
+static func create_heli_rotor_sound() -> AudioStream:
+	# Looping Mi-24 Hind 5-blade heavy low-frequency rotor chop + twin turbine hum!
+	if _sound_cache.has("proc_mi24_rotor"):
+		return _sound_cache["proc_mi24_rotor"]
+	var sr: int = 22050
+	var dur: float = 1.0
+	var n: int = int(sr * dur)
+	var buf := PackedFloat32Array()
+	buf.resize(n)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 242424
+	for i in range(n):
+		var t: float = float(i) / float(sr)
+		# 10 Hz heavy blade-slap pulse (exact integer cycle in 1.0s for seamless loop!)
+		var blade_env: float = pow(0.5 + 0.5 * sin(TAU * 10.0 * t), 2.4)
+		var chop: float = (sin(TAU * 50.0 * t) * 0.55 + sin(TAU * 100.0 * t) * 0.25 + rng.randf_range(-0.35, 0.35)) * blade_env
+		var turbine: float = sin(TAU * 420.0 * t) * 0.07 + sin(TAU * 630.0 * t) * 0.04
+		buf[i] = clampf((chop * 0.65 + turbine) * 0.72, -1.0, 1.0)
+	var wav := _make_wav_16bit(buf, sr, true)
+	_sound_cache["proc_mi24_rotor"] = wav
+	return wav

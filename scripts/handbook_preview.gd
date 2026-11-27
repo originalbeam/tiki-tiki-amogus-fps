@@ -7,6 +7,13 @@ const AK47Model = preload("res://scripts/weapons/models/ak47_model.gd")
 const ShotgunModel = preload("res://scripts/weapons/models/shotgun_model.gd")
 const PistolModel = preload("res://scripts/weapons/models/pistol_model.gd")
 const RPGModel = preload("res://scripts/weapons/models/rpg_model.gd")
+const Kar98kModel = preload("res://scripts/weapons/models/kar98k_model.gd")
+const PKMModel = preload("res://scripts/weapons/models/pkm_model.gd")
+const L96A1Model = preload("res://scripts/weapons/models/l96a1_model.gd")
+const DeagleModel = preload("res://scripts/weapons/models/deagle_model.gd")
+const AA12Model = preload("res://scripts/weapons/models/aa12_model.gd")
+const MG42Model = preload("res://scripts/weapons/models/mg42_model.gd")
+const WeaponModVisualsScript = preload("res://scripts/weapons/models/weapon_mod_visuals.gd")
 const SniperModel = preload("res://scripts/weapons/models/sniper_model.gd")
 const KnifeModel = preload("res://scripts/weapons/models/knife_model.gd")
 const AxeModel = preload("res://scripts/weapons/models/axe_model.gd")
@@ -14,6 +21,9 @@ const PreviewCrewmate = preload("res://scripts/ui/previews/preview_crewmate.gd")
 const PreviewDrone = preload("res://scripts/ui/previews/preview_drone.gd")
 const PreviewItems = preload("res://scripts/ui/previews/preview_items.gd")
 const WeaponWorkbenchScript = preload("res://scripts/shop/weapon_workbench.gd")
+const BlackMinivanScript = preload("res://scripts/enemies/black_minivan.gd")
+const TigerTankScript = preload("res://scripts/enemies/tiger_tank.gd")
+const Mi24BossScript = preload("res://scripts/enemies/mi24_boss.gd")
 
 @onready var viewport: SubViewport = $SubViewport
 @onready var model_pivot: Node3D = $SubViewport/ModelPivot
@@ -115,7 +125,7 @@ func clamp_pan_limits() -> void:
 	model_pivot.position.x = clampf(model_pivot.position.x, -max_pan_x, max_pan_x)
 	model_pivot.position.y = clampf(model_pivot.position.y, -max_pan_y, max_pan_y)
 
-func show_item(item_id: String) -> void:
+func show_item(item_id: String, ammo_mode: String = "") -> void:
 	if not viewport:
 		viewport = get_node_or_null("SubViewport")
 	if not model_pivot and viewport:
@@ -147,16 +157,61 @@ func show_item(item_id: String) -> void:
 		"ak", "ak47":
 			current_model_node = AK47Model.create()
 			camera.position = Vector3(0, 0.03, 1.05)
+		"ammo_ak":
+			current_model_node = PreviewItems.create_ammo_ak(ammo_mode if ammo_mode != "" else "fmj")
+			camera.position = Vector3(0, 0.04, 0.54)
 		"shotgun":
 			current_model_node = ShotgunModel.create()
 			camera.position = Vector3(0, 0.03, 1.25)
+		"ammo_shotgun":
+			current_model_node = PreviewItems.create_ammo_shotgun(ammo_mode if ammo_mode != "" else "buck")
+			camera.position = Vector3(0, 0.02, 0.44)
 		"pistol":
 			current_model_node = PistolModel.create()
 			camera.position = Vector3(0, 0.01, 0.52)
+		"ammo_pistol":
+			current_model_node = PreviewItems.create_ammo_pistol(ammo_mode if ammo_mode != "" else "fmj")
+			camera.position = Vector3(0, 0.03, 0.48)
 		"rpg", "rpg7":
 			current_model_node = RPGModel.create(true)
 			current_model_node.position = Vector3(0, 0.0, 0.165)
 			camera.position = Vector3(0, 0.04, 1.48)
+		"ammo_rpg":
+			current_model_node = PreviewItems.create_ammo_rpg(ammo_mode if ammo_mode != "" else "standard")
+			camera.position = Vector3(0, 0.03, 1.18)
+		"ammo_ugl":
+			current_model_node = PreviewItems.create_ammo_ugl()
+			camera.position = Vector3(0, 0.03, 0.52)
+		"kar98k":
+			current_model_node = Kar98kModel.create()
+			camera.position = Vector3(0, 0.03, 1.28)
+		"pkm":
+			current_model_node = PKMModel.create()
+			camera.position = Vector3(0, 0.04, 1.35)
+		"l96a1":
+			current_model_node = L96A1Model.create()
+			camera.position = Vector3(0, 0.04, 1.38)
+		"deagle":
+			current_model_node = DeagleModel.create()
+			camera.position = Vector3(0, 0.01, 0.56)
+		"aa12":
+			current_model_node = AA12Model.create()
+			camera.position = Vector3(0, 0.03, 1.15)
+		"mg42":
+			current_model_node = MG42Model.create()
+			camera.position = Vector3(0, 0.04, 1.38)
+		"ammo_792x57":
+			current_model_node = PreviewItems.create_ammo_792x57(ammo_mode if ammo_mode != "" else "fmj")
+			camera.position = Vector3(0, 0.03, 0.54)
+		"ammo_762x54r":
+			current_model_node = PreviewItems.create_ammo_762x54r(ammo_mode if ammo_mode != "" else "fmj")
+			camera.position = Vector3(0, 0.03, 0.56)
+		"ammo_338lm":
+			current_model_node = PreviewItems.create_ammo_338lm(ammo_mode if ammo_mode != "" else "fmj")
+			camera.position = Vector3(0, 0.03, 0.58)
+		"ammo_50ae":
+			current_model_node = PreviewItems.create_ammo_50ae(ammo_mode if ammo_mode != "" else "fmj")
+			camera.position = Vector3(0, 0.03, 0.50)
 		"sniper", "awp":
 			current_model_node = SniperModel.create()
 			camera.position = Vector3(0, 0.04, 1.35)
@@ -178,9 +233,31 @@ func show_item(item_id: String) -> void:
 		"enemy_green":
 			current_model_node = PreviewCrewmate.create(Color(0.15, 0.85, 0.25), 3)
 			camera.position = Vector3(0, 0.0, 2.35)
+		"enemy_engineer":
+			current_model_node = PreviewCrewmate.create(Color(0.95, 0.45, 0.10), 4)
+			camera.position = Vector3(0, 0.0, 2.35)
+		"enemy_shield":
+			current_model_node = PreviewCrewmate.create(Color(0.14, 0.15, 0.18), 5)
+			camera.position = Vector3(0, 0.0, 2.55)
+		"enemy_saboteur":
+			current_model_node = PreviewCrewmate.create(Color(0.30, 0.33, 0.36), 6)
+			camera.position = Vector3(0, 0.0, 2.35)
+		"enemy_cloaker":
+			current_model_node = PreviewCrewmate.create(Color(0.18, 0.20, 0.22), 7)
+			camera.position = Vector3(0, 0.0, 2.35)
 		"enemy_shahed", "shahed":
 			current_model_node = PreviewDrone.create()
 			camera.position = Vector3(0, 0.25, 2.2)
+		"enemy_busik", "busik":
+			current_model_node = BlackMinivanScript.create_preview()
+			camera.position = Vector3(0, 0.28, 2.75)
+		"enemy_tiger", "tiger":
+			current_model_node = TigerTankScript.create_preview()
+			camera.position = Vector3(0, 0.34, 3.10)
+		"enemy_mi24", "mi24":
+			current_model_node = Mi24BossScript.create_preview_model()
+			current_model_node.scale = Vector3(0.24, 0.24, 0.24)
+			camera.position = Vector3(0, 0.45, 3.45)
 		"armor_vest":
 			current_model_node = PreviewItems.create_armor()
 			camera.position = Vector3(0, 0.0, 0.95)
@@ -237,9 +314,9 @@ func show_weapon_with_mods(weapon: Weapon, keep_transform: bool = false) -> void
 	
 	match weapon.weapon_id:
 		"ak47":
-			current_model_node = AK47Model.create_with_mods(weapon.installed_mods)
+			current_model_node = AK47Model.create()
 			if not keep_transform:
-				camera.position = Vector3(0, 0.03, 1.02)
+				camera.position = Vector3(0, 0.03, 1.05)
 		"shotgun":
 			current_model_node = ShotgunModel.create()
 			if not keep_transform:
@@ -247,16 +324,41 @@ func show_weapon_with_mods(weapon: Weapon, keep_transform: bool = false) -> void
 		"pistol":
 			current_model_node = PistolModel.create()
 			if not keep_transform:
-				camera.position = Vector3(0, 0.01, 0.52)
+				camera.position = Vector3(0, 0.01, 0.56)
 		"rpg":
 			current_model_node = RPGModel.create(true)
 			current_model_node.position = Vector3(0, 0.0, 0.165)
 			if not keep_transform:
 				camera.position = Vector3(0, 0.04, 1.48)
+		"kar98k":
+			current_model_node = Kar98kModel.create()
+			if not keep_transform:
+				camera.position = Vector3(0, 0.03, 1.30)
+		"pkm":
+			current_model_node = PKMModel.create()
+			if not keep_transform:
+				camera.position = Vector3(0, 0.04, 1.38)
+		"l96a1":
+			current_model_node = L96A1Model.create()
+			if not keep_transform:
+				camera.position = Vector3(0, 0.04, 1.40)
+		"deagle":
+			current_model_node = DeagleModel.create()
+			if not keep_transform:
+				camera.position = Vector3(0, 0.01, 0.60)
+		"aa12":
+			current_model_node = AA12Model.create()
+			if not keep_transform:
+				camera.position = Vector3(0, 0.03, 1.18)
+		"mg42":
+			current_model_node = MG42Model.create()
+			if not keep_transform:
+				camera.position = Vector3(0, 0.04, 1.40)
 		_:
 			current_model_node = AK47Model.create()
 			
 	if current_model_node:
+		WeaponModVisualsScript.apply_mods_to_weapon_node(weapon.weapon_id, current_model_node, weapon.installed_mods)
 		model_pivot.add_child(current_model_node)
 		
 	if keep_transform:

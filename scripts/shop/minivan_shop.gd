@@ -40,6 +40,7 @@ func _ready() -> void:
 	build_shop_zone()
 	
 	audio_player = AudioStreamPlayer3D.new()
+	audio_player.bus = "SFX"
 	audio_player.max_distance = 60.0
 	audio_player.unit_size = 10.0
 	add_child(audio_player)

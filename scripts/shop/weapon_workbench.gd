@@ -56,7 +56,15 @@ static func find_safe_center_pos(tree: SceneTree, player: Node3D) -> Vector3:
 		Vector3(-6.0, 0.0, 6.5),
 		Vector3(4.0, 0.0, 7.5),
 		Vector3(8.5, 0.0, -5.5),
-		Vector3(-7.5, 0.0, -3.5)
+		Vector3(-7.5, 0.0, -3.5),
+		Vector3(11.0, 0.0, 0.0),
+		Vector3(-11.0, 0.0, 0.0),
+		Vector3(0.0, 0.0, 11.0),
+		Vector3(0.0, 0.0, -11.0),
+		Vector3(10.0, 0.0, 9.0),
+		Vector3(-10.0, 0.0, 9.0),
+		Vector3(10.0, 0.0, -9.0),
+		Vector3(-10.0, 0.0, -9.0),
 	]
 	
 	var vans := tree.get_nodes_in_group("minivan_shop")

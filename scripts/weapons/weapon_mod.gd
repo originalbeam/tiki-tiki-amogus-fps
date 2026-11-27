@@ -27,10 +27,11 @@ var reload_time_mult: float = 1.0 # < 1.0 = faster reload
 var ergonomics_add: float = 0.0
 
 # Dependency & structural rules
-var requires_mods: Array[String] = []   # All listed mod IDs must be installed on the weapon
-var conflicts_with: Array[String] = []  # Cannot coexist with any of these mod IDs
-var provides_slots: Array[String] = []  # Unlocks additional child mod slots (e.g. Picatinny cover unlocks "optic")
-var is_vanilla_default: bool = false    # True if this is the factory stock component
+var requires_mods: Array[String] = []     # All listed mod IDs must be installed on the weapon
+var requires_any_mods: Array[String] = [] # At least ONE of these mod IDs must be installed (e.g. Picatinny cover OR B-13 rail)
+var conflicts_with: Array[String] = []    # Cannot coexist with any of these mod IDs
+var provides_slots: Array[String] = []    # Unlocks additional child mod slots (e.g. Picatinny cover unlocks "optic")
+var is_vanilla_default: bool = false      # True if this is the factory stock component
 
 # Gameplay mechanics dictionary (extensible for future updates):
 # Supported keys:
@@ -67,6 +68,8 @@ static func make(cfg: Dictionary) -> RefCounted:
 	m.ergonomics_add = cfg.get("ergonomics_add", 0.0)
 	for r in cfg.get("requires_mods", []):
 		m.requires_mods.append(str(r))
+	for ra in cfg.get("requires_any_mods", []):
+		m.requires_any_mods.append(str(ra))
 	for c in cfg.get("conflicts_with", []):
 		m.conflicts_with.append(str(c))
 	for p in cfg.get("provides_slots", []):

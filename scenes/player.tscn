@@ -458,7 +458,7 @@ corner_radius_bottom_right = 0
 corner_radius_bottom_left = 0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_Pause"]
-bg_color = Color(0.07, 0.08, 0.09, 0.96)
+bg_color = Color(0.07, 0.08, 0.09, 1)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
@@ -579,6 +579,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
 
 [node name="Camera3D" type="Camera3D" parent="Head"]
 fov = 85.0
+near = 0.015
 
 [node name="WeaponHolder" type="Node3D" parent="Head/Camera3D" node_paths=PackedStringArray("camera")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.26, -0.24, -0.52)
@@ -1374,49 +1375,49 @@ custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
 theme_override_font_sizes/font_size = 13
 theme_override_styles/normal = SubResource("StyleBoxFlat_HB_Btn")
-text = "Патроны АК-47 ($20)"
+text = "Патроны АК-47 ($42)"
 
 [node name="BtnShopShotgun" type="Button" parent="HUD/ShopPanel/HBox/LeftCol/VBox/Scroll/List"]
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
 theme_override_font_sizes/font_size = 13
 theme_override_styles/normal = SubResource("StyleBoxFlat_HB_Btn")
-text = "Картечь дробовика ($3)"
+text = "Картечь дробовика ($7)"
 
 [node name="BtnShopPistol" type="Button" parent="HUD/ShopPanel/HBox/LeftCol/VBox/Scroll/List"]
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
 theme_override_font_sizes/font_size = 13
 theme_override_styles/normal = SubResource("StyleBoxFlat_HB_Btn")
-text = "Патроны пистолета ($12)"
+text = "Патроны пистолета ($22)"
 
 [node name="BtnShopRPGLauncher" type="Button" parent="HUD/ShopPanel/HBox/LeftCol/VBox/Scroll/List"]
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
 theme_override_font_sizes/font_size = 13
 theme_override_styles/normal = SubResource("StyleBoxFlat_HB_Btn")
-text = "РПГ-7 ($350)"
+text = "РПГ-7 ($460)"
 
 [node name="BtnShopRPG" type="Button" parent="HUD/ShopPanel/HBox/LeftCol/VBox/Scroll/List"]
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
 theme_override_font_sizes/font_size = 13
 theme_override_styles/normal = SubResource("StyleBoxFlat_HB_Btn")
-text = "Граната ПГ-7В ($100)"
+text = "Граната ПГ-7В ($150)"
 
 [node name="BtnShopWorkbench" type="Button" parent="HUD/ShopPanel/HBox/LeftCol/VBox/Scroll/List"]
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
 theme_override_font_sizes/font_size = 13
 theme_override_styles/normal = SubResource("StyleBoxFlat_HB_Btn")
-text = "Верстак модификации ($250)"
+text = "Верстак модификации ($280)"
 
 [node name="BtnShopMedkit" type="Button" parent="HUD/ShopPanel/HBox/LeftCol/VBox/Scroll/List"]
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
 theme_override_font_sizes/font_size = 13
 theme_override_styles/normal = SubResource("StyleBoxFlat_HB_Btn")
-text = "Большая аптечка ($40)"
+text = "Большая аптечка ($75)"
 
 [node name="BtnShopVodka" type="Button" parent="HUD/ShopPanel/HBox/LeftCol/VBox/Scroll/List"]
 custom_minimum_size = Vector2(0, 42)
@@ -1430,14 +1431,14 @@ custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
 theme_override_font_sizes/font_size = 13
 theme_override_styles/normal = SubResource("StyleBoxFlat_HB_Btn")
-text = "Сверхтяжелый бронежилет ($80)"
+text = "Сверхтяжелый бронежилет ($220)"
 
 [node name="BtnShopPlate" type="Button" parent="HUD/ShopPanel/HBox/LeftCol/VBox/Scroll/List"]
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
 theme_override_font_sizes/font_size = 13
 theme_override_styles/normal = SubResource("StyleBoxFlat_HB_Btn")
-text = "Бронеплита (+30) ($30)"
+text = "Бронеплита (+30) ($65)"
 
 [node name="CloseShopBtn" type="Button" parent="HUD/ShopPanel/HBox/LeftCol/VBox"]
 custom_minimum_size = Vector2(0, 42)
@@ -1789,7 +1790,7 @@ layout_mode = 2
 layout_mode = 2
 theme_override_colors/font_color = Color(0.8, 0.35, 0.35, 1)
 theme_override_font_sizes/font_size = 13
-text = "── 👾 ВРАГИ (КРЮМЕЙТЫ) ──"
+text = "── 👾 ВРАГИ И ТЕХНИКА ──"
 
 [node name="BtnRed" type="Button" parent="HUD/HandbookPanel/HBox/LeftCol/VBox/Scroll/List"]
 custom_minimum_size = Vector2(0, 36)

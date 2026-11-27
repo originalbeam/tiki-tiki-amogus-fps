@@ -235,6 +235,43 @@ static func populate_crewmate_visuals(visuals_root: Node3D, color: Color, enemy_
 			mat_rf.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 			mat_rf.albedo_color = Color(0.2, 1.0, 0.65)
 			_add_cyl(visor_root, "RangefinderLens", 0.036, 0.036, 0.03, Vector3(0.35, 0.02, 0.12), mat_rf, 10, Vector3(90, 0, 0))
+		4: # ORANGE_ENGINEER: Combat Engineer (Yellow Hard-Hat + Headlamp + Welder Tool Rig!)
+			var mat_yel := StandardMaterial3D.new()
+			mat_yel.albedo_color = Color(0.95, 0.78, 0.12); mat_yel.roughness = 0.35
+			var mat_lamp := StandardMaterial3D.new()
+			mat_lamp.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+			mat_lamp.albedo_color = Color(1.0, 0.96, 0.75)
+			var hh := _add_cyl(visuals_root, "HardHat", 0.42, 0.48, 0.24, Vector3(0, 1.56, 0.0), mat_yel, 16)
+			_add_box(hh, "HatBrim", Vector3(0.56, 0.04, 0.22), Vector3(0, -0.09, 0.40), mat_yel)
+			_add_cyl(hh, "HeadLamp", 0.075, 0.075, 0.06, Vector3(0, 0.02, 0.46), mat_lamp, 10, Vector3(90, 0, 0))
+			_add_box(visuals_root, "ToolVest", Vector3(0.56, 0.32, 0.14), Vector3(0, 0.84, 0.40), mat_gear)
+			_add_cyl(bp, "EngAntenna", 0.015, 0.022, 0.68, Vector3(-0.18, 0.65, 0), mat_steel, 8)
+		5: # BLACK_SHIELD: SWAT Ballistic Shield Breacher (Armored SWAT Helmet + Heavy Shoulder Guards!)
+			var swat_h := _add_cyl(visuals_root, "SWATHelmet", 0.44, 0.49, 0.26, Vector3(0, 1.56, -0.02), mat_gear, 16)
+			_add_box(swat_h, "FaceShieldBar", Vector3(0.62, 0.07, 0.14), Vector3(0, -0.10, 0.40), mat_steel)
+			_add_box(visuals_root, "BallisticChest", Vector3(0.58, 0.46, 0.16), Vector3(0, 0.84, 0.42), mat_gear)
+			for sx in [-1.0, 1.0]:
+				_add_box(visuals_root, "SWATPauldron", Vector3(0.20, 0.30, 0.38), Vector3(0.48 * sx, 1.02, 0.0), mat_gear, Vector3(0, 0, -16.0 * sx))
+		6: # GRAY_SABOTEUR: Night Spec-Ops Shooter (Stealth Hood + Dual-Tube Glowing Green NVG Goggles!)
+			var mat_nvg := StandardMaterial3D.new()
+			mat_nvg.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+			mat_nvg.albedo_color = Color(0.18, 1.0, 0.36)
+			_add_cyl(visuals_root, "StealthHelm", 0.42, 0.46, 0.24, Vector3(0, 1.56, -0.02), mat_gear, 16)
+			_add_box(visor_root, "NVGBridge", Vector3(0.28, 0.06, 0.10), Vector3(0, 0.08, 0.14), mat_gear)
+			for nx in [-0.11, 0.11]:
+				_add_cyl(visor_root, "NVGTube", 0.052, 0.052, 0.14, Vector3(nx, 0.05, 0.17), mat_gear, 10, Vector3(90, 0, 0))
+				_add_cyl(visor_root, "NVGLens", 0.040, 0.040, 0.03, Vector3(nx, 0.05, 0.24), mat_nvg, 10, Vector3(90, 0, 0))
+			_add_box(visuals_root, "StealthRig", Vector3(0.52, 0.28, 0.10), Vector3(0, 0.84, 0.40), mat_gear)
+		7: # GRAY_CLOAKER: Payday 2 Style Night Cloaker (Iconic Glowing 3-Lens Green Tri-NVG Goggles!)
+			var mat_clk := StandardMaterial3D.new()
+			mat_clk.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+			mat_clk.albedo_color = Color(0.12, 1.0, 0.28)
+			_add_cyl(visuals_root, "CloakerMask", 0.43, 0.46, 0.25, Vector3(0, 1.55, -0.01), mat_gear, 16)
+			_add_box(visor_root, "TriMount", Vector3(0.32, 0.18, 0.12), Vector3(0, 0.04, 0.14), mat_gear)
+			for pt in [Vector3(-0.11, 0.01, 0.20), Vector3(0.11, 0.01, 0.20), Vector3(0.0, 0.13, 0.20)]:
+				_add_cyl(visor_root, "CloakerTube", 0.048, 0.048, 0.12, pt, mat_gear, 10, Vector3(90, 0, 0))
+				_add_cyl(visor_root, "CloakerGlowLens", 0.038, 0.038, 0.03, pt + Vector3(0, 0, 0.06), mat_clk, 10, Vector3(90, 0, 0))
+			_add_box(visuals_root, "CloakerHarness", Vector3(0.54, 0.34, 0.12), Vector3(0, 0.84, 0.40), mat_gear)
 
 	return {
 		"body": body,
@@ -292,5 +329,33 @@ static func create(color: Color, enemy_type: int = 0) -> Node3D:
 			var snp := SniperModel.create()
 			snp.scale = Vector3(1.05, 1.05, 1.05)
 			weapon_mount.add_child(snp)
+		4: # Orange Engineer
+			var pst4 := PistolModel.create()
+			pst4.scale = Vector3(1.25, 1.25, 1.25)
+			pst4.rotation.y = PI
+			weapon_mount.add_child(pst4)
+		5: # Black Shield Breacher (Preview with Heavy Steel Riot Shield!)
+			var pst5 := PistolModel.create()
+			pst5.scale = Vector3(1.25, 1.25, 1.25)
+			pst5.rotation.y = PI
+			weapon_mount.add_child(pst5)
+			var m_sh := StandardMaterial3D.new(); m_sh.albedo_color = Color(0.11, 0.12, 0.14); m_sh.metallic = 0.82; m_sh.roughness = 0.38
+			var m_gl := StandardMaterial3D.new(); m_gl.albedo_color = Color(0.28, 0.56, 0.68, 0.55); m_gl.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+			_add_box(root, "PreviewShieldLow", Vector3(0.92, 0.96, 0.06), Vector3(0.12, 0.62, 0.68), m_sh)
+			_add_box(root, "PreviewShieldTop", Vector3(0.92, 0.34, 0.06), Vector3(0.12, 1.44, 0.68), m_sh)
+			_add_box(root, "PreviewShieldGlass", Vector3(0.56, 0.18, 0.04), Vector3(0.12, 1.18, 0.68), m_gl)
+		6: # Gray Saboteur Shooter (Suppressed Carbine)
+			var ak6 := AK47Model.create()
+			ak6.scale = Vector3(1.12, 1.12, 1.12)
+			ak6.rotation.y = PI
+			ak6.position = Vector3(0, 0.02, 0.05)
+			weapon_mount.add_child(ak6)
+			var m_sup := StandardMaterial3D.new(); m_sup.albedo_color = Color(0.08, 0.09, 0.10); m_sup.metallic = 0.80; m_sup.roughness = 0.35
+			_add_cyl(weapon_mount, "Suppressor", 0.028, 0.028, 0.24, Vector3(0, 0.02, 0.62), m_sup, 10, Vector3(90, 0, 0))
+		7: # Gray Cloaker (Glowing Tactical Shock Baton)
+			var m_bat := StandardMaterial3D.new(); m_bat.albedo_color = Color(0.10, 0.11, 0.12); m_bat.metallic = 0.85; m_bat.roughness = 0.28
+			var m_tip := StandardMaterial3D.new(); m_tip.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED; m_tip.albedo_color = Color(0.18, 1.0, 0.42)
+			_add_cyl(weapon_mount, "CloakerBaton", 0.024, 0.024, 0.68, Vector3(0, 0.06, 0.28), m_bat, 10, Vector3(62, 0, 0))
+			_add_cyl(weapon_mount, "BatonGlow", 0.028, 0.028, 0.10, Vector3(0, 0.22, 0.56), m_tip, 10, Vector3(62, 0, 0))
 			
 	return root

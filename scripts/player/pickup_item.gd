@@ -103,6 +103,7 @@ func pickup(player: Node3D) -> void:
 
 func play_sound(stream: AudioStream) -> void:
 	var sfx := AudioStreamPlayer.new()
+	sfx.bus = "SFX"
 	sfx.stream = stream
 	get_tree().root.add_child(sfx)
 	sfx.play()
